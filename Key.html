@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Generador de Claves</title>
+<style>
+  :root {
+    --ink: #12141f;
+    --card: #1c2033;
+    --border: #2c3150;
+    --parchment: #efe9da;
+    --gold: #e3b23c;
+    --jade: #3fa796;
+    --muted: #8b8fa3;
+    --danger: #d9534f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: -apple-system, "Inter", sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .wrap {
+    width: 100%;
+    max-width: 480px;
+    padding: 32px 20px 60px;
+  }
+  .orb {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--gold), var(--jade));
+    margin-bottom: 18px;
+    box-shadow: 0 0 24px rgba(227,178,60,0.35);
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 26px;
+    margin: 0 0 6px;
+  }
+  p.subtitle { color: var(--muted); font-size: 13.5px; margin: 0 0 28px; line-height: 1.5; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+  .tab.active { background: var(--card); color: var(--parchment); border-color: var(--jade); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  label {
+    display: block;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--jade);
+    font-weight: 700;
+    margin: 16px 0 6px;
+  }
+  select, input, textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 13px;
+    color: var(--parchment);
+    font-size: 14.5px;
+    outline: none;
+    font-family: inherit;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .chip {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .chip.selected { background: var(--jade); color: var(--ink); border-color: var(--jade); font-weight: 700; }
+
+  button.primary {
+    margin-top: 24px;
+    width: 100%;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    border-radius: 10px;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .result {
+    margin-top: 22px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: none;
+  }
+  .result.show { display: block; }
+  .result .row { margin-bottom: 10px; }
+  .result .row:last-child { margin-bottom: 0; }
+  .result .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .result .v { font-size: 14px; word-break: break-all; }
+  .result .v.mono { font-family: "SF Mono", Consolas, monospace; }
+  .copy-btn {
+    margin-top: 4px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--jade);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 11.5px;
+    cursor: pointer;
+  }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+  .badge.ok { background: rgba(63,167,150,0.18); color: var(--jade); }
+  .badge.bad { background: rgba(217,83,79,0.18); color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="orb"></div>
+  <h1>Generador de Claves</h1>
+  <p class="subtitle">Crea claves con caducidad y valídalas después. Las gratis duran máximo 1 día.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="generar">Generar</button>
+    <button class="tab" data-tab="validar">Validar</button>
+  </div>
+
+  <!-- GENERAR -->
+  <div class="panel active" id="panel-generar">
+    <label>Método</label>
+    <select id="metodo">
+      <option value="alfanumerico">Alfanumérico (letras y números)</option>
+      <option value="seguro">Seguro (letras, números y símbolos)</option>
+      <option value="pin">PIN (6 dígitos)</option>
+      <option value="frase">Frase (palabras separadas por guiones)</option>
+    </select>
+
+    <label>Plan</label>
+    <div class="chip-row" id="plan-chips">
+      <button class="chip selected" data-plan="gratis">Gratis (1 día)</button>
+      <button class="chip" data-plan="pago">Con duración elegida</button>
+    </div>
+
+    <div id="dias-wrap" style="display:none;">
+      <label>Duración</label>
+      <div class="chip-row" id="dias-chips">
+        <button class="chip" data-dias="1">1 día</button>
+        <button class="chip" data-dias="2">2 días</button>
+        <button class="chip" data-dias="5">5 días</button>
+        <button class="chip" data-dias="10">10 días</button>
+        <button class="chip" data-dias="30">30 días</button>
+      </div>
+    </div>
+
+    <button class="primary" id="btn-generar">Generar clave</button>
+
+    <div class="result" id="resultado-generar"></div>
+  </div>
+
+  <!-- VALIDAR -->
+  <div class="panel" id="panel-validar">
+    <label>Token a validar</label>
+    <textarea id="token-input" rows="4" placeholder="Pega aquí el token que quieres validar"></textarea>
+    <button class="primary" id="btn-validar">Validar</button>
+    <div class="result" id="resultado-validar"></div>
+  </div>
+</div>
+
+<script>
+// ---------- Config ----------
+// Cambia esta clave por una tuya propia y mantenla en secreto en producción real.
+const SECRET_KEY = "cambia-esta-clave-por-una-tuya-bien-larga";
+const DIAS_PERMITIDOS = [1, 2, 5, 10, 30];
+const PALABRAS = ["sol","rio","luna","monte","mar","cielo","roca","viento","fuego","hoja","nube","arena","valle","torre","faro","isla"];
+
+// ---------- Utilidades criptográficas (HMAC-SHA256 vía SubtleCrypto) ----------
+function b64urlEncode(bytes) {
+  let str = "";
+  bytes.forEach(b => str += String.fromCharCode(b));
+  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function b64urlDecodeToBytes(str) {
+  str = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (str.length % 4) str += "=";
+  const bin = atob(str);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+async function hmacSign(message) {
+  const enc = new TextEncoder();
+  const keyData = enc.encode(SECRET_KEY);
+  const cryptoKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", cryptoKey, enc.encode(message));
+  return new Uint8Array(sig).slice(0, 8); // igual que el script de Python: 8 bytes
+}
+
+// ---------- Generación de secretos ----------
+function randInt(max) {
+  const arr = new Uint32Array(1);
+  crypto.getRandomValues(arr);
+  return arr[0] % max;
+}
+function generarTexto(metodo) {
+  const longitud = 12;
+  if (metodo === "alfanumerico") {
+    const alf = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let out = ""; for (let i = 0; i < longitud; i++) out += alf[randInt(alf.length)];
+    return out;
+  }
+  if (metodo === "seguro") {
+    const alf = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*-_";
+    let out = ""; for (let i = 0; i < longitud; i++) out += alf[randInt(alf.length)];
+    return out;
+  }
+  if (metodo === "pin") {
+    let out = ""; for (let i = 0; i < 6; i++) out += randInt(10);
+    return out;
+  }
+  if (metodo === "frase") {
+    const copia = [...PALABRAS];
+    const elegidas = [];
+    for (let i = 0; i < 4; i++) {
+      const idx = randInt(copia.length);
+      elegidas.push(copia.splice(idx, 1)[0]);
+    }
+    return elegidas.join("-") + "-" + (100 + randInt(900));
+  }
+  throw new Error("Método desconocido");
+}
+
+// ---------- Generar clave con caducidad ----------
+async function generarClave(metodo, dias, esGratis) {
+  if (esGratis) dias = 1;
+  if (!DIAS_PERMITIDOS.includes(dias)) throw new Error("Duración inválida");
+
+  const valor = generarTexto(metodo);
+  const creado = Math.floor(Date.now() / 1000);
+  const expira = creado + dias * 86400;
+
+  const payload = { v: valor, m: metodo, c: creado, e: expira, g: esGratis };
+  const payloadStr = JSON.stringify(payload);
+  const payloadBytes = new TextEncoder().encode(payloadStr);
+  const firma = await hmacSign(payloadStr);
+
+  const token = b64urlEncode(payloadBytes) + "." + b64urlEncode(firma);
+  return {
+    clave_visible: valor,
+    token_validable: token,
+    metodo, dias,
+    expira_en: new Date(expira * 1000).toLocaleString("es-ES"),
+  };
+}
+
+// ---------- Validar token ----------
+async function validarClave(token) {
+  const partes = token.trim().split(".");
+  if (partes.length !== 2) return { valido: false, motivo: "Formato de token inválido" };
+
+  let payloadBytes, firmaRecibida;
+  try {
+    payloadBytes = b64urlDecodeToBytes(partes[0]);
+    firmaRecibida = b64urlDecodeToBytes(partes[1]);
+  } catch (e) {
+    return { valido: false, motivo: "Formato de token inválido" };
+  }
+
+  const payloadStr = new TextDecoder().decode(payloadBytes);
+  const firmaEsperada = await hmacSign(payloadStr);
+
+  if (firmaRecibida.length !== firmaEsperada.length ||
+      !firmaRecibida.every((b, i) => b === firmaEsperada[i])) {
+    return { valido: false, motivo: "Firma inválida, el token fue alterado" };
+  }
+
+  const payload = JSON.parse(payloadStr);
+  const ahora = Math.floor(Date.now() / 1000);
+
+  if (ahora > payload.e) {
+    return { valido: false, motivo: "La clave ha caducado", expiro_en: new Date(payload.e * 1000).toLocaleString("es-ES") };
+  }
+
+  return {
+    valido: true,
+    motivo: "Clave vigente",
+    clave_visible: payload.v,
+    metodo: payload.m,
+    expira_en: new Date(payload.e * 1000).toLocaleString("es-ES"),
+    es_gratis: payload.g,
+  };
+}
+
+// ---------- UI ----------
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById("panel-" + tab.dataset.tab).classList.add("active");
+  });
+});
+
+let planSeleccionado = "gratis";
+let diasSeleccionado = 1;
+
+document.querySelectorAll("#plan-chips .chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#plan-chips .chip").forEach(c => c.classList.remove("selected"));
+    chip.classList.add("selected");
+    planSeleccionado = chip.dataset.plan;
+    document.getElementById("dias-wrap").style.display = planSeleccionado === "pago" ? "block" : "none";
+  });
+});
+
+document.querySelectorAll("#dias-chips .chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll("#dias-chips .chip").forEach(c => c.classList.remove("selected"));
+    chip.classList.add("selected");
+    diasSeleccionado = parseInt(chip.dataset.dias, 10);
+  });
+});
+
+document.getElementById("btn-generar").addEventListener("click", async () => {
+  const metodo = document.getElementById("metodo").value;
+  const esGratis = planSeleccionado === "gratis";
+  const dias = esGratis ? 1 : diasSeleccionado;
+
+  const btn = document.getElementById("btn-generar");
+  btn.disabled = true;
+  btn.textContent = "Generando…";
+
+  try {
+    const r = await generarClave(metodo, dias, esGratis);
+    const el = document.getElementById("resultado-generar");
+    el.innerHTML = `
+      <div class="row"><div class="k">Clave visible</div><div class="v mono">${r.clave_visible}</div></div>
+      <div class="row"><div class="k">Método</div><div class="v">${r.metodo}</div></div>
+      <div class="row"><div class="k">Expira</div><div class="v">${r.expira_en}</div></div>
+      <div class="row">
+        <div class="k">Token validable</div>
+        <div class="v mono" id="token-out">${r.token_validable}</div>
+        <button class="copy-btn" id="copy-btn">Copiar token</button>
+      </div>
+    `;
+    el.classList.add("show");
+    document.getElementById("copy-btn").addEventListener("click", () => {
+      navigator.clipboard.writeText(r.token_validable);
+      document.getElementById("copy-btn").textContent = "¡Copiado!";
+    });
+  } catch (e) {
+    alert(e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Generar clave";
+  }
+});
+
+document.getElementById("btn-validar").addEventListener("click", async () => {
+  const token = document.getElementById("token-input").value;
+  if (!token.trim()) return;
+  const r = await validarClave(token);
+  const el = document.getElementById("resultado-validar");
+
+  if (r.valido) {
+    el.innerHTML = `
+      <div class="row"><span class="badge ok">VÁLIDA</span></div>
+      <div class="row"><div class="k">Clave</div><div class="v mono">${r.clave_visible}</div></div>
+      <div class="row"><div class="k">Método</div><div class="v">${r.metodo}</div></div>
+      <div class="row"><div class="k">Expira</div><div class="v">${r.expira_en}</div></div>
+      <div class="row"><div class="k">Plan</div><div class="v">${r.es_gratis ? "Gratis" : "Con duración elegida"}</div></div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="row"><span class="badge bad">NO VÁLIDA</span></div>
+      <div class="row"><div class="k">Motivo</div><div class="v">${r.motivo}</div></div>
+      ${r.expiro_en ? `<div class="row"><div class="k">Expiró en</div><div class="v">${r.expiro_en}</div></div>` : ""}
+    `;
+  }
+  el.classList.add("show");
+});
+</script>
+</body>
+          </html>
+          
