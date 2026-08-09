@@ -1,0 +1,1066 @@
+<html style="margin:0;padding:0;">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0f">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+(function(){
+  var s = document.createElement('style');
+  s.textContent = `
+:root{
+  --bg:#0a0a0f;
+  --bg-2:#12121a;
+  --card:rgba(255,255,255,.04);
+  --card-strong:rgba(255,255,255,.07);
+  --text:#f5f5f7;
+  --muted:#a1a1aa;
+  --accent:#a78bfa;
+  --accent-2:#fbbf24;
+  --accent-soft:rgba(167,139,250,.15);
+  --accent-2-soft:rgba(251,191,36,.12);
+  --border:rgba(255,255,255,.08);
+  --border-strong:rgba(255,255,255,.14);
+  --danger:#f87171;
+  --danger-soft:rgba(248,113,113,.12);
+  --success:#4ade80;
+  --success-soft:rgba(74,222,128,.12);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;width:100%;overflow-x:hidden}
+body{
+  font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(167,139,250,.18), transparent 60%),
+    radial-gradient(900px 700px at 110% 10%, rgba(251,191,36,.10), transparent 55%),
+    radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.10), transparent 50%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at center, black 40%, transparent 80%);
+  pointer-events:none;
+  z-index:0;
+}
+.app{position:relative;z-index:1}
+.glass{
+  background:var(--card);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+}
+.glass-strong{
+  background:var(--card-strong);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border:1px solid var(--border-strong);
+}
+.gradient-text{
+  background:linear-gradient(135deg, #c4b5fd 0%, #fbbf24 50%, #f0abfc 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.btn-primary{
+  background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  color:white;border:none;min-height:44px;
+  box-shadow:0 8px 24px -8px rgba(139,92,246,.6), inset 0 1px 0 rgba(255,255,255,.2);
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  touch-action:manipulation;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 32px -10px rgba(139,92,246,.75)}
+.btn-primary:active{transform:translateY(0);filter:brightness(.95)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-gold{
+  background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  color:#1c1917;border:none;font-weight:600;min-height:44px;
+  box-shadow:0 8px 24px -8px rgba(245,158,11,.55), inset 0 1px 0 rgba(255,255,255,.3);
+  transition:all .25s cubic-bezier(.4,0,.2,1);
+  touch-action:manipulation;
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 32px -10px rgba(245,158,11,.7)}
+.btn-gold:active{transform:translateY(0);filter:brightness(.95)}
+.btn-gold:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-ghost{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);color:var(--muted);min-height:44px;
+  transition:all .2s ease;touch-action:manipulation;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.08);color:var(--text);border-color:var(--border-strong)}
+.btn-soft{
+  background:var(--accent-soft);color:var(--accent);min-height:40px;
+  border:1px solid rgba(167,139,250,.2);transition:all .2s ease;touch-action:manipulation;
+}
+.btn-soft:hover{background:rgba(167,139,250,.25)}
+.btn-danger{
+  background:var(--danger-soft);color:var(--danger);min-height:40px;
+  border:1px solid rgba(248,113,113,.25);transition:all .2s ease;touch-action:manipulation;
+}
+.btn-danger:hover{background:rgba(248,113,113,.22)}
+.btn-icon{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);
+  min-width:40px;min-height:40px;transition:all .18s ease;touch-action:manipulation;
+}
+.btn-icon:hover{background:rgba(255,255,255,.09);color:var(--text);border-color:var(--border-strong)}
+.input{
+  background:rgba(0,0,0,.3);border:1px solid var(--border);color:var(--text);
+  min-height:48px;font-size:16px !important;
+  transition:all .2s ease;border-radius:14px;padding:12px 14px;width:100%;
+}
+.input::placeholder{color:#71717a}
+.input:focus{
+  outline:none;
+  border-color:rgba(167,139,250,.55);
+  box-shadow:0 0 0 4px rgba(167,139,250,.12);
+  background:rgba(0,0,0,.4);
+}
+.input-red{
+  border-color:rgba(248,113,113,.22);
+}
+.input-red:focus{
+  border-color:rgba(248,113,113,.5);
+  box-shadow:0 0 0 4px rgba(248,113,113,.12);
+}
+input[type="file"]{display:none}
+.file-label{
+  cursor:pointer;min-height:160px;
+  border:2px dashed rgba(167,139,250,.35);
+  background:rgba(167,139,250,.05);
+  transition:all .25s ease;border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:24px 14px;text-align:center;color:var(--muted);
+  touch-action:manipulation;
+}
+.file-label:hover,.file-label:active{
+  border-color:rgba(167,139,250,.6);
+  background:rgba(167,139,250,.09);color:var(--text);
+}
+.file-label.has-image{
+  border-style:solid;padding:8px;min-height:0;background:rgba(0,0,0,.3);
+}
+.card-hover{
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  position:relative;overflow:hidden;
+}
+.card-hover::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(600px circle at var(--x,50%) var(--y,0%), rgba(167,139,250,.12), transparent 40%);
+  opacity:0;transition:opacity .4s ease;pointer-events:none;
+}
+.card-hover:hover::before{opacity:1}
+.card-hover:hover{
+  transform:translateY(-3px);
+  border-color:rgba(167,139,250,.3);
+  box-shadow:0 20px 50px -18px rgba(0,0,0,.65), 0 0 0 1px rgba(167,139,250,.15);
+}
+.stat-card{position:relative;overflow:hidden}
+.fade-in{animation:fadeIn .5s cubic-bezier(.4,0,.2,1) both}
+.fade-in-1{animation-delay:.05s}.fade-in-2{animation-delay:.12s}
+.fade-in-3{animation-delay:.2s}.fade-in-4{animation-delay:.28s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.shine{position:relative;overflow:hidden}
+.shine::after{
+  content:"";position:absolute;top:0;left:-100%;width:50%;height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+  transition:left .7s ease;
+}
+.shine:hover::after{left:150%}
+.gallery-item{position:relative;overflow:hidden;border-radius:18px}
+.gallery-item img{
+  transition:opacity .3s ease;width:100%;height:100%;object-fit:cover;display:block;
+}
+.gallery-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg, transparent 45%, rgba(0,0,0,.85) 100%);
+  opacity:0;transition:opacity .3s ease;
+  display:flex;align-items:flex-end;padding:16px;
+}
+.gallery-item:hover .gallery-overlay,
+.gallery-item:active .gallery-overlay{opacity:1}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;border-radius:999px;font-size:11px;
+  font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+}
+.section-title{
+  display:flex;align-items:center;gap:12px;
+  font-weight:700;letter-spacing:-.02em;flex-wrap:wrap;
+}
+.section-title .dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  box-shadow:0 0 12px rgba(167,139,250,.6);
+}
+.empty-state{
+  border:1px dashed var(--border-strong);
+  background:repeating-linear-gradient(45deg, rgba(255,255,255,.015) 0 12px, transparent 12px 24px);
+}
+.progress-bar{height:6px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06)}
+.progress-bar > div{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  transition:width .3s ease;
+}
+.spinner{
+  width:18px;height:18px;border:2.5px solid rgba(255,255,255,.25);
+  border-top-color:white;border-radius:50%;
+  animation:spin .7s linear infinite;display:inline-block;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.locked-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:999px;font-size:10.5px;
+  background:rgba(248,113,113,.12);color:#fca5a5;
+  border:1px solid rgba(248,113,113,.25);font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.unlocked-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:999px;font-size:10.5px;
+  background:var(--success-soft);color:var(--success);
+  border:1px solid rgba(74,222,128,.3);font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.public-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:999px;font-size:10px;
+  background:var(--success-soft);color:var(--success);font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.unlock-box{
+  margin-top:12px;padding:12px;border-radius:12px;
+  background:rgba(0,0,0,.25);border:1px solid var(--border);
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.unlock-box input{flex:1;min-width:140px;min-height:42px;font-size:16px}
+.unlock-box button{min-height:42px}
+.blur-content{
+  filter:blur(14px) brightness(.7);
+  user-select:none;
+  -webkit-user-select:none;
+  pointer-events:none;
+}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.18)}
+@media (max-width:640px){
+  .section-title{font-size:1.1rem !important}
+  h1{font-size:2rem !important;line-height:1.15 !important}
+  .gallery-overlay{opacity:1;background:linear-gradient(180deg, transparent 55%, rgba(0,0,0,.85) 100%)}
+}
+`;
+  document.head.appendChild(s);
+})();
+</script>
+<div style="background-color:transparent;box-sizing:border-box;">
+<div class="app">
+
+  <!-- ==================== LOGIN ADMIN ==================== -->
+  <div id="loginScreen" class="hidden">
+    <div class="flex items-center justify-center px-4 py-16 sm:py-24">
+      <div class="w-full max-w-md glass-strong rounded-3xl p-6 sm:p-8 fade-in shadow-2xl shine">
+        <div class="text-center mb-7">
+          <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-5 rounded-2xl flex items-center justify-center"
+               style="background:linear-gradient(135deg, rgba(167,139,250,.25), rgba(251,191,36,.18));border:1px solid rgba(167,139,250,.3);box-shadow:0 12px 40px -10px rgba(167,139,250,.4)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="url(#lg)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>
+              <rect x="3" y="11" width="18" height="11" rx="2.5"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold mb-2">Panel <span class="gradient-text">Privado</span></h1>
+          <p style="color:var(--muted)" class="text-sm">Ingresa tu contraseña para administrar</p>
+        </div>
+        <div class="space-y-4">
+          <div class="relative">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input id="passwordInput" type="password" placeholder="Contraseña" autocomplete="current-password" class="input w-full pl-12 pr-4">
+          </div>
+          <p id="loginError" class="text-sm text-red-400 hidden pl-1">✗ Contraseña incorrecta</p>
+          <button onclick="doLogin()" class="btn-primary shine w-full py-3 rounded-xl font-semibold text-[15px]">Entrar al panel</button>
+          <button onclick="showPublic()" class="btn-ghost w-full py-3 rounded-xl font-medium text-sm">← Ver sitio público</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PANEL ADMIN ==================== -->
+  <div id="adminScreen" class="hidden max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-8 sm:mb-10 fade-in">
+      <div>
+        <div class="chip mb-2 sm:mb-3" style="background:var(--accent-soft);color:var(--accent)">
+          <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+          MODO ADMINISTRADOR
+        </div>
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight">
+          Tu <span class="gradient-text">Centro de Control</span>
+        </h1>
+        <p style="color:var(--muted)" class="mt-1.5 text-sm sm:text-[15px]">Enlaces y fotos · todo con contraseña opcional · guardado permanente</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="showPublic()" class="btn-soft px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span class="hidden sm:inline">Ver sitio</span><span class="sm:hidden">Ver</span>
+        </button>
+        <button onclick="logout()" class="btn-danger px-4 sm:px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span class="hidden sm:inline">Salir</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-8 sm:mb-10">
+      <div class="stat-card glass-strong rounded-2xl p-5 sm:p-6 fade-in fade-in-1"
+           style="background:linear-gradient(135deg, rgba(167,139,250,.12), rgba(139,92,246,.04));">
+        <div style="position:absolute;top:-40%;right:-10%;width:180px;height:180px;background:#8b5cf6;filter:blur(70px);opacity:.3;border-radius:50%"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center" style="background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.3)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </div>
+            <span class="chip" style="background:rgba(167,139,250,.15);color:#c4b5fd">URLS</span>
+          </div>
+          <p class="text-xs sm:text-sm mb-1" style="color:var(--muted)">Enlaces guardados</p>
+          <p id="statUrls" class="text-3xl sm:text-4xl font-extrabold tracking-tight">0</p>
+        </div>
+      </div>
+      <div class="stat-card glass-strong rounded-2xl p-5 sm:p-6 fade-in fade-in-2"
+           style="background:linear-gradient(135deg, rgba(251,191,36,.10), rgba(245,158,11,.03));">
+        <div style="position:absolute;top:-40%;right:-10%;width:180px;height:180px;background:#f59e0b;filter:blur(70px);opacity:.25;border-radius:50%"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center" style="background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.3)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <span class="chip" style="background:rgba(251,191,36,.15);color:#fcd34d">FOTOS</span>
+          </div>
+          <p class="text-xs sm:text-sm mb-1" style="color:var(--muted)">Imágenes publicadas</p>
+          <p id="statImages" class="text-3xl sm:text-4xl font-extrabold tracking-tight">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ APARTADO: SUBIR URL + SU CONTRASEÑA ============ -->
+    <div class="glass-strong rounded-3xl p-5 sm:p-7 mb-5 sm:mb-6 fade-in fade-in-2 card-hover">
+      <div class="section-title text-lg sm:text-xl mb-4 sm:mb-5">
+        <span class="dot"></span>
+        Agregar nuevo enlace
+        <span class="chip ml-auto" style="background:rgba(248,113,113,.1);color:#fca5a5;font-size:10px">
+          🔒 con contraseña propia
+        </span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+        <input id="urlTitle" type="text" placeholder="Título del enlace *" class="input md:col-span-3">
+        <input id="urlLink" type="url" placeholder="https://tu-enlace.com *" class="input md:col-span-5">
+        <input id="urlDesc" type="text" placeholder="Descripción (opcional)" class="input md:col-span-4">
+        <div class="md:col-span-6 relative">
+          <svg class="absolute left-4 top-1/2 -translate-y-1/2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input id="urlPass" type="password" placeholder="🔒 Contraseña para ESTE enlace (opcional · vacío = público)"
+                 class="input input-red w-full pl-12 pr-16">
+          <button type="button" onclick="togglePass('urlPass',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs px-2.5 py-1.5 rounded-lg" style="color:var(--muted);background:rgba(255,255,255,.05);min-height:32px">Ver</button>
+        </div>
+        <div class="md:col-span-6 flex items-end">
+          <button onclick="addUrl()" class="btn-primary shine w-full md:w-auto px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Guardar enlace
+          </button>
+        </div>
+      </div>
+      <p class="text-[11px] sm:text-xs mt-3" style="color:var(--muted)">
+        💡 Cada enlace puede tener <b>su propia contraseña distinta</b>. La gente tendrá que escribirla para verlo.
+      </p>
+    </div>
+
+    <!-- ============ APARTADO: SUBIR FOTO + SU CONTRASEÑA (MISMO FORMATO) ============ -->
+    <div class="glass-strong rounded-3xl p-5 sm:p-7 mb-8 sm:mb-10 fade-in fade-in-3 card-hover">
+      <div class="section-title text-lg sm:text-xl mb-4 sm:mb-5">
+        <span class="dot" style="background:linear-gradient(135deg,var(--accent-2),#f472b6)"></span>
+        Subir foto desde mi dispositivo
+        <span class="chip ml-auto" style="background:rgba(248,113,113,.1);color:#fca5a5;font-size:10px">
+          🔒 también con contraseña propia
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4">
+        <!-- Columna IZQ: seleccionar foto -->
+        <div class="md:col-span-5">
+          <input type="file" id="imgFile" accept="image/*" capture="environment" onchange="previewImage(this)">
+          <label for="imgFile" id="imgFileLabel" class="file-label">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--accent)">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <div>
+              <div class="font-semibold text-[14.5px] sm:text-[15px]" style="color:var(--text)">Toca para seleccionar foto</div>
+              <div class="text-[11px] sm:text-xs mt-1">JPG · PNG · WEBP · optimizada automáticamente</div>
+            </div>
+          </label>
+          <div id="uploadProgress" class="hidden mt-3">
+            <div class="flex justify-between text-xs mb-1.5" style="color:var(--muted)">
+              <span id="progressText">Procesando...</span><span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar"><div id="progressBar"></div></div>
+          </div>
+        </div>
+
+        <!-- Columna DER: TÍTULO + DESCRIPCIÓN + ENLACE + CONTRASEÑA (MISMO ESTILO QUE URLS) -->
+        <div class="md:col-span-7 space-y-3">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <input id="imgTitle" type="text" placeholder="Título de la foto *" class="input md:col-span-5">
+            <input id="imgDesc" type="text" placeholder="Descripción (opcional) · igual que en los enlaces" class="input md:col-span-7">
+          </div>
+          <input id="imgLink" type="url" placeholder="Abrir al hacer clic (opcional · https://...)">
+
+          <!-- AQUÍ ESTÁ LA CONTRASEÑA, IGUAL QUE EN EL APARTADO DE ARRIBA -->
+          <div class="relative">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input id="imgPass" type="password" placeholder="🔒 Contraseña para ESTA foto (opcional · vacío = público)"
+                   class="input input-red w-full pl-12 pr-16">
+            <button type="button" onclick="togglePass('imgPass',this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs px-2.5 py-1.5 rounded-lg" style="color:var(--muted);background:rgba(255,255,255,.05);min-height:32px">Ver</button>
+          </div>
+
+          <div class="p-3 rounded-xl text-[11px] sm:text-xs flex items-start gap-3"
+               style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.15);color:#c4b5fd">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="flex-shrink-0 mt-0.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M12 22V12"/></svg>
+            <div>
+              <b>Listo:</b> seleccionas la foto → pones título, descripción, enlace <b>y su contraseña</b> (si quieres) →
+              el HTML lo guarda todo junto. Se ve bien en celular, tablet y PC.
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button id="btnSaveImage" onclick="addImage()" disabled
+                    class="btn-gold shine px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Publicar foto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ LISTA URLs ============ -->
+    <div class="mb-10 sm:mb-12 fade-in fade-in-3">
+      <div class="flex items-end justify-between mb-4 sm:mb-5">
+        <h2 class="section-title text-xl sm:text-2xl">
+          <span class="dot"></span>
+          Mis Enlaces
+          <span id="urlCount" class="text-sm font-normal ml-2" style="color:var(--muted)"></span>
+        </h2>
+      </div>
+      <div id="urlsList" class="space-y-3"></div>
+    </div>
+
+    <!-- ============ LISTA FOTOS ============ -->
+    <div class="mb-14 sm:mb-16 fade-in fade-in-4">
+      <div class="flex items-end justify-between mb-4 sm:mb-5">
+        <h2 class="section-title text-xl sm:text-2xl">
+          <span class="dot" style="background:linear-gradient(135deg,var(--accent-2),#f472b6)"></span>
+          Mi Galería
+          <span id="imgCount" class="text-sm font-normal ml-2" style="color:var(--muted)"></span>
+        </h2>
+      </div>
+      <div id="imagesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5"></div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="glass rounded-3xl p-5 sm:p-6 fade-in"
+         style="border:1px solid rgba(248,113,113,.25);background:linear-gradient(135deg, rgba(248,113,113,.06), transparent)">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+               style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-base sm:text-lg text-red-300">Zona de peligro</h3>
+            <p class="text-xs sm:text-sm mt-1" style="color:var(--muted)">Elimina TODO permanentemente.</p>
+          </div>
+        </div>
+        <button onclick="clearAll()" class="btn-danger px-5 sm:px-6 py-3 rounded-xl font-semibold text-sm flex items-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          Borrar todo
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SITIO PÚBLICO ==================== -->
+  <div id="publicScreen" class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20">
+    <div class="text-center mb-12 sm:mb-16 fade-in">
+      <button onclick="showLogin()" class="chip mb-5 sm:mb-6 btn-ghost" style="border-color:var(--border-strong);min-height:34px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Administrar
+      </button>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-4 sm:mb-5">
+        Mi <span class="gradient-text">Espacio</span>
+      </h1>
+      <p class="text-base sm:text-lg md:text-xl max-w-2xl mx-auto" style="color:var(--muted)">
+        Mis enlaces y fotos. Algunos son privados con contraseña.
+      </p>
+    </div>
+    <div id="publicUrls" class="mb-16 sm:mb-20"></div>
+    <div id="publicImages"></div>
+  </div>
+
+</div>
+
+<script>
+// ============== CONFIG ==============
+const ADMIN_PASSWORD = "1";
+const STORAGE_KEY = "admin_panel_data_v3";
+const AUTH_KEY = "admin_panel_auth_v3";
+const UNLOCKED_KEY = "unlocked_items_v3";
+const MAX_IMAGE_WIDTH = 1600;
+const JPEG_QUALITY = 0.78;
+
+let pendingImageBase64 = null;
+
+// ============== STORAGE ==============
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { urls: [], images: [] };
+    const d = JSON.parse(raw);
+    return { urls: d.urls || [], images: d.images || [] };
+  }catch(e){ return { urls:[], images:[] }; }
+}
+function saveData(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function getData(){ return loadData(); }
+function setData(d){ saveData(d); refreshAll(); }
+function getUnlocked(){ try{ return JSON.parse(localStorage.getItem(UNLOCKED_KEY)||"{}"); }catch(e){ return {}; } }
+function setUnlocked(u){ localStorage.setItem(UNLOCKED_KEY, JSON.stringify(u)); }
+
+// ============== AUTH ==============
+function isAuthed(){ return sessionStorage.getItem(AUTH_KEY) === "1"; }
+function doLogin(){
+  const v = document.getElementById("passwordInput").value;
+  if(v === ADMIN_PASSWORD){
+    sessionStorage.setItem(AUTH_KEY,"1");
+    document.getElementById("loginError").classList.add("hidden");
+    showAdmin();
+  }else{
+    document.getElementById("loginError").classList.remove("hidden");
+  }
+}
+function logout(){ sessionStorage.removeItem(AUTH_KEY); showPublic(); }
+
+// ============== SCREENS ==============
+function hideAll(){
+  ["loginScreen","adminScreen","publicScreen"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+}
+function showLogin(){
+  hideAll();
+  document.getElementById("loginScreen").classList.remove("hidden");
+  const el = document.getElementById("passwordInput"); el.value="";
+  setTimeout(()=>el.focus(),60);
+}
+function showAdmin(){
+  if(!isAuthed()){ showLogin(); return; }
+  hideAll();
+  document.getElementById("adminScreen").classList.remove("hidden");
+  resetImageForm();
+  refreshAll();
+  setupCardGlow();
+}
+function showPublic(){
+  hideAll();
+  document.getElementById("publicScreen").classList.remove("hidden");
+  renderPublic();
+}
+
+// ============== COMPRIMIR IMAGEN ==============
+function setProgress(p,text){
+  document.getElementById("uploadProgress").classList.remove("hidden");
+  document.getElementById("progressBar").style.width = p+"%";
+  document.getElementById("progressPercent").textContent = Math.round(p)+"%";
+  if(text) document.getElementById("progressText").textContent = text;
+}
+function hideProgress(){
+  document.getElementById("uploadProgress").classList.add("hidden");
+  document.getElementById("progressBar").style.width = "0%";
+}
+function compressImage(file){
+  return new Promise((res,rej)=>{
+    if(!file || !file.type.startsWith("image/")){ rej("No es imagen"); return; }
+    setProgress(10,"Leyendo...");
+    const r = new FileReader();
+    r.onerror = ()=>rej("Error lectura");
+    r.onload = e=>{
+      setProgress(30,"Decodificando...");
+      const img = new Image();
+      img.onerror = ()=>rej("Formato no válido");
+      img.onload = ()=>{
+        setProgress(55,"Redimensionando...");
+        requestAnimationFrame(()=>{
+          try{
+            let w=img.naturalWidth, h=img.naturalHeight;
+            if(w>MAX_IMAGE_WIDTH){ h=Math.round(h*(MAX_IMAGE_WIDTH/w)); w=MAX_IMAGE_WIDTH; }
+            const c = document.createElement("canvas"); c.width=w; c.height=h;
+            const ctx = c.getContext("2d");
+            ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+            ctx.drawImage(img,0,0,w,h);
+            setProgress(82,"Comprimiendo...");
+            requestAnimationFrame(()=>{
+              try{
+                const b64 = c.toDataURL("image/jpeg", JPEG_QUALITY);
+                const kb = Math.round((b64.length*0.75)/1024);
+                setProgress(100,`Listo · ${kb} KB · ${w}×${h}`);
+                setTimeout(hideProgress,900);
+                res({data:b64,width:w,height:h,sizeKB:kb});
+              }catch(err){rej("Error compresión")}
+            });
+          }catch(err){rej("Error procesamiento")}
+        });
+      };
+      img.src = e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+async function previewImage(input){
+  const file = input.files[0];
+  const label = document.getElementById("imgFileLabel");
+  const btn = document.getElementById("btnSaveImage");
+  pendingImageBase64 = null; btn.disabled = true;
+  if(!file){ resetImageForm(); return; }
+  try{
+    const r = await compressImage(file);
+    pendingImageBase64 = r.data;
+    label.classList.add("has-image");
+    label.innerHTML = `
+      <div style="position:relative;width:100%;max-height:240px;overflow:hidden;border-radius:12px">
+        <img src="${r.data}" style="width:100%;height:auto;display:block">
+        <div style="position:absolute;top:8px;left:8px" class="chip"
+             style="background:rgba(0,0,0,.65);color:white;backdrop-filter:blur(6px)">
+          ✓ ${r.width}×${r.height} · ${r.sizeKB} KB
+        </div>
+      </div>
+      <div class="text-[11px] sm:text-xs mt-2" style="color:var(--success)">
+        ✔ Lista para publicar · toca para cambiar
+      </div>`;
+    btn.disabled = false;
+  }catch(err){
+    alert("❌ "+err); hideProgress(); resetImageForm();
+  }
+}
+function resetImageForm(){
+  pendingImageBase64=null;
+  ["imgFile","imgTitle","imgDesc","imgLink","imgPass"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+  const b = document.getElementById("btnSaveImage"); if(b) b.disabled=true;
+  const l = document.getElementById("imgFileLabel"); if(!l) return;
+  l.classList.remove("has-image");
+  l.innerHTML = `
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="color:var(--accent)">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+      <polyline points="17 8 12 3 7 8"/>
+      <line x1="12" y1="3" x2="12" y2="15"/>
+    </svg>
+    <div>
+      <div class="font-semibold text-[14.5px] sm:text-[15px]" style="color:var(--text)">Toca para seleccionar foto</div>
+      <div class="text-[11px] sm:text-xs mt-1">JPG · PNG · optimizada</div>
+    </div>`;
+  hideProgress();
+}
+function togglePass(id,btn){
+  const el = document.getElementById(id);
+  if(el.type==="password"){ el.type="text"; btn.textContent="Ocultar"; }
+  else{ el.type="password"; btn.textContent="Ver"; }
+}
+
+// ============== URLs CRUD ==============
+function addUrl(){
+  const title = document.getElementById("urlTitle").value.trim();
+  const link = document.getElementById("urlLink").value.trim();
+  const desc = document.getElementById("urlDesc").value.trim();
+  const pass = document.getElementById("urlPass").value.trim();
+  if(!title || !link){ alert("⚠️ Título y enlace son obligatorios"); return; }
+  const d = getData();
+  d.urls.unshift({ id: Date.now(), title, link, desc, password: pass });
+  setData(d);
+  ["urlTitle","urlLink","urlDesc","urlPass"].forEach(id=>document.getElementById(id).value="");
+}
+function deleteUrl(id){ if(!confirm("¿Borrar este enlace?")) return; const d=getData(); d.urls=d.urls.filter(u=>u.id!==id); setData(d); }
+function editUrl(id){
+  const d=getData(); const u=d.urls.find(x=>x.id===id); if(!u) return;
+  const nt=prompt("Título:",u.title); if(nt===null) return;
+  const nl=prompt("Enlace:",u.link); if(nl===null) return;
+  const nd=prompt("Descripción (opcional):",u.desc||""); if(nd===null) return;
+  const np=prompt("🔒 CONTRASEÑA de este enlace (opcional · vacío = público):\n\n(actual: "+(u.password?"••••"+u.password.slice(-2):"NINGUNA / público")+")", u.password||"");
+  if(np===null) return;
+  u.title=nt.trim(); u.link=nl.trim(); u.desc=nd.trim(); u.password=np.trim();
+  if(!u.title||!u.link){ alert("Título y enlace obligatorios"); return; }
+  setData(d);
+}
+function moveUrl(id,dir){
+  const d=getData(); const i=d.urls.findIndex(u=>u.id===id); const j=i+dir;
+  if(i<0||j<0||j>=d.urls.length) return;
+  [d.urls[i],d.urls[j]]=[d.urls[j],d.urls[i]]; setData(d);
+}
+
+// ============== IMÁGENES CRUD (AHORA CON DESCRIPCIÓN + CONTRASEÑA) ==============
+async function addImage(){
+  const title = document.getElementById("imgTitle").value.trim();
+  const desc = document.getElementById("imgDesc").value.trim();
+  const link = document.getElementById("imgLink").value.trim();
+  const pass = document.getElementById("imgPass").value.trim();
+  if(!title){ alert("Escribe un título"); return; }
+  if(!pendingImageBase64){ alert("Selecciona una foto de tu dispositivo"); return; }
+  const btn = document.getElementById("btnSaveImage");
+  btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> Guardando...`;
+  await new Promise(r=>setTimeout(r,180));
+  const d = getData();
+  d.images.unshift({
+    id: Date.now(),
+    title,
+    desc,      // <-- NUEVO: descripción, igual que las URLs
+    link,
+    password: pass, // <-- NUEVO: contraseña PROPIA de la foto
+    data: pendingImageBase64
+  });
+  setData(d);
+  resetImageForm();
+}
+function deleteImage(id){ if(!confirm("¿Borrar esta foto?")) return; const d=getData(); d.images=d.images.filter(i=>i.id!==id); setData(d); }
+async function editImage(id){
+  const d=getData(); const im=d.images.find(x=>x.id===id); if(!im) return;
+  const nt=prompt("Título:",im.title); if(nt===null) return;
+  const nd=prompt("Descripción (opcional):",im.desc||""); if(nd===null) return;
+  const nl=prompt("Enlace al hacer clic (opcional):",im.link||""); if(nl===null) return;
+  const np=prompt("🔒 CONTRASEÑA de esta foto (opcional · vacío = público):\n\n(actual: "+(im.password?"••••"+im.password.slice(-2):"NINGUNA / público")+")", im.password||"");
+  if(np===null) return;
+  let ndata = im.data;
+  if(confirm("¿Cambiar también la foto?\n\nAceptar = seleccionar nueva\nCancelar = mantener actual")){
+    const tmp = document.createElement("input");
+    tmp.type="file"; tmp.accept="image/*";
+    const f = await new Promise(r=>{ tmp.onchange=()=>r(tmp.files[0]||null); tmp.click(); setTimeout(()=>r(null),30000); });
+    if(f){ try{ const rr=await compressImage(f); ndata=rr.data; }catch(e){ alert("No se procesó: "+e); return; } }
+  }
+  im.title=nt.trim(); im.desc=nd.trim(); im.link=nl.trim(); im.password=np.trim(); im.data=ndata;
+  if(!im.title){ alert("Título obligatorio"); return; }
+  setData(d);
+}
+function moveImage(id,dir){
+  const d=getData(); const i=d.images.findIndex(x=>x.id===id); const j=i+dir;
+  if(i<0||j<0||j>=d.images.length) return;
+  [d.images[i],d.images[j]]=[d.images[j],d.images[i]]; setData(d);
+}
+function clearAll(){
+  if(!confirm("⚠️ ¿SEGURO? Se borra TODO (URLs + fotos + sus contraseñas). No hay vuelta atrás.")) return;
+  if(!confirm("¿Realmente deseas eliminar TODO el contenido?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(UNLOCKED_KEY);
+  refreshAll();
+}
+
+// ============== RENDER ADMIN ==============
+function refreshAll(){
+  const d = getData();
+  document.getElementById("statUrls").textContent = d.urls.length;
+  document.getElementById("statImages").textContent = d.images.length;
+  document.getElementById("urlCount").textContent = "· "+d.urls.length;
+  document.getElementById("imgCount").textContent = "· "+d.images.length;
+
+  // URLs
+  const ul = document.getElementById("urlsList");
+  if(d.urls.length===0){
+    ul.innerHTML = emptyStateHTML("Aún no hay enlaces","Agrega tu primer enlace arriba. Puedes ponerle su propia contraseña.","#c4b5fd",`<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>`);
+  }else{
+    ul.innerHTML = d.urls.map((u,i)=>`
+      <div class="glass card-hover rounded-2xl p-4 sm:p-5 flex flex-wrap items-center gap-3 sm:gap-4" onmousemove="glow(this,event)">
+        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
+             style="background:linear-gradient(135deg, rgba(167,139,250,.22), rgba(139,92,246,.06));border:1px solid rgba(167,139,250,.28)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <div class="flex-1 min-w-[180px]">
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="font-bold text-[15px] sm:text-[15.5px]">${esc(u.title)}</div>
+            ${u.password?`<span class="locked-badge">🔒 ${u.password.length>4?u.password.slice(0,4)+"…":u.password}</span>`:`<span class="public-badge">público</span>`}
+          </div>
+          <a href="${esc(u.link)}" target="_blank" class="text-[11px] sm:text-xs truncate block mt-0.5 hover:underline" style="color:var(--accent)">${esc(u.link)}</a>
+          ${u.desc?`<p class="text-xs sm:text-sm mt-1.5" style="color:var(--muted)">${esc(u.desc)}</p>`:""}
+        </div>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <a href="${esc(u.link)}" target="_blank" class="btn-icon rounded-lg flex items-center justify-center" title="Abrir">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/></svg>
+          </a>
+          <button onclick="moveUrl(${u.id},-1)" ${i===0?'disabled style="opacity:.35"':''} class="btn-icon rounded-lg">↑</button>
+          <button onclick="moveUrl(${u.id},1)" ${i===d.urls.length-1?'disabled style="opacity:.35"':''} class="btn-icon rounded-lg">↓</button>
+          <button onclick="editUrl(${u.id})" class="btn-soft px-3 h-10 rounded-lg text-xs font-semibold">Editar</button>
+          <button onclick="deleteUrl(${u.id})" class="btn-danger px-3 h-10 rounded-lg text-xs font-semibold">Borrar</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // IMÁGENES (AHORA MUESTRA DESCRIPCIÓN + 🔒 CONTRASEÑA)
+  const il = document.getElementById("imagesList");
+  if(d.images.length===0){
+    il.innerHTML = `<div class="col-span-full">${emptyStateHTML("Galería vacía","Sube fotos de tu dispositivo. Cada una puede tener su propia contraseña y descripción.","#fcd34d",`<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>`)}</div>`;
+  }else{
+    il.innerHTML = d.images.map((im,i)=>`
+      <div class="glass-strong card-hover rounded-2xl overflow-hidden fade-in" onmousemove="glow(this,event)">
+        <div class="gallery-item" style="aspect-ratio:4/3;background:#0a0a0f">
+          <img src="${esc(im.data)}" alt="${esc(im.title)}" loading="lazy"
+               onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center p-4 text-center text-xs\\' style=\\'color:var(--muted)\\'>No carga</div>'">
+        </div>
+        <div class="p-4">
+          <div class="flex flex-wrap items-center gap-2 mb-1.5">
+            <div class="font-bold text-[14.5px] sm:text-[15px] truncate flex-1 min-w-0">${esc(im.title)}</div>
+            ${im.password?`<span class="locked-badge" style="flex-shrink:0">🔒 ${im.password.length>4?im.password.slice(0,4)+"…":im.password}</span>`:`<span class="public-badge" style="flex-shrink:0">público</span>`}
+          </div>
+          ${im.desc?`<p class="text-xs sm:text-sm mb-2.5 leading-relaxed" style="color:var(--muted)">${esc(im.desc)}</p>`:""}
+          ${im.link?`<a href="${esc(im.link)}" target="_blank" class="text-[11px] truncate block mb-3 pb-3 border-b" style="color:var(--accent);border-color:var(--border)">🔗 ${esc(im.link)}</a>`:`<div class="pb-3 mb-3 border-b" style="border-color:var(--border)"></div>`}
+          <div class="grid grid-cols-4 gap-1.5">
+            <button onclick="moveImage(${im.id},-1)" ${i===0?'disabled style="opacity:.35"':''} class="btn-icon rounded-lg text-xs">←</button>
+            <button onclick="moveImage(${im.id},1)" ${i===d.images.length-1?'disabled style="opacity:.35"':''} class="btn-icon rounded-lg text-xs">→</button>
+            <button onclick="editImage(${im.id})" class="btn-soft rounded-lg text-xs font-semibold">Editar</button>
+            <button onclick="deleteImage(${im.id})" class="btn-danger rounded-lg text-xs font-semibold">Borrar</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+  setupCardGlow();
+}
+
+// ============== RENDER PÚBLICO (URLs + FOTOS AMBAS CON DESBLOQUEO) ==============
+function renderPublic(){
+  const d = getData();
+  const unlocked = getUnlocked();
+  const pu = document.getElementById("publicUrls");
+  const pi = document.getElementById("publicImages");
+
+  // --- URLs ---
+  if(d.urls.length>0){
+    pu.innerHTML = `
+      <div class="mb-6 sm:mb-8 flex items-center gap-3">
+        <span class="chip" style="background:var(--accent-soft);color:#c4b5fd">ENLACES</span>
+        <div class="flex-1 h-px" style="background:linear-gradient(90deg,var(--border),transparent)"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        ${d.urls.map((u,i)=>renderPublicUrl(u,i,unlocked)).join("")}
+      </div>`;
+  }else pu.innerHTML = "";
+
+  // --- FOTOS (TAMBIÉN CON DESBLOQUEO POR CONTRASEÑA + DESCRIPCIÓN) ---
+  if(d.images.length>0){
+    pi.innerHTML = `
+      <div class="mb-6 sm:mb-8 flex items-center gap-3">
+        <span class="chip" style="background:var(--accent-2-soft);color:#fcd34d">GALERÍA</span>
+        <div class="flex-1 h-px" style="background:linear-gradient(90deg,var(--border),transparent)"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        ${d.images.map((im,i)=>renderPublicImage(im,i,unlocked)).join("")}
+      </div>`;
+  }else pi.innerHTML = "";
+
+  if(d.urls.length===0 && d.images.length===0){
+    pi.innerHTML = `
+      <div class="glass-strong rounded-3xl p-10 sm:p-14 text-center fade-in max-w-xl mx-auto">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-5 rounded-2xl flex items-center justify-center"
+             style="background:linear-gradient(135deg, rgba(167,139,250,.22), rgba(251,191,36,.12));border:1px solid rgba(167,139,250,.25)">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="url(#em)" stroke-width="1.8">
+            <defs><linearGradient id="em" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/>
+          </svg>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-extrabold mb-2">Listo para usar</h2>
+        <p class="mb-5 sm:mb-6 text-sm sm:text-base" style="color:var(--muted)">Entra al admin para agregar enlaces y fotos con su contraseña.</p>
+        <button onclick="showLogin()" class="btn-primary shine px-6 sm:px-7 py-3.5 rounded-xl font-semibold">Ir al panel →</button>
+      </div>`;
+  }
+  setupCardGlow();
+}
+
+function renderPublicUrl(u, i, unlocked){
+  const key = "u_"+u.id;
+  const ok = !u.password || unlocked[key] === "1";
+  if(ok){
+    return `
+      <a href="${esc(u.link)}" target="_blank" rel="noopener"
+         class="glass-strong card-hover rounded-2xl p-5 sm:p-6 block fade-in shine"
+         style="animation-delay:${i*.04}s" onmousemove="glow(this,event)">
+        <div class="flex items-start gap-3 sm:gap-4">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
+               style="background:linear-gradient(135deg, rgba(167,139,250,.25), rgba(139,92,246,.08));border:1px solid rgba(167,139,250,.3)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-bold text-base sm:text-lg truncate">${esc(u.title)}</h3>
+              ${u.password?`<span class="unlocked-badge">🔓 desbloqueado</span>`:""}
+            </div>
+            ${u.desc?`<p class="text-xs sm:text-sm mt-1.5 leading-relaxed" style="color:var(--muted)">${esc(u.desc)}</p>`:""}
+            <div class="text-[11px] sm:text-xs mt-3 truncate" style="color:#a78bfa">${esc(u.link)}</div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" class="flex-shrink-0 mt-1"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </div>
+      </a>`;
+  }
+  return `
+    <div class="glass-strong card-hover rounded-2xl p-5 sm:p-6 fade-in"
+         style="animation-delay:${i*.04}s;border-color:rgba(248,113,113,.2)"
+         onmousemove="glow(this,event)">
+      <div class="flex items-start gap-3 sm:gap-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
+             style="background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.3)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 class="font-bold text-base sm:text-lg truncate">${esc(u.title)}</h3>
+            <span class="locked-badge">🔒 privado</span>
+          </div>
+          ${u.desc?`<p class="text-xs sm:text-sm mt-1.5 leading-relaxed" style="color:var(--muted)">${esc(u.desc)}</p>`:""}
+          <p class="text-[11px] sm:text-xs mt-2" style="color:#fca5a5">Escribe la contraseña para ver este enlace</p>
+          <div class="unlock-box">
+            <input type="text" id="pass-u-${u.id}" placeholder="Contraseña..." onkeydown="if(event.key==='Enter')tryUnlock('u',${u.id})">
+            <button onclick="tryUnlock('u',${u.id})" class="btn-primary px-4 rounded-xl font-semibold text-sm">Desbloquear</button>
+          </div>
+          <p id="err-u-${u.id}" class="text-[11px] mt-1.5 hidden" style="color:#f87171">✗ Contraseña incorrecta</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderPublicImage(im, i, unlocked){
+  const key = "i_"+im.id;
+  const ok = !im.password || unlocked[key] === "1";
+
+  const baseCard = `
+    <div class="glass-strong card-hover rounded-2xl overflow-hidden fade-in"
+         style="animation-delay:${i*.04}s;box-shadow:0 18px 45px -18px rgba(0,0,0,.6)"
+         onmousemove="glow(this,event)">`;
+
+  // PARTE DE ARRIBA: imagen (o imagen + candado si está bloqueada)
+  let top = "";
+  if(ok){
+    top = im.link
+      ? `<a href="${esc(im.link)}" target="_blank" rel="noopener" class="block gallery-item aspect-[4/3]" style="background:#0a0a0f">
+           <img src="${esc(im.data)}" alt="${esc(im.title)}" loading="lazy"
+                onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-sm\\' style=\\'color:var(--muted)\\'>No disponible</div>'">
+           <div class="gallery-overlay">
+             <div class="w-full">
+               <h3 class="font-bold text-base sm:text-lg text-white drop-shadow-lg">${esc(im.title)}</h3>
+               <div class="text-[11px] sm:text-xs mt-1 text-white/75 flex items-center gap-1">
+                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/></svg>
+                 Abrir enlace
+               </div>
+             </div>
+           </div>
+         </a>`
+      : `<div class="gallery-item aspect-[4/3]" style="background:#0a0a0f">
+           <img src="${esc(im.data)}" alt="${esc(im.title)}" loading="lazy"
+                onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-sm\\' style=\\'color:var(--muted)\\'>No disponible</div>'">
+           <div class="gallery-overlay">
+             <div class="w-full"><h3 class="font-bold text-base sm:text-lg text-white drop-shadow-lg">${esc(im.title)}</h3></div>
+           </div>
+         </div>`;
+  }else{
+    // BLOQUEADA: imagen borrosa + candado encima
+    top = `
+      <div class="gallery-item aspect-[4/3] relative" style="background:#0a0a0f">
+        <img src="${esc(im.data)}" alt="" class="blur-content" aria-hidden="true">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:white;text-align:center;padding:16px">
+          <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+               style="background:rgba(248,113,113,.18);border:1px solid rgba(248,113,113,.4);backdrop-filter:blur(8px)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <div class="font-bold">Contenido privado</div>
+            <div class="text-xs text-white/70 mt-1">Necesitas contraseña para ver</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // PARTE DE ABAJO: título + descripción + (si está bloqueada: pedir contraseña)
+  let bottom = "";
+  if(ok){
+    bottom = `
+      <div class="p-4">
+        <div class="flex items-center gap-2 flex-wrap mb-1">
+          <div class="font-bold text-[14.5px] sm:text-[15px] truncate flex-1 min-w-0">${esc(im.title)}</div>
+          ${im.password?`<span class="unlocked-badge" style="flex-shrink:0">🔓</span>`:""}
+        </div>
+        ${im.desc?`<p class="text-xs sm:text-sm leading-relaxed" style="color:var(--muted)">${esc(im.desc)}</p>`:""}
+      </div>`;
+  }else{
+    bottom = `
+      <div class="p-4">
+        <div class="flex items-center gap-2 flex-wrap mb-1.5">
+          <div class="font-bold text-[14.5px] sm:text-[15px] truncate flex-1 min-w-0">${esc(im.title)}</div>
+          <span class="locked-badge" style="flex-shrink:0">🔒</span>
+        </div>
+        ${im.desc?`<p class="text-xs sm:text-sm mb-2 leading-relaxed" style="color:var(--muted)">${esc(im.desc)}</p>`:""}
+        <div class="unlock-box" style="margin-top:0">
+          <input type="text" id="pass-i-${im.id}" placeholder="Contraseña..." onkeydown="if(event.key==='Enter')tryUnlock('i',${im.id})">
+          <button onclick="tryUnlock('i',${im.id})" class="btn-primary px-4 rounded-xl font-semibold text-sm">Ver</button>
+        </div>
+        <p id="err-i-${im.id}" class="text-[11px] mt-1.5 hidden" style="color:#f87171">✗ Incorrecta</p>
+      </div>`;
+  }
+
+  return baseCard + top + bottom + `</div>`;
+}
+
+function tryUnlock(type, id){
+  const d = getData();
+  const list = type==="u" ? d.urls : d.images;
+  const item = list.find(x=>x.id===id);
+  if(!item) return;
+  const key = type+"_"+id;
+  const val = document.getElementById("pass-"+key).value.trim();
+  const err = document.getElementById("err-"+key);
+  if(val === item.password){
+    err.classList.add("hidden");
+    const un = getUnlocked(); un[key]="1"; setUnlocked(un);
+    renderPublic();
+  }else{
+    err.classList.remove("hidden");
+  }
+}
+
+// ============== UTILS ==============
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function glow(c,e){ const r=c.getBoundingClientRect(); c.style.setProperty("--x",(e.clientX-r.left)+"px"); c.style.setProperty("--y",(e.clientY-r.top)+"px"); }
+function setupCardGlow(){
+  document.querySelectorAll(".card-hover").forEach(c=>{
+    if(c.dataset.glow) return; c.dataset.glow="1";
+    c.addEventListener("mousemove", e=>glow(c,e));
+    c.addEventListener("touchmove", e=>{ if(e.touches[0]) glow(c,e.touches[0]); }, {passive:true});
+  });
+}
+function emptyStateHTML(tit,desc,color,svgPath){
+  return `<div class="empty-state rounded-3xl p-10 sm:p-12 text-center">
+    <div class="w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center" style="background:${color}15">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8">${svgPath}</svg>
+    </div>
+    <h3 class="text-base sm:text-lg font-bold mb-1">${tit}</h3>
+    <p class="text-xs sm:text-sm" style="color:var(--muted)">${desc}</p>
+  </div>`;
+}
+document.addEventListener("keydown",e=>{
+  if(e.key==="Enter" && document.activeElement?.id==="passwordInput") doLogin();
+});
+
+// ============== INICIO ==============
+showPublic();
+</script>
+</div>
+</html>
