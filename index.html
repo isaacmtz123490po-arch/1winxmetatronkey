@@ -30,9 +30,7 @@
     }
     input,select,textarea{-webkit-user-select:text;user-select:text}
 
-    /* =====================================================
-       🎥 FONDO VIDEO · 100% A PRUEBA DE iOS
-       ===================================================== */
+    /* 🎥 FONDO VIDEO · 100% A PRUEBA DE iOS */
     .bg-layer{
       position:fixed;inset:0;z-index:0;
       width:100vw;height:100vh;height:100dvh;
@@ -80,9 +78,7 @@
     @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
     .overlay{position:fixed;inset:0;z-index:1;background:rgba(0,0,0,.42);backdrop-filter:blur(1px);pointer-events:none}
 
-    /* =====================================================
-       🔔 TOAST · MINI NOTIFICACIÓN DE ACTUALIZACIÓN
-       ===================================================== */
+    /* 🔔 TOAST NOTIFICACIÓN SYNC */
     .toast{
       position:fixed;top:18px;right:18px;z-index:9999;
       max-width:300px;padding:12px 16px;border-radius:12px;
@@ -219,12 +215,7 @@
 
     .divider{height:1px;background:var(--border);margin:18px 0}
     .hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}
-
-    .sync-ind{
-      display:inline-flex;align-items:center;gap:6px;
-      font-size:10px;letter-spacing:.12em;text-transform:uppercase;
-      color:var(--muted);margin-top:8px;
-    }
+    .sync-ind{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:8px}
     .sync-ind .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulso 1.4s ease infinite}
     .sync-ind.off .dot{background:var(--muted);animation:none}
 
@@ -271,7 +262,7 @@
 
 <div style="position:relative;min-height:100vh;min-height:100dvh;">
 
-  <!-- 🔔 TOAST NOTIFICACIÓN -->
+  <!-- 🔔 TOAST -->
   <div id="toast" class="toast"><span class="punto"></span><span id="toastTxt">Listo</span></div>
 
   <!-- Fondos -->
@@ -301,7 +292,7 @@
 
     <div class="panel-body">
 
-      <!-- LOGIN · CONTRASEÑA = 1 -->
+      <!-- LOGIN · PASS = 1 -->
       <div id="loginScreen" class="login-wrap">
         <div class="brand-center">
           <div class="logo-big">M</div>
@@ -317,9 +308,8 @@
         <div class="status" id="loginStatus"></div>
       </div>
 
-      <!-- Contenido admin -->
+      <!-- Admin -->
       <div id="adminContent" style="display:none">
-
         <div class="tab-row">
           <button class="tab-btn active" data-tab="video">Video</button>
           <button class="tab-btn" data-tab="url">URL</button>
@@ -328,14 +318,13 @@
           <button class="tab-btn" data-tab="settings">Ajustes</button>
         </div>
 
-        <!-- VIDEO FONDO + SYNC -->
         <div class="tab-content active" id="tab-video">
           <div class="field">
-            <label>Video de fondo · Se sincroniza en todos los dispositivos</label>
+            <label>Video de fondo · Se sincroniza en todos</label>
             <div class="file-wrap" id="videoDrop">
               <input type="file" id="videoInput" accept="video/mp4,video/webm,video/quicktime">
               <div style="font-weight:700;font-size:14px;color:#fff">Clic o arrastra tu video</div>
-              <div class="file-hint">MP4 H.264 recomendado · Al guardar se actualizan todos los celus</div>
+              <div class="file-hint">MP4 H.264 recomendado · Todos se actualizan solos</div>
               <div class="file-name" id="videoName">Ningún archivo seleccionado</div>
             </div>
           </div>
@@ -345,21 +334,16 @@
           <div class="sync-ind" id="syncInd"><span class="dot"></span><span>Sincronización activa</span></div>
         </div>
 
-        <!-- URL -->
         <div class="tab-content" id="tab-url">
-          <div class="field">
-            <label>Enlace directo de imagen</label>
-            <input type="url" id="urlInput" placeholder="https://dominio.com/foto.jpg">
-          </div>
+          <div class="field"><label>Enlace de imagen</label><input type="url" id="urlInput" placeholder="https://dominio.com/foto.jpg"></div>
           <div class="preview" id="urlPreview"><img alt="preview"></div>
           <button class="btn btn-primary" id="applyUrl">Aplicar y Sincronizar</button>
           <div class="status" id="stUrl"></div>
         </div>
 
-        <!-- IMAGEN -->
         <div class="tab-content" id="tab-image">
           <div class="field">
-            <label>Subir imagen de fondo</label>
+            <label>Subir imagen</label>
             <div class="file-wrap" id="imageDrop">
               <input type="file" id="imageInput" accept="image/*">
               <div style="font-weight:700;font-size:14px;color:#fff">Clic o arrastra tu foto</div>
@@ -372,65 +356,38 @@
           <div class="status" id="stImage"></div>
         </div>
 
-        <!-- LINK -->
         <div class="tab-content" id="tab-link">
-          <div class="field">
-            <label>Texto del botón</label>
-            <input type="text" id="linkText" placeholder="Ej: Contáctanos">
+          <div class="field"><label>Texto botón</label><input type="text" id="linkText" placeholder="Ej: Contáctanos"></div>
+          <div class="field"><label>URL destino</label><input type="url" id="linkUrl" placeholder="https://..."></div>
+          <div class="field"><label>Apertura</label>
+            <select id="linkTarget"><option value="_blank">Pestaña nueva</option><option value="_self">Misma pestaña</option></select>
           </div>
-          <div class="field">
-            <label>Enlace / URL destino</label>
-            <input type="url" id="linkUrl" placeholder="https://...">
-          </div>
-          <div class="field">
-            <label>Modo de apertura</label>
-            <select id="linkTarget">
-              <option value="_blank">Pestaña nueva</option>
-              <option value="_self">Misma pestaña</option>
-            </select>
-          </div>
-          <label class="check-row"><input type="checkbox" id="linkShow" checked> Mostrar botón en pantalla</label>
+          <label class="check-row"><input type="checkbox" id="linkShow" checked> Mostrar botón</label>
           <div class="divider"></div>
           <button class="btn btn-primary" id="saveLink">Guardar y Sincronizar</button>
           <button class="btn btn-secondary" id="hideLink" style="margin-top:10px">Ocultar Link</button>
           <div class="status" id="stLink"></div>
-          <div class="current-bg" style="margin-top:16px">
-            <div class="label">Link activo</div>
-            <div class="value" id="currentLink">Ninguno configurado</div>
-          </div>
+          <div class="current-bg" style="margin-top:16px"><div class="label">Link activo</div><div class="value" id="currentLink">Ninguno configurado</div></div>
         </div>
 
-        <!-- AJUSTES -->
         <div class="tab-content" id="tab-settings">
-          <div class="field">
-            <label>Contraseña actual</label>
-            <input type="password" id="oldPass" placeholder="••••••••">
-          </div>
-          <div class="field">
-            <label>Contraseña nueva</label>
-            <input type="password" id="newPass" placeholder="Mínimo 1 carácter">
-          </div>
-          <div class="field">
-            <label>Repite la nueva</label>
-            <input type="password" id="newPass2" placeholder="Confirma">
-          </div>
+          <div class="field"><label>Contraseña actual</label><input type="password" id="oldPass" placeholder="••••••••"></div>
+          <div class="field"><label>Contraseña nueva</label><input type="password" id="newPass" placeholder="Mínimo 1 carácter"></div>
+          <div class="field"><label>Repite nueva</label><input type="password" id="newPass2" placeholder="Confirma"></div>
           <button class="btn btn-primary" id="changePassBtn">Cambiar Contraseña</button>
           <div class="status" id="stPass"></div>
           <div class="divider"></div>
           <button class="btn btn-secondary" id="resetBgBtn">Solo restablecer fondo</button>
           <button class="btn btn-danger" id="resetAllBtn" style="margin-top:10px">Restablecer TODO a fábrica</button>
-          <p class="hint">Esto borra fondo, link y devuelve la contraseña a la original.</p>
-          <div class="current-bg" style="margin-top:22px">
-            <div class="label">Fondo activo actualmente</div>
-            <div class="value" id="currentBg">Gradiente Metatron por defecto</div>
-          </div>
+          <p class="hint">Borra fondo, link y devuelve contraseña a 1.</p>
+          <div class="current-bg" style="margin-top:22px"><div class="label">Fondo activo</div><div class="value" id="currentBg">Gradiente Metatron por defecto</div></div>
         </div>
 
       </div>
     </div>
   </aside>
 
-  <!-- Pantalla principal -->
+  <!-- Hero -->
   <main class="hero">
     <div class="brand-mark">
       <div class="logo-mark">M</div>
@@ -445,192 +402,88 @@
   </main>
 
 </div>
-
-<!-- ✅ SCRIPTS AL FINAL · TODO FUNCIONAL + SYNC -->
 <script>
 (function(){
   'use strict';
 
-  // ============================================================
-  // 🔔 SISTEMA DE TOAST
-  // ============================================================
+  // 🔔 TOAST
   var toastEl=document.getElementById('toast'),toastTxt=document.getElementById('toastTxt'),toastT;
   function toast(msg,ok){
-    toastTxt.textContent=msg;
-    toastEl.className='toast'+(ok?' ok':'');
-    toastEl.classList.add('show');
-    clearTimeout(toastT);
-    toastT=setTimeout(function(){toastEl.classList.remove('show')},2600);
+    toastTxt.textContent=msg;toastEl.className='toast'+(ok?' ok':'');toastEl.classList.add('show');
+    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},2600);
   }
 
-  // ============================================================
-  // 🔗 SINCORNIZACIÓN ENTRE DISPOSITIVOS
-  // ============================================================
-  // - BroadcastChannel = instantáneo MISMO dispositivo / varias pestañas
-  // - Polling HTTP cada 3s = todos los dispositivos MISMA URL
-  var CANAL='metatron-sync-v1';
-  var ARCHIVO_DATOS='metatron-datos.json'; // mismo servidor, misma carpeta
-  var bc=null;
-  try{bc=new BroadcastChannel(CANAL)}catch(e){bc=null}
-  var hashLocal='';
-  var syncActivo=true;
+  // 🔗 SINCRONIZACIÓN DISPOSITIVOS (misma URL HTTP)
+  var CANAL='metatron-sync-v1', ARCHIVO='metatron-datos.json';
+  var bc=null; try{bc=new BroadcastChannel(CANAL)}catch(e){bc=null}
+  var hashLocal='', syncActivo=true;
 
-  // Hash simple para detectar cambios rápido
-  function hash(str){
-    var h=0;if(!str)return h;
-    for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0}
-    return h.toString(36);
-  }
+  function hash(str){var h=0;if(!str)return h;for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0}return h.toString(36)}
 
-  // Guardar datos en LocalStorage + avisar a otros
   function guardarDatos(datos){
     var str=JSON.stringify(datos);
     localStorage.setItem('mt_datos',str);
     hashLocal=hash(str);
-    // Avisar a otras pestañas mismo dispositivo
     if(bc)try{bc.postMessage({tipo:'cambio',datos:datos,hash:hashLocal})}catch(e){}
-    // Intentar guardar en servidor para otros dispositivos
-    enviarAlServidor(datos).catch(function(){});
+    enviarServer(datos).catch(function(){});
+  }
+  function enviarServer(d){
+    return new Promise(function(r,j){try{var x=new XMLHttpRequest();x.open('POST',ARCHIVO,true);x.setRequestHeader('Content-Type','application/json');x.onload=function(){r()};x.onerror=function(){j()};x.timeout=2500;x.send(JSON.stringify(d))}catch(e){j()}});
+  }
+  function cargarServer(){
+    return new Promise(function(r,j){try{var x=new XMLHttpRequest();x.open('GET',ARCHIVO+'?t='+Date.now(),true);x.responseType='text';x.onload=function(){if(x.status>=200&&x.status<300&&x.responseText){try{r(JSON.parse(x.responseText))}catch(e){j()}}else j()};x.onerror=function(){j()};x.timeout=2000;x.send()}catch(e){j()}});
   }
 
-  // Enviar datos al servidor (si soporta POST)
-  function enviarAlServidor(datos){
-    return new Promise(function(res,rej){
-      try{
-        var xhr=new XMLHttpRequest();
-        xhr.open('POST',ARCHIVO_DATOS,true);
-        xhr.setRequestHeader('Content-Type','application/json');
-        xhr.onload=function(){res()};
-        xhr.onerror=function(){rej()};
-        xhr.ontimeout=function(){rej()};
-        xhr.timeout=2500;
-        xhr.send(JSON.stringify(datos));
-      }catch(e){rej()}
-    });
-  }
-
-  // Cargar datos del servidor
-  function cargarDeServidor(){
-    return new Promise(function(res,rej){
-      try{
-        var xhr=new XMLHttpRequest();
-        xhr.open('GET',ARCHIVO_DATOS+'?t='+Date.now(),true);
-        xhr.responseType='text';
-        xhr.onload=function(){
-          if(xhr.status>=200&&xhr.status<300&&xhr.responseText){
-            try{res(JSON.parse(xhr.responseText))}catch(e){rej()}
-          }else rej()
-        };
-        xhr.onerror=function(){rej()};
-        xhr.ontimeout=function(){rej()};
-        xhr.timeout=2000;
-        xhr.send();
-      }catch(e){rej()}
-    });
-  }
-
-  // Aplicar datos recibidos (cambia fondo sin recargar)
-  var aplicandoCambio=false;
-  function aplicarDatos(datos, avisar){
-    if(!datos||aplicandoCambio)return;
-    aplicandoCambio=true;
+  var aplicando=false;
+  function aplicarDatos(d, avisar){
+    if(!d||aplicando)return;
+    aplicando=true;
     try{
-      if(datos.tipo==='video'&&datos.base64){
-        ponerVideoFondo(datos.base64,datos.nombre||'fondo',true);
-        if(avisar)toast('🎥 Nuevo video de fondo',true);
-      }
-      else if(datos.tipo==='imagen'&&datos.base64){
-        cf();bl.style.backgroundImage='url("'+datos.base64+'")';sbl();
-        cb.textContent='Imagen: '+(datos.nombre||'fondo');
-        if(avisar)toast('🖼️ Nueva imagen de fondo',true);
-      }
-      else if(datos.tipo==='url'&&datos.url){
-        cf();bl.style.backgroundImage='url("'+datos.url+'")';sbl();
-        cb.textContent='URL: '+datos.url;
-        if(avisar)toast('🌐 Fondo actualizado',true);
-      }
-      if(datos.link)rl(datos.link);
+      if(d.tipo==='video'&&d.base64){ponerVideoFondo(d.base64,d.nombre||'fondo');if(avisar)toast('🎥 Video nuevo sincronizado',true)}
+      else if(d.tipo==='imagen'&&d.base64){cf();bl.style.backgroundImage='url("'+d.base64+'")';sbl();cb.textContent='Imagen: '+(d.nombre||'fondo');if(avisar)toast('🖼️ Imagen nueva',true)}
+      else if(d.tipo==='url'&&d.url){cf();bl.style.backgroundImage='url("'+d.url+'")';sbl();cb.textContent='URL: '+d.url;if(avisar)toast('🌐 Fondo actualizado',true)}
+      if(d.link)rl(d.link);
     }catch(e){}
-    aplicandoCambio=false;
+    aplicando=false;
   }
 
-  // Escuchar mensajes de otras pestañas
-  if(bc){
-    bc.onmessage=function(e){
-      if(!e.data||e.data.tipo!=='cambio')return;
-      if(e.data.hash===hashLocal)return; // ya lo tengo
-      hashLocal=e.data.hash;
-      localStorage.setItem('mt_datos',JSON.stringify(e.data.datos));
-      aplicarDatos(e.data.datos,true);
-    };
-  }
+  if(bc){bc.onmessage=function(e){
+    if(!e.data||e.data.tipo!=='cambio'||e.data.hash===hashLocal)return;
+    hashLocal=e.data.hash;localStorage.setItem('mt_datos',JSON.stringify(e.data.datos));
+    aplicarDatos(e.data.datos,true);
+  }}
 
-  // Polling cada 3s: preguntar al servidor si hubo cambios
-  function revisarServidor(){
+  function revisarServer(){
     if(!syncActivo)return;
-    cargarDeServidor().then(function(datos){
+    cargarServer().then(function(d){
       document.getElementById('syncInd').classList.remove('off');
-      var h=hash(JSON.stringify(datos));
-      if(h===hashLocal)return;
-      // NUEVO CAMBIO DETECTADO
-      hashLocal=h;
-      localStorage.setItem('mt_datos',JSON.stringify(datos));
-      if(bc)try{bc.postMessage({tipo:'cambio',datos:datos,hash:h})}catch(e){}
-      aplicarDatos(datos,true);
-    }).catch(function(){
-      // Sin servidor → solo sync entre pestañas
-      document.getElementById('syncInd').classList.add('off');
-    });
+      var h=hash(JSON.stringify(d));if(h===hashLocal)return;
+      hashLocal=h;localStorage.setItem('mt_datos',JSON.stringify(d));
+      if(bc)try{bc.postMessage({tipo:'cambio',datos:d,hash:h})}catch(e){}
+      aplicarDatos(d,true);
+    }).catch(function(){document.getElementById('syncInd').classList.add('off')});
   }
-  setInterval(revisarServidor,3000);
+  setInterval(revisarServer,3000);
 
   // 🔒 BLOQUEO ZOOM
   (function(){
     var tz=['+','-','='];
-    document.addEventListener('keydown',function(e){
-      if((e.ctrlKey||e.metaKey)&&(tz.includes(e.key)||e.key==='0'||e.keyCode===107||e.keyCode===109||e.keyCode===187||e.keyCode===189)){
-        e.preventDefault();e.stopImmediatePropagation();return false;
-      }
-    },{passive:false,capture:true});
-    window.addEventListener('wheel',function(e){if(e.ctrlKey||e.metaKey){e.preventDefault();e.stopImmediatePropagation();}},{passive:false,capture:true});
-    var ut=0;
-    document.addEventListener('touchstart',function(e){
-      if(e.touches.length>1){e.preventDefault();e.stopImmediatePropagation();}
-      var a=Date.now();if(a-ut<=320)e.preventDefault();ut=a;
-    },{passive:false,capture:true});
-    document.addEventListener('touchmove',function(e){if(e.touches.length>1){e.preventDefault();e.stopImmediatePropagation();}},{passive:false,capture:true});
-    ['gesturestart','gesturechange','gestureend'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault();},{passive:false,capture:true});});
-    document.addEventListener('dblclick',function(e){e.preventDefault();},{passive:false,capture:true});
-    function fe(){
-      var m=document.querySelector('meta[name="viewport"]');
-      if(m)m.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover');
-      document.documentElement.style.transform='scale(1)';
-    }
+    document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&(tz.includes(e.key)||e.key==='0'||e.keyCode===107||e.keyCode===109||e.keyCode===187||e.keyCode===189)){e.preventDefault();e.stopImmediatePropagation();return false}},{passive:false,capture:true});
+    window.addEventListener('wheel',function(e){if(e.ctrlKey||e.metaKey){e.preventDefault();e.stopImmediatePropagation()}},{passive:false,capture:true});
+    var ut=0;document.addEventListener('touchstart',function(e){if(e.touches.length>1){e.preventDefault();e.stopImmediatePropagation()}var a=Date.now();if(a-ut<=320)e.preventDefault();ut=a},{passive:false,capture:true});
+    document.addEventListener('touchmove',function(e){if(e.touches.length>1){e.preventDefault();e.stopImmediatePropagation()}},{passive:false,capture:true});
+    ['gesturestart','gesturechange','gestureend'].forEach(function(ev){document.addEventListener(ev,function(e){e.preventDefault()},{passive:false,capture:true})});
+    document.addEventListener('dblclick',function(e){e.preventDefault()},{passive:false,capture:true});
+    function fe(){var m=document.querySelector('meta[name="viewport"]');if(m)m.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover');document.documentElement.style.transform='scale(1)'}
     window.addEventListener('resize',fe);window.addEventListener('orientationchange',fe);fe();
   })();
 
   // 💾 INDEXEDDB
   var DB='metatron_db',VDB=1,SV='videos',SI='imagenes';
-  function odb(){
-    return new Promise(function(r,j){
-      try{var q=indexedDB.open(DB,VDB);
-        q.onupgradeneeded=function(e){var d=e.target.result;
-          if(!d.objectStoreNames.contains(SV))d.createObjectStore(SV,{keyPath:'id'});
-          if(!d.objectStoreNames.contains(SI))d.createObjectStore(SI,{keyPath:'id'});
-        };
-        q.onsuccess=function(){r(q.result)};q.onerror=function(){j(q.error)};
-      }catch(e){j(e)}
-    });
-  }
-  function gb(s,i,b,m){return odb().then(function(d){return new Promise(function(r,j){
-    try{var t=d.transaction(s,'readwrite');t.objectStore(s).put({id:i,data:b,meta:m||{}});t.oncomplete=function(){r(true)};t.onerror=function(){j(t.error)}}catch(e){j(e)}
-  })})}
-  function lb(s,i){return odb().then(function(d){return new Promise(function(r,j){
-    try{var t=d.transaction(s,'readonly');var q=t.objectStore(s).get(i);q.onsuccess=function(){r(q.result||null)};q.onerror=function(){j(q.error)}}catch(e){j(e)}
-  })})}
-  function bb(s,i){return odb().then(function(d){return new Promise(function(r){
-    try{var t=d.transaction(s,'readwrite');t.objectStore(s).delete(i);t.oncomplete=function(){r()}}catch(e){r()}
-  })})}
+  function odb(){return new Promise(function(r,j){try{var q=indexedDB.open(DB,VDB);q.onupgradeneeded=function(e){var d=e.target.result;if(!d.objectStoreNames.contains(SV))d.createObjectStore(SV,{keyPath:'id'});if(!d.objectStoreNames.contains(SI))d.createObjectStore(SI,{keyPath:'id'})};q.onsuccess=function(){r(q.result)};q.onerror=function(){j(q.error)}}catch(e){j(e)}})}
+  function gb(s,i,b,m){return odb().then(function(d){return new Promise(function(r,j){try{var t=d.transaction(s,'readwrite');t.objectStore(s).put({id:i,data:b,meta:m||{}});t.oncomplete=function(){r(true)};t.onerror=function(){j(t.error)}}catch(e){j(e)}})})}
+  function lb(s,i){return odb().then(function(d){return new Promise(function(r,j){try{var t=d.transaction(s,'readonly');var q=t.objectStore(s).get(i);q.onsuccess=function(){r(q.result||null)};q.onerror=function(){j(q.error)}}catch(e){j(e)}})})}
+  function bb(s,i){return odb().then(function(d){return new Promise(function(r){try{var t=d.transaction(s,'readwrite');t.objectStore(s).delete(i);t.oncomplete=function(){r()}}catch(e){r()}})})}
 
   // 🔐 PASS = 1
   var DP='1';
@@ -638,7 +491,6 @@
   function gsp(){return localStorage.getItem('mt_pass')||hp(DP)}
   function ia(){return localStorage.getItem('mt_authed')==='1'}
   function sa(v){localStorage.setItem('mt_authed',v?'1':'0')}
-
   var ls=document.getElementById('loginScreen'),ac=document.getElementById('adminContent');
   var pi=document.getElementById('passInput'),lb2=document.getElementById('loginBtn'),lst=document.getElementById('loginStatus');
   var sp=document.getElementById('showPass'),lo=document.getElementById('logoutBtn');
@@ -648,18 +500,15 @@
   lb2.addEventListener('click',dl);pi.addEventListener('keydown',function(e){if(e.key==='Enter')dl()});
   lo.addEventListener('click',function(){sa(false);rau();pi.value=''});
   function dl(){
-    if(hp(pi.value.trim())===gsp()){
-      sa(true);rau();lst.className='status show ok';lst.textContent='Acceso correcto';
-      setTimeout(function(){lst.classList.remove('show')},1400);
-    }else{lst.className='status show err';lst.textContent='Contraseña incorrecta';pi.value='';pi.focus()}
+    if(hp(pi.value.trim())===gsp()){sa(true);rau();lst.className='status show ok';lst.textContent='Acceso correcto';setTimeout(function(){lst.classList.remove('show')},1400)}
+    else{lst.className='status show err';lst.textContent='Contraseña incorrecta';pi.value='';pi.focus()}
   }
   document.getElementById('changePassBtn').addEventListener('click',function(){
     var o=document.getElementById('oldPass').value.trim(),n=document.getElementById('newPass').value.trim(),n2=document.getElementById('newPass2').value.trim(),st=document.getElementById('stPass');
     if(hp(o)!==gsp()){st.className='status show err';st.textContent='Contraseña actual incorrecta';return}
     if(n.length<1){st.className='status show err';st.textContent='Escribe al menos 1 carácter';return}
     if(n!==n2){st.className='status show err';st.textContent='No coinciden';return}
-    localStorage.setItem('mt_pass',hp(n));
-    ['oldPass','newPass','newPass2'].forEach(function(i){document.getElementById(i).value=''});
+    localStorage.setItem('mt_pass',hp(n));['oldPass','newPass','newPass2'].forEach(function(i){document.getElementById(i).value=''});
     st.className='status show ok';st.textContent='Contraseña actualizada ✓';
   });
 
@@ -679,61 +528,39 @@
     });
   });
 
-  // ============================================================
   // 🎥 NÚCLEO VIDEO iOS PROOF
-  // ============================================================
   var bl=document.getElementById('bgLayer'),df=document.getElementById('defaultBg'),cb=document.getElementById('currentBg');
   var videoActivo=null,intentosPlay=0;
-
-  function cf(){
-    bl.innerHTML='';bl.style.backgroundImage='';bl.style.opacity='0';df.style.display='block';
-    videoActivo=null;intentosPlay=0;
-  }
+  function cf(){bl.innerHTML='';bl.style.backgroundImage='';bl.style.opacity='0';df.style.display='block';videoActivo=null;intentosPlay=0}
   function sbl(){bl.style.opacity='1';df.style.display='none'}
   function st2(el,m,ok){el.textContent=m;el.className='status show '+(ok?'ok':'err');setTimeout(function(){el.classList.remove('show')},3500)}
 
   function crearVideoiOS(src){
     var v=document.createElement('video');
-    v.setAttribute('src',src);
-    v.setAttribute('autoplay','autoplay');v.setAttribute('muted','muted');v.setAttribute('loop','loop');
-    v.setAttribute('playsinline','playsinline');v.setAttribute('webkit-playsinline','true');
-    v.setAttribute('x5-playsinline','true');v.setAttribute('x5-video-player-type','h5');
-    v.setAttribute('x5-video-player-fullscreen','false');v.setAttribute('preload','auto');
-    v.setAttribute('disablePictureInPicture','true');
-    v.setAttribute('controlslist','nodownload nofullscreen noremoteplayback noplaybackrate');
+    v.setAttribute('src',src);v.setAttribute('autoplay','autoplay');v.setAttribute('muted','muted');v.setAttribute('loop','loop');
+    v.setAttribute('playsinline','playsinline');v.setAttribute('webkit-playsinline','true');v.setAttribute('x5-playsinline','true');
+    v.setAttribute('x5-video-player-type','h5');v.setAttribute('x5-video-player-fullscreen','false');v.setAttribute('preload','auto');
+    v.setAttribute('disablePictureInPicture','true');v.setAttribute('controlslist','nodownload nofullscreen noremoteplayback noplaybackrate');
     v.setAttribute('disableRemotePlayback','true');v.setAttribute('draggable','false');
-    v.autoplay=true;v.muted=true;v.loop=true;v.playsInline=true;
-    v.controls=false;v.defaultMuted=true;v.volume=0;
-
+    v.autoplay=true;v.muted=true;v.loop=true;v.playsInline=true;v.controls=false;v.defaultMuted=true;v.volume=0;
     v.addEventListener('webkitbeginfullscreen',function(e){e.preventDefault();try{if(v.webkitExitFullscreen)v.webkitExitFullscreen()}catch(err){}return false},true);
     v.addEventListener('webkitenterfullscreen',function(e){e.preventDefault();try{if(v.webkitExitFullscreen)v.webkitExitFullscreen()}catch(err){}return false},true);
     v.addEventListener('enterfullscreen',function(e){e.preventDefault();try{document.exitFullscreen()}catch(err){}return false},true);
     v.addEventListener('fullscreenchange',function(){try{if(document.fullscreenElement===v||document.webkitFullscreenElement===v){if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen()}}catch(err){}},true);
-
     v.oncontextmenu=function(){return false};
-    ['contextmenu','click','tap','touchstart','touchend','touchmove'].forEach(function(ev){
-      v.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();return false},true);
-    });
-
+    ['contextmenu','click','tap','touchstart','touchend','touchmove'].forEach(function(ev){v.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();return false},true)});
     v.addEventListener('ended',function(){try{v.currentTime=0.01;v.play().catch(function(){})}catch(err){}},true);
     v.addEventListener('canplaythrough',function(){reproiOS(v)},{once:true});
     v.addEventListener('pause',function(){setTimeout(function(){reproiOS(v)},150)},true);
     v.addEventListener('error',function(){intentosPlay++;if(intentosPlay<5)setTimeout(function(){v.load();reproiOS(v)},500)},true);
     return v;
   }
-
   function reproiOS(v){
-    if(!v)return;
-    try{
-      v.muted=true;v.volume=0;
-      var p=v.play();
-      if(p&&typeof p.catch==='function'){
-        p.catch(function(){intentosPlay++;if(intentosPlay<10)setTimeout(function(){reproiOS(v)},300)});
-      }
+    if(!v)return;try{v.muted=true;v.volume=0;var p=v.play();
+      if(p&&typeof p.catch==='function')p.catch(function(){intentosPlay++;if(intentosPlay<10)setTimeout(function(){reproiOS(v)},300)});
       sbl();
     }catch(err){intentosPlay++;if(intentosPlay<10)setTimeout(function(){reproiOS(v)},300)}
   }
-
   function ponerVideoFondo(data,nombre){
     cf();intentosPlay=0;
     var wrap=document.createElement('div');wrap.className='bg-video-wrap';
@@ -742,14 +569,134 @@
     setTimeout(function(){try{v.load()}catch(e){}reproiOS(v)},50);
     cb.textContent='Video: '+(nombre||'fondo');
   }
-
   function forzarPlay(){if(videoActivo)reproiOS(videoActivo)}
   document.addEventListener('touchstart',forzarPlay,{passive:true});
   document.addEventListener('click',forzarPlay,{passive:true});
-
-  // ✅ SUBIR VIDEO → BASE64 → GUARDAR → SINCRONIZAR A TODOS
+  // 🎥 SUBIR VIDEO → BASE64 → GUARDAR → SINCRONIZAR
   var vi=document.getElementById('videoInput'),vn=document.getElementById('videoName');
   var vp=document.getElementById('videoPreview'),vpe=vp.querySelector('video'),pvf=null;
   vi.addEventListener('change',function(e){
     var f=e.target.files[0];if(!f)return;
-    if(!f.type.startsWith('video/')){st2(document.getElementById('stVideo'),
+    if(!f.type.startsWith('video/')){st2(document.getElementById('stVideo'),'Archivo no válido',false);return}
+    pvf=f;vn.textContent=f.name+' · '+(f.size/1024/1024).toFixed(2)+' MB';
+    var u=URL.createObjectURL(f);vpe.src=u;vp.classList.add('show');
+  });
+  document.getElementById('applyVideo').addEventListener('click',async function(){
+    var s=document.getElementById('stVideo');if(!pvf){st2(s,'Selecciona un video primero',false);return}
+    try{
+      s.className='status show';s.textContent='💾 Convirtiendo... (tarda según tamaño)';
+      var b64=await new Promise(function(r,j){var x=new FileReader();x.onload=e=>r(e.target.result);x.onerror=e=>j(e.error);x.readAsDataURL(pvf)});
+      await bb(SV,'fondo');await gb(SV,'fondo',b64,{nombre:pvf.name,tipo:pvf.type});
+      var datos={tipo:'video',nombre:pvf.name,base64:b64,ts:Date.now()};
+      ponerVideoFondo(b64,pvf.name);guardarDatos(datos);
+      st2(s,'✅ Listo · Se actualizó en TODOS los dispositivos',true);
+      toast('🎥 Video nuevo sincronizado',true);
+    }catch(err){console.error(err);st2(s,'❌ Error: '+(err.message||''),false)}
+  });
+
+  // 🌐 URL
+  var ui=document.getElementById('urlInput'),up=document.getElementById('urlPreview'),upe=up.querySelector('img');
+  ui.addEventListener('input',function(){var v=this.value.trim();if(v&&/^https?:\/\//i.test(v)){upe.onload=function(){up.classList.add('show')};upe.onerror=function(){up.classList.remove('show')};upe.src=v}else up.classList.remove('show')});
+  document.getElementById('applyUrl').addEventListener('click',function(){
+    var u=ui.value.trim(),s=document.getElementById('stUrl');if(!u||!/^https?:\/\//i.test(u)){st2(s,'URL inválida',false);return}
+    var i=new Image();i.onload=function(){cf();bl.style.backgroundImage='url("'+u+'")';sbl();cb.textContent='URL: '+u;guardarDatos({tipo:'url',url:u,ts:Date.now()});st2(s,'✅ Aplicado y sincronizado',true);toast('🌐 Fondo actualizado',true);bb(SV,'fondo').catch(function(){})};
+    i.onerror=function(){st2(s,'No se pudo cargar',false)};i.src=u;
+  });
+
+  // 🖼️ IMAGEN
+  var ii=document.getElementById('imageInput'),inn=document.getElementById('imageName');
+  var ip=document.getElementById('imagePreview'),ipe=ip.querySelector('img'),pif=null;
+  ii.addEventListener('change',function(e){
+    var f=e.target.files[0];if(!f)return;
+    if(!f.type.startsWith('image/')){st2(document.getElementById('stImage'),'No es una imagen',false);return}
+    pif=f;inn.textContent=f.name+' · '+(f.size/1024/1024).toFixed(2)+' MB';
+    var u=URL.createObjectURL(f);ipe.src=u;ip.classList.add('show');
+  });
+  document.getElementById('applyImage').addEventListener('click',async function(){
+    var s=document.getElementById('stImage');if(!pif){st2(s,'Selecciona una imagen',false);return}
+    try{
+      s.className='status show';s.textContent='💾 Guardando...';
+      var b64=await new Promise(function(r){var x=new FileReader();x.onload=e=>r(e.target.result);x.readAsDataURL(pif)});
+      await bb(SI,'fondo');await gb(SI,'fondo',b64,{nombre:pif.name});
+      cf();bl.style.backgroundImage='url("'+b64+'")';sbl();cb.textContent='Imagen: '+pif.name;
+      guardarDatos({tipo:'imagen',nombre:pif.name,base64:b64,ts:Date.now()});
+      st2(s,'✅ Guardada y sincronizada',true);toast('🖼️ Imagen nueva',true);bb(SV,'fondo').catch(function(){});
+    }catch(err){st2(s,'❌ Error: '+err.message,false)}
+  });
+
+  // 🔄 RESETS
+  document.getElementById('resetBgBtn').addEventListener('click',async function(){
+    cf();cb.textContent='Gradiente Metatron por defecto';
+    localStorage.removeItem('mt_bg');localStorage.removeItem('mt_datos');hashLocal='';
+    try{await bb(SV,'fondo');await bb(SI,'fondo')}catch(e){}
+    if(bc)try{bc.postMessage({tipo:'reset'})}catch(e){}
+    toast('🔄 Fondo restablecido',true);
+  });
+  document.getElementById('resetAllBtn').addEventListener('click',async function(){
+    if(!confirm('¿Restablecer TODO de METATRON a fábrica?'))return;
+    ['mt_bg','mt_datos','mt_link','mt_pass','mt_authed'].forEach(function(k){localStorage.removeItem(k)});
+    hashLocal='';try{await bb(SV,'fondo');await bb(SI,'fondo')}catch(e){}
+    location.reload();
+  });
+
+  // 🔗 LINK
+  var ml=document.getElementById('mainLink'),lt=document.getElementById('linkText'),lu=document.getElementById('linkUrl');
+  var ltg=document.getElementById('linkTarget'),lsh=document.getElementById('linkShow'),cle=document.getElementById('currentLink');
+  function rl(c){
+    if(!c||!c.url||!c.show){ml.style.display='none';cle.textContent='Ninguno configurado';return}
+    ml.textContent=c.text||'Abrir enlace';ml.href=c.url;ml.target=c.target||'_blank';ml.rel='noopener noreferrer';ml.style.display='inline-block';
+    cle.textContent=(c.text||'Link')+' → '+c.url;lt.value=c.text||'';lu.value=c.url||'';ltg.value=c.target||'_blank';lsh.checked=!!c.show;
+  }
+  document.getElementById('saveLink').addEventListener('click',function(){
+    var t=lt.value.trim(),u=lu.value.trim(),s=document.getElementById('stLink');
+    if(!u){st2(s,'Ingresa al menos una URL',false);return}
+    if(!/^https?:\/\//i.test(u)){st2(s,'URL debe empezar con http:// o https://',false);return}
+    var cfg={text:t||'Abrir enlace',url:u,target:ltg.value,show:true};
+    localStorage.setItem('mt_link',JSON.stringify(cfg));lsh.checked=true;rl(cfg);
+    var act=JSON.parse(localStorage.getItem('mt_datos')||'{}');act.link=cfg;act.ts=Date.now();guardarDatos(act);
+    st2(s,'✅ Link guardado y sincronizado',true);toast('🔗 Link actualizado',true);
+  });
+  document.getElementById('hideLink').addEventListener('click',function(){
+    var raw=localStorage.getItem('mt_link'),c=raw?JSON.parse(raw):{};c.show=false;c.url=c.url||lu.value;
+    localStorage.setItem('mt_link',JSON.stringify(c));lsh.checked=false;rl(c);
+    var act=JSON.parse(localStorage.getItem('mt_datos')||'{}');act.link=c;act.ts=Date.now();guardarDatos(act);
+    st2(document.getElementById('stLink'),'Link ocultado',true);
+  });
+
+  // 🚀 CARGAR AL INICIAR
+  async function cargarInicio(){
+    try{
+      var ok=false;
+      try{
+        var ds=await cargarServer();
+        if(ds&&ds.ts){
+          hashLocal=hash(JSON.stringify(ds));localStorage.setItem('mt_datos',JSON.stringify(ds));
+          aplicarDatos(ds,false);rl(ds.link||JSON.parse(localStorage.getItem('mt_link')||'null'));ok=true;
+        }
+      }catch(e){}
+      if(!ok){
+        var raw=localStorage.getItem('mt_bg');
+        if(raw){
+          var b=JSON.parse(raw);
+          if(b.tipo==='video'&&b.guardado){var r=await lb(SV,'fondo');if(r&&r.data){ponerVideoFondo(r.data,(r.meta&&r.meta.nombre)||b.nombre||'fondo');return}}
+          if(b.tipo==='imagen'&&b.guardado){var r=await lb(SI,'fondo');if(r&&r.data){cf();bl.style.backgroundImage='url("'+r.data+'")';sbl();cb.textContent='Imagen: '+(r.meta&&r.meta.nombre||'fondo');return}}
+          if(b.tipo==='url'&&b.url){var i=new Image();i.onload=function(){cf();bl.style.backgroundImage='url("'+b.url+'")';sbl();cb.textContent='URL: '+b.url;ui.value=b.url};i.src=b.url}
+        }
+        rl(JSON.parse(localStorage.getItem('mt_link')||'null'));
+      }
+    }catch(e){console.error('Cargar:',e)}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cargarInicio);else cargarInicio();
+
+  // 📂 DRAG & DROP
+  function drop(z,input){
+    ['dragenter','dragover'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();z.style.borderColor='var(--accent)';z.style.background='var(--accent-soft)'})});
+    ['dragleave','drop'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();z.style.borderColor='';z.style.background=''})});
+    z.addEventListener('drop',function(e){var f=e.dataTransfer.files[0];if(f){input.files=e.dataTransfer.files;input.dispatchEvent(new Event('change'))}});
+  }
+  drop(document.getElementById('videoDrop'),vi);drop(document.getElementById('imageDrop'),ii);
+
+})();
+</script>
+</html>
+<!-- ✅ FIN ARCHIVO COMPLETO -->
