@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nandx Sensibility — Free Fire Sensitivity Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Ambient background -->
+  <div class="bg-ambient">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">NANDX <span class="logo-accent">SENSIBILITY</span></span>
+      </div>
+      <nav class="nav">
+        <a href="#sensibilidad" class="nav-link active">Sensibilidad</a>
+        <a href="#hud" class="nav-link">Custom HUD</a>
+        <a href="#about" class="nav-link">Acerca</a>
+      </nav>
+      <button class="hamburger" id="hamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#sensibilidad" class="mobile-nav-link">Sensibilidad</a>
+      <a href="#hud" class="mobile-nav-link">Custom HUD</a>
+      <a href="#about" class="mobile-nav-link">Acerca</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">FREE FIRE • OPTIMIZADOR PRO</div>
+    <h1 class="hero-title">
+      <span class="hero-line">DOMINA</span>
+      <span class="hero-line accent">CADA</span>
+      <span class="hero-line">PARTIDA</span>
+    </h1>
+    <p class="hero-sub">Sensibilidades generadas con IA y calibradas para tu dispositivo específico. Sin suposiciones. Solo precisión.</p>
+    <div class="hero-cta">
+      <a href="#sensibilidad" class="btn-primary">Generar Sensibilidad</a>
+      <a href="#hud" class="btn-secondary">Custom HUD</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">200+</span><span class="stat-label">Dispositivos</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Precisión</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">0</span><span class="stat-label">Temblor</span></div>
+    </div>
+  </section>
+
+  <!-- MAIN TABS -->
+  <main id="sensibilidad" class="main-section">
+    <div class="section-header">
+      <div class="section-tag">MÓDULO 01</div>
+      <h2 class="section-title">SENSIBILIDADES</h2>
+    </div>
+
+    <!-- TAB SWITCHER -->
+    <div class="tab-switcher">
+      <button class="tab-btn active" data-tab="crear">
+        <span class="tab-icon">⚡</span> Crear Sensibilidad
+      </button>
+      <button class="tab-btn" data-tab="estabilizar">
+        <span class="tab-icon">◎</span> Estabilizar Sensibilidad
+      </button>
+    </div>
+
+    <!-- ========== CREAR SENSIBILIDAD ========== -->
+    <div class="tab-content active" id="tab-crear">
+      <div class="card">
+        <div class="card-header">
+          <h3>Datos de tu Dispositivo</h3>
+          <p>Ingresa la información para calibrar tu sensibilidad</p>
+        </div>
+
+        <!-- Device Info -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nombre del Dispositivo</label>
+            <input type="text" class="form-input" id="crear-device" placeholder="Ej: Samsung Galaxy A54" />
+            <span class="form-hint">Modelo exacto para mejor calibración</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">RAM del Dispositivo</label>
+            <select class="form-input" id="crear-ram">
+              <option value="">Seleccionar RAM</option>
+              <option value="2">2 GB</option>
+              <option value="3">3 GB</option>
+              <option value="4">4 GB</option>
+              <option value="6">6 GB</option>
+              <option value="8">8 GB</option>
+              <option value="12">12 GB</option>
+              <option value="16">16 GB</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- DPI Options -->
+        <div class="toggle-group">
+          <span class="toggle-label">Configuración DPI</span>
+          <div class="toggle-buttons">
+            <button class="toggle-btn active" data-group="dpi-crear" data-val="sin">SIN DPI</button>
+            <button class="toggle-btn" data-group="dpi-crear" data-val="con">CON DPI</button>
+          </div>
+        </div>
+
+        <!-- Fire Button -->
+        <div class="toggle-group">
+          <span class="toggle-label">Botón de Disparo</span>
+          <div class="toggle-buttons">
+            <button class="toggle-btn active" data-group="fire-crear" data-val="auto">GENERAR AUTOMÁTICO</button>
+            <button class="toggle-btn" data-group="fire-crear" data-val="manual">TENGO UNO</button>
+          </div>
+        </div>
+
+        <div class="fire-manual-section hidden" id="fire-manual-crear">
+          <label class="form-label">Porcentaje de tu Botón de Disparo: <span id="fire-val-crear">50</span>%</label>
+          <input type="range" class="range-input" id="fire-range-crear" min="10" max="100" value="50">
+          <div class="range-labels"><span>10%</span><span>100%</span></div>
+        </div>
+
+        <button class="btn-generate" id="btn-crear">
+          <span class="btn-glow"></span>
+          <span class="btn-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            GENERAR SENSIBILIDAD
+          </span>
+        </button>
+      </div>
+
+      <!-- Results -->
+      <div class="results-panel hidden" id="results-crear">
+        <div class="results-header">
+          <div>
+            <h3 class="results-title">TU SENSIBILIDAD</h3>
+            <p class="results-device" id="results-device-name">—</p>
+          </div>
+          <button class="btn-copy" id="copy-crear">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            COPIAR
+          </button>
+        </div>
+
+        <div class="sensitivity-grid" id="sens-grid-crear">
+          <!-- filled by JS -->
+        </div>
+
+        <div class="tier-badge" id="tier-badge-crear"></div>
+      </div>
+    </div>
+
+    <!-- ========== ESTABILIZAR SENSIBILIDAD ========== -->
+    <div class="tab-content" id="tab-estabilizar">
+      <div class="card">
+        <div class="card-header">
+          <h3>Calibrar tu Sensibilidad Actual</h3>
+          <p>Ingresa tus valores actuales para optimizarlos</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nombre del Dispositivo</label>
+            <input type="text" class="form-input" id="estab-device" placeholder="Ej: Xiaomi Redmi Note 12" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">RAM del Dispositivo</label>
+            <select class="form-input" id="estab-ram">
+              <option value="">Seleccionar RAM</option>
+              <option value="2">2 GB</option>
+              <option value="3">3 GB</option>
+              <option value="4">4 GB</option>
+              <option value="6">6 GB</option>
+              <option value="8">8 GB</option>
+              <option value="12">12 GB</option>
+              <option value="16">16 GB</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toggle-group">
+          <span class="toggle-label">Configuración DPI</span>
+          <div class="toggle-buttons">
+            <button class="toggle-btn active" data-group="dpi-estab" data-val="sin">SIN DPI</button>
+            <button class="toggle-btn" data-group="dpi-estab" data-val="con">CON DPI</button>
+          </div>
+        </div>
+
+        <div class="section-subtitle">Ingresa tu Sensibilidad Actual</div>
+
+        <div class="sliders-grid">
+          <div class="slider-item">
+            <div class="slider-info">
+              <span class="slider-name">General</span>
+              <span class="slider-val" id="sv-general">100</span>
+            </div>
+            <input type="range" class="range-input" data-key="general" min="0" max="200" value="100">
+          </div>
+          <div class="slider-item">
+            <div class="slider-info">
+              <span class="slider-name">Punto Rojo</span>
+              <span class="slider-val" id="sv-punto_rojo">100</span>
+            </div>
+            <input type="range" class="range-input" data-key="punto_rojo" min="0" max="200" value="100">
+          </div>
+          <div class="slider-item">
+            <div class="slider-info">
+              <span class="slider-name">Mira 2x</span>
+              <span class="slider-val" id="sv-mira2x">100</span>
+            </div>
+            <input type="range" class="range-input" data-key="mira2x" min="0" max="200" value="100">
+          </div>
+          <div class="slider-item">
+            <div class="slider-info">
+              <span class="slider-name">Mira 4x</span>
+              <span class="slider-val" id="sv-mira4x">100</span>
+            </div>
+            <input type="range" class="range-input" data-key="mira4x" min="0" max="200" value="100">
+          </div>
+          <div class="slider-item">
+            <div class="slider-info">
+              <span class="slider-name">AWM (Francotirador)</span>
+              <span class="slider-val" id="sv-awm">100</span>
+            </div>
+            <input type="range" class="range-input" data-key="awm" min="0" max="200" value="100">
+          </div>
+          <div class="slider-item">
+            <div class="slider-info">
+              <span class="slider-name">Cámara 360°</span>
+              <span class="slider-val" id="sv-cam360">100</span>
+            </div>
+            <input type="range" class="range-input" data-key="cam360" min="0" max="200" value="100">
+          </div>
+        </div>
+
+        <button class="btn-generate secondary" id="btn-estabilizar">
+          <span class="btn-glow"></span>
+          <span class="btn-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            CALIBRAR SENSIBILIDAD
+          </span>
+        </button>
+      </div>
+
+      <div class="results-panel hidden" id="results-estab">
+        <div class="results-header">
+          <div>
+            <h3 class="results-title">SENSIBILIDAD CALIBRADA</h3>
+            <p class="results-device" id="results-estab-device">—</p>
+          </div>
+          <button class="btn-copy" id="copy-estab">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            COPIAR
+          </button>
+        </div>
+        <div class="sensitivity-grid" id="sens-grid-estab"></div>
+        <div class="calibration-note">
+          <span class="note-icon">◈</span>
+          <span id="calibration-msg">Sensibilidad calibrada para máxima estabilidad según tu dispositivo.</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- HUD SECTION -->
+  <section id="hud" class="main-section hud-section">
+    <div class="section-header">
+      <div class="section-tag">MÓDULO 02</div>
+      <h2 class="section-title">CUSTOM HUD</h2>
+    </div>
+
+    <!-- Fingers selector -->
+    <div class="fingers-selector">
+      <button class="finger-btn active" data-fingers="2">
+        <span class="finger-icon">✌️</span>
+        <span>2 Dedos</span>
+      </button>
+      <button class="finger-btn" data-fingers="3">
+        <span class="finger-icon">🤟</span>
+        <span>3 Dedos</span>
+      </button>
+      <button class="finger-btn" data-fingers="4">
+        <span class="finger-icon">🖐️</span>
+        <span>4 Dedos</span>
+      </button>
+    </div>
+
+    <!-- HUD Mode -->
+    <div class="hud-mode-select" id="hudModeSelect">
+      <button class="hud-mode-btn active" data-mode="cargar">
+        <div class="hud-mode-icon">📤</div>
+        <div class="hud-mode-text">
+          <strong>Cargar Custom HUD</strong>
+          <span>Sube tu captura y optimizamos tu layout</span>
+        </div>
+      </button>
+      <button class="hud-mode-btn" data-mode="buscar">
+        <div class="hud-mode-icon">🔍</div>
+        <div class="hud-mode-text">
+          <strong>Buscar Custom HUD</strong>
+          <span>Te damos el código de los mejores HUDs</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- CARGAR HUD -->
+    <div class="hud-panel active" id="panel-cargar">
+      <div class="card">
+        <div class="card-header">
+          <h3>Sube tu Captura de Pantalla</h3>
+          <p>Analizamos tu HUD actual y lo optimizamos para <span id="fingers-label">2 dedos</span></p>
+        </div>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="hudFile" accept="image/*" hidden>
+          <div class="upload-content" id="uploadContent">
+            <div class="upload-icon">◈</div>
+            <p class="upload-text">Arrastra tu imagen aquí</p>
+            <p class="upload-sub">o haz clic para seleccionar</p>
+            <button class="btn-upload" onclick="document.getElementById('hudFile').click()">SELECCIONAR IMAGEN</button>
+          </div>
+          <div class="upload-preview hidden" id="uploadPreview">
+            <img id="previewImg" src="" alt="preview">
+            <button class="btn-remove-img" id="removeImg">✕</button>
+          </div>
+        </div>
+
+        <div class="toggle-group">
+          <span class="toggle-label">¿Mantener Botón de Disparo?</span>
+          <div class="toggle-buttons">
+            <button class="toggle-btn active" data-group="keep-fire" data-val="mantener">MANTENER</button>
+            <button class="toggle-btn" data-group="keep-fire" data-val="cambiar">CAMBIAR</button>
+          </div>
+        </div>
+
+        <button class="btn-generate" id="btn-analyze-hud">
+          <span class="btn-glow"></span>
+          <span class="btn-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            ANALIZAR Y OPTIMIZAR HUD
+          </span>
+        </button>
+      </div>
+
+      <div class="results-panel hidden" id="hud-result-cargar">
+        <div class="results-header">
+          <h3 class="results-title">HUD OPTIMIZADO</h3>
+        </div>
+        <div class="hud-result-content" id="hud-result-content">
+          <!-- filled by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- BUSCAR HUD -->
+    <div class="hud-panel" id="panel-buscar">
+      <div class="card">
+        <div class="card-header">
+          <h3>Buscar Mejores HUDs</h3>
+          <p>Encontramos los mejores códigos para <span class="fingers-label-b">2 dedos</span> optimizados para Sudamérica</p>
+        </div>
+        <div class="region-note">
+          <span class="note-icon">🌎</span>
+          Códigos adaptados para servidores de Sudamérica
+        </div>
+
+        <button class="btn-generate" id="btn-search-hud">
+          <span class="btn-glow"></span>
+          <span class="btn-content">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            BUSCAR MEJORES HUDs
+          </span>
+        </button>
+      </div>
+
+      <div class="results-panel hidden" id="hud-result-buscar">
+        <div class="results-header">
+          <h3 class="results-title">CÓDIGOS HUD ENCONTRADOS</h3>
+        </div>
+        <div class="hud-codes-list" id="hud-codes-list">
+          <!-- filled by JS -->
+        </div>
+        <div class="hud-code-instructions">
+          <p><strong>¿Cómo usar el código?</strong></p>
+          <p>En Free Fire → Configuración → Controles → Importar → Pega el código</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about-section">
+    <div class="about-inner">
+      <div class="about-text">
+        <div class="section-tag">ACERCA</div>
+        <h2>¿Cómo funciona <span class="accent">Nandx</span>?</h2>
+        <p>Nandx Sensibility analiza el hardware real de tu dispositivo — procesador, RAM, pantalla — para calcular sensibilidades que se ajusten exactamente a tu teléfono. No usamos valores genéricos.</p>
+        <p>El sistema considera el tier del dispositivo (gama baja, media, alta), calibra cada punto de mira individualmente, y balancea el botón de disparo para que no haya temblor al disparar.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-card-icon">🎯</div>
+          <h4>Gama Detectada</h4>
+          <p>Clasificamos tu dispositivo automáticamente en baja, media o alta para ajustar los rangos</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">⚖️</div>
+          <h4>Equilibrio de Miras</h4>
+          <p>Cada mira tiene su propio peso. Calibramos la transición entre ellas para cero desestabilización</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🔫</div>
+          <h4>Botón Anti-Temblor</h4>
+          <p>El botón de disparo va sincronizado con la sensibilidad para que tus ráfagas sean precisas</p>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon">🌎</div>
+          <h4>Región SA</h4>
+          <p>Todos los HUDs y códigos están optimizados para los servidores de Sudamérica</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">NANDX <span class="logo-accent">SENSIBILITY</span></span>
+      </div>
+      <p class="footer-text">Creado para jugadores que quieren dominar cada partida.</p>
+      <p class="footer-copy">© 2025 Nandx Sensibility — No afiliado a Garena Free Fire</p>
+    </div>
+  </footer>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p class="loading-text" id="loadingText">Analizando dispositivo...</p>
+      <div class="loading-steps" id="loadingSteps"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
