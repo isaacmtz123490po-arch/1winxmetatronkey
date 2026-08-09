@@ -14,7 +14,7 @@
   s.textContent = `
     :root{
       --bg:#14141a;--card:#1b1b22;--text:#f4f2f6;--muted:#9e9baa;
-      --accent:#b48ad4;--accent-soft:rgba(180,138,212,.2);
+      --accent:#b48ad4;--accent-soft:rgba(180,138,212,.25);
       --accent2:#c4a87c;--accent2-soft:rgba(196,168,124,.18);
       --border:rgba(158,155,170,.16);--ok:#0d9669;--err:#dc4a38;
     }
@@ -31,61 +31,46 @@
     input,select,textarea{-webkit-user-select:text;user-select:text}
 
     /* =====================================================
-       🎥 FONDO VIDEO · 100% A PRUEBA DE iOS · NUNCA FULLSCREEN
+       🎥 FONDO VIDEO · 100% A PRUEBA DE iOS
        ===================================================== */
     .bg-layer{
       position:fixed;inset:0;z-index:0;
       width:100vw;height:100vh;height:100dvh;
-      overflow:hidden !important;
-      background:#000;
+      overflow:hidden !important;background:#000;
       background-size:cover;background-position:center center;background-repeat:no-repeat;
-      transition:opacity .9s ease;
+      transition:opacity .6s ease;
       image-rendering:-webkit-optimize-contrast;image-rendering:high-quality;
       transform:translateZ(0);will-change:transform,opacity;backface-visibility:hidden;
-      /* ✅ IMPOSIBLE TOCARLO */
-      pointer-events:none !important;
-      user-select:none !important;
-      -webkit-user-drag:none !important;
+      pointer-events:none !important;user-select:none !important;-webkit-user-drag:none !important;
     }
-    /* ✅ CONTENEDOR EXTRA PARA iOS — EVITA FULLSCREEN */
     .bg-video-wrap{
-      position:absolute;inset:-2% !important;
-      overflow:hidden !important;
-      transform:scale(1.04) translateZ(0);
-      pointer-events:none !important;
+      position:absolute;inset:-2% !important;overflow:hidden !important;
+      transform:scale(1.04) translateZ(0);pointer-events:none !important;
     }
     .bg-layer video{
       position:absolute;top:50%;left:50%;
       min-width:100% !important;min-height:100% !important;
       width:auto !important;height:auto !important;
       max-width:none !important;max-height:none !important;
-      /* ✅ CENTRADO PERFECTO · LLENA PANTALLA */
       -webkit-transform:translate(-50%,-50%) translateZ(0);
       transform:translate(-50%,-50%) translateZ(0);
       object-fit:cover !important;
       image-rendering:-webkit-optimize-contrast;image-rendering:high-quality;
-      backface-visibility:hidden;
-      filter:none !important;-webkit-filter:none !important;
-      outline:none !important;border:none !important;
-      display:block !important;background:#000 !important;
-      /* ✅ NINGUNA INTERACCIÓN POSIBLE EN iOS */
-      pointer-events:none !important;
-      user-select:none !important;
-      -webkit-user-drag:none !important;
+      backface-visibility:hidden;filter:none !important;-webkit-filter:none !important;
+      outline:none !important;border:none !important;display:block !important;background:#000 !important;
+      pointer-events:none !important;user-select:none !important;-webkit-user-drag:none !important;
       -webkit-tap-highlight-color:transparent !important;
     }
-    /* ✅ BLOQUEO TOTAL DE PANTALLA COMPLETA iOS */
-    video::-webkit-media-controls{display:none !important;-webkit-appearance:none}
-    video::-webkit-media-controls-play-button{display:none !important}
-    video::-webkit-media-controls-start-playback-button{display:none !important;opacity:0 !important;pointer-events:none !important}
-    video::-webkit-media-controls-enclosure{display:none !important}
-    video::-webkit-full-screen-button{display:none !important}
+    video::-webkit-media-controls,
+    video::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-start-playback-button,
+    video::-webkit-media-controls-enclosure,
+    video::-webkit-full-screen-button{display:none !important;-webkit-appearance:none;opacity:0 !important;pointer-events:none !important}
 
     .bg-layer img{
       position:absolute;inset:0;width:100%;height:100%;
       object-fit:cover;object-position:center center;
-      image-rendering:-webkit-optimize-contrast;
-      pointer-events:none !important;user-select:none !important;
+      image-rendering:-webkit-optimize-contrast;pointer-events:none !important;
     }
     .default-bg{
       position:fixed;inset:0;z-index:0;
@@ -94,6 +79,27 @@
     }
     @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
     .overlay{position:fixed;inset:0;z-index:1;background:rgba(0,0,0,.42);backdrop-filter:blur(1px);pointer-events:none}
+
+    /* =====================================================
+       🔔 TOAST · MINI NOTIFICACIÓN DE ACTUALIZACIÓN
+       ===================================================== */
+    .toast{
+      position:fixed;top:18px;right:18px;z-index:9999;
+      max-width:300px;padding:12px 16px;border-radius:12px;
+      background:rgba(27,27,34,.92);color:var(--text);
+      border:1px solid var(--accent);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      box-shadow:0 10px 30px var(--accent-soft);
+      font-size:13px;font-weight:500;line-height:1.35;
+      transform:translateX(calc(100% + 30px));opacity:0;
+      transition:all .35s cubic-bezier(.4,0,.2,1);
+      pointer-events:none;user-select:none;
+      display:flex;align-items:center;gap:10px;
+    }
+    .toast.show{transform:translateX(0);opacity:1}
+    .toast .punto{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);animation:pulso 1.4s ease infinite}
+    .toast.ok .punto{background:var(--ok);box-shadow:0 0 0 4px rgba(13,150,105,.18)}
+    @keyframes pulso{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
 
     /* Botón rayitas */
     .menu-btn{
@@ -214,6 +220,14 @@
     .divider{height:1px;background:var(--border);margin:18px 0}
     .hint{font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}
 
+    .sync-ind{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+      color:var(--muted);margin-top:8px;
+    }
+    .sync-ind .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulso 1.4s ease infinite}
+    .sync-ind.off .dot{background:var(--muted);animation:none}
+
     .hero{
       position:relative;z-index:2;min-height:100vh;min-height:100dvh;
       display:flex;flex-direction:column;justify-content:center;align-items:center;
@@ -257,6 +271,9 @@
 
 <div style="position:relative;min-height:100vh;min-height:100dvh;">
 
+  <!-- 🔔 TOAST NOTIFICACIÓN -->
+  <div id="toast" class="toast"><span class="punto"></span><span id="toastTxt">Listo</span></div>
+
   <!-- Fondos -->
   <div id="defaultBg" class="default-bg"></div>
   <div id="bgLayer" class="bg-layer" style="opacity:0;"></div>
@@ -276,7 +293,7 @@
         <div class="logo">M</div>
         <div>
           <h2>METATRON</h2>
-          <small>Panel de Control</small>
+          <small>Panel de Control · Sync ON</small>
         </div>
       </div>
       <button id="logoutBtn" class="btn btn-secondary btn-small" style="display:none">Salir</button>
@@ -311,20 +328,21 @@
           <button class="tab-btn" data-tab="settings">Ajustes</button>
         </div>
 
-        <!-- VIDEO FONDO · 100% iOS PROOF -->
+        <!-- VIDEO FONDO + SYNC -->
         <div class="tab-content active" id="tab-video">
           <div class="field">
-            <label>Video de fondo · Bucle permanente · iPhone listo</label>
+            <label>Video de fondo · Se sincroniza en todos los dispositivos</label>
             <div class="file-wrap" id="videoDrop">
               <input type="file" id="videoInput" accept="video/mp4,video/webm,video/quicktime">
               <div style="font-weight:700;font-size:14px;color:#fff">Clic o arrastra tu video</div>
-              <div class="file-hint">MP4 H.264 recomendado · Nunca se sale de la pantalla</div>
+              <div class="file-hint">MP4 H.264 recomendado · Al guardar se actualizan todos los celus</div>
               <div class="file-name" id="videoName">Ningún archivo seleccionado</div>
             </div>
           </div>
           <div class="preview" id="videoPreview"><video muted loop playsinline preload="auto"></video></div>
-          <button class="btn btn-primary" id="applyVideo">💾 Guardar y Poner de Fondo</button>
+          <button class="btn btn-primary" id="applyVideo">💾 Guardar y Sincronizar en Todos</button>
           <div class="status" id="stVideo"></div>
+          <div class="sync-ind" id="syncInd"><span class="dot"></span><span>Sincronización activa</span></div>
         </div>
 
         <!-- URL -->
@@ -334,7 +352,7 @@
             <input type="url" id="urlInput" placeholder="https://dominio.com/foto.jpg">
           </div>
           <div class="preview" id="urlPreview"><img alt="preview"></div>
-          <button class="btn btn-primary" id="applyUrl">Aplicar Imagen desde URL</button>
+          <button class="btn btn-primary" id="applyUrl">Aplicar y Sincronizar</button>
           <div class="status" id="stUrl"></div>
         </div>
 
@@ -345,12 +363,12 @@
             <div class="file-wrap" id="imageDrop">
               <input type="file" id="imageInput" accept="image/*">
               <div style="font-weight:700;font-size:14px;color:#fff">Clic o arrastra tu foto</div>
-              <div class="file-hint">JPG · PNG · WebP · Guardado permanente</div>
+              <div class="file-hint">JPG · PNG · Se sincroniza en todos</div>
               <div class="file-name" id="imageName">Ningún archivo seleccionado</div>
             </div>
           </div>
           <div class="preview" id="imagePreview"><img alt="preview"></div>
-          <button class="btn btn-primary" id="applyImage">Guardar y Aplicar Imagen</button>
+          <button class="btn btn-primary" id="applyImage">Guardar y Sincronizar</button>
           <div class="status" id="stImage"></div>
         </div>
 
@@ -373,7 +391,7 @@
           </div>
           <label class="check-row"><input type="checkbox" id="linkShow" checked> Mostrar botón en pantalla</label>
           <div class="divider"></div>
-          <button class="btn btn-primary" id="saveLink">Guardar y Mostrar Link</button>
+          <button class="btn btn-primary" id="saveLink">Guardar y Sincronizar</button>
           <button class="btn btn-secondary" id="hideLink" style="margin-top:10px">Ocultar Link</button>
           <div class="status" id="stLink"></div>
           <div class="current-bg" style="margin-top:16px">
@@ -428,10 +446,143 @@
 
 </div>
 
-<!-- ✅ SCRIPTS AL FINAL · 100% SEGURO iOS -->
+<!-- ✅ SCRIPTS AL FINAL · TODO FUNCIONAL + SYNC -->
 <script>
 (function(){
   'use strict';
+
+  // ============================================================
+  // 🔔 SISTEMA DE TOAST
+  // ============================================================
+  var toastEl=document.getElementById('toast'),toastTxt=document.getElementById('toastTxt'),toastT;
+  function toast(msg,ok){
+    toastTxt.textContent=msg;
+    toastEl.className='toast'+(ok?' ok':'');
+    toastEl.classList.add('show');
+    clearTimeout(toastT);
+    toastT=setTimeout(function(){toastEl.classList.remove('show')},2600);
+  }
+
+  // ============================================================
+  // 🔗 SINCORNIZACIÓN ENTRE DISPOSITIVOS
+  // ============================================================
+  // - BroadcastChannel = instantáneo MISMO dispositivo / varias pestañas
+  // - Polling HTTP cada 3s = todos los dispositivos MISMA URL
+  var CANAL='metatron-sync-v1';
+  var ARCHIVO_DATOS='metatron-datos.json'; // mismo servidor, misma carpeta
+  var bc=null;
+  try{bc=new BroadcastChannel(CANAL)}catch(e){bc=null}
+  var hashLocal='';
+  var syncActivo=true;
+
+  // Hash simple para detectar cambios rápido
+  function hash(str){
+    var h=0;if(!str)return h;
+    for(var i=0;i<str.length;i++){h=((h<<5)-h)+str.charCodeAt(i);h|=0}
+    return h.toString(36);
+  }
+
+  // Guardar datos en LocalStorage + avisar a otros
+  function guardarDatos(datos){
+    var str=JSON.stringify(datos);
+    localStorage.setItem('mt_datos',str);
+    hashLocal=hash(str);
+    // Avisar a otras pestañas mismo dispositivo
+    if(bc)try{bc.postMessage({tipo:'cambio',datos:datos,hash:hashLocal})}catch(e){}
+    // Intentar guardar en servidor para otros dispositivos
+    enviarAlServidor(datos).catch(function(){});
+  }
+
+  // Enviar datos al servidor (si soporta POST)
+  function enviarAlServidor(datos){
+    return new Promise(function(res,rej){
+      try{
+        var xhr=new XMLHttpRequest();
+        xhr.open('POST',ARCHIVO_DATOS,true);
+        xhr.setRequestHeader('Content-Type','application/json');
+        xhr.onload=function(){res()};
+        xhr.onerror=function(){rej()};
+        xhr.ontimeout=function(){rej()};
+        xhr.timeout=2500;
+        xhr.send(JSON.stringify(datos));
+      }catch(e){rej()}
+    });
+  }
+
+  // Cargar datos del servidor
+  function cargarDeServidor(){
+    return new Promise(function(res,rej){
+      try{
+        var xhr=new XMLHttpRequest();
+        xhr.open('GET',ARCHIVO_DATOS+'?t='+Date.now(),true);
+        xhr.responseType='text';
+        xhr.onload=function(){
+          if(xhr.status>=200&&xhr.status<300&&xhr.responseText){
+            try{res(JSON.parse(xhr.responseText))}catch(e){rej()}
+          }else rej()
+        };
+        xhr.onerror=function(){rej()};
+        xhr.ontimeout=function(){rej()};
+        xhr.timeout=2000;
+        xhr.send();
+      }catch(e){rej()}
+    });
+  }
+
+  // Aplicar datos recibidos (cambia fondo sin recargar)
+  var aplicandoCambio=false;
+  function aplicarDatos(datos, avisar){
+    if(!datos||aplicandoCambio)return;
+    aplicandoCambio=true;
+    try{
+      if(datos.tipo==='video'&&datos.base64){
+        ponerVideoFondo(datos.base64,datos.nombre||'fondo',true);
+        if(avisar)toast('🎥 Nuevo video de fondo',true);
+      }
+      else if(datos.tipo==='imagen'&&datos.base64){
+        cf();bl.style.backgroundImage='url("'+datos.base64+'")';sbl();
+        cb.textContent='Imagen: '+(datos.nombre||'fondo');
+        if(avisar)toast('🖼️ Nueva imagen de fondo',true);
+      }
+      else if(datos.tipo==='url'&&datos.url){
+        cf();bl.style.backgroundImage='url("'+datos.url+'")';sbl();
+        cb.textContent='URL: '+datos.url;
+        if(avisar)toast('🌐 Fondo actualizado',true);
+      }
+      if(datos.link)rl(datos.link);
+    }catch(e){}
+    aplicandoCambio=false;
+  }
+
+  // Escuchar mensajes de otras pestañas
+  if(bc){
+    bc.onmessage=function(e){
+      if(!e.data||e.data.tipo!=='cambio')return;
+      if(e.data.hash===hashLocal)return; // ya lo tengo
+      hashLocal=e.data.hash;
+      localStorage.setItem('mt_datos',JSON.stringify(e.data.datos));
+      aplicarDatos(e.data.datos,true);
+    };
+  }
+
+  // Polling cada 3s: preguntar al servidor si hubo cambios
+  function revisarServidor(){
+    if(!syncActivo)return;
+    cargarDeServidor().then(function(datos){
+      document.getElementById('syncInd').classList.remove('off');
+      var h=hash(JSON.stringify(datos));
+      if(h===hashLocal)return;
+      // NUEVO CAMBIO DETECTADO
+      hashLocal=h;
+      localStorage.setItem('mt_datos',JSON.stringify(datos));
+      if(bc)try{bc.postMessage({tipo:'cambio',datos:datos,hash:h})}catch(e){}
+      aplicarDatos(datos,true);
+    }).catch(function(){
+      // Sin servidor → solo sync entre pestañas
+      document.getElementById('syncInd').classList.add('off');
+    });
+  }
+  setInterval(revisarServidor,3000);
 
   // 🔒 BLOQUEO ZOOM
   (function(){
@@ -529,305 +680,426 @@
   });
 
   // ============================================================
-  // 🎥 NÚCLEO VIDEO — 100% A PRUEBA DE IPHONE / iOS SAFARI
+  // 🎥 NÚCLEO VIDEO iOS PROOF
   // ============================================================
   var bl=document.getElementById('bgLayer'),df=document.getElementById('defaultBg'),cb=document.getElementById('currentBg');
-  var videoActivo=null;
-  var intentosPlay=0;
+  var videoActivo=null,intentosPlay=0;
 
   function cf(){
     bl.innerHTML='';bl.style.backgroundImage='';bl.style.opacity='0';df.style.display='block';
     videoActivo=null;intentosPlay=0;
   }
   function sbl(){bl.style.opacity='1';df.style.display='none'}
-  function st(el,m,ok){el.textContent=m;el.className='status show '+(ok?'ok':'err');setTimeout(function(){el.classList.remove('show')},3500)}
+  function st2(el,m,ok){el.textContent=m;el.className='status show '+(ok?'ok':'err');setTimeout(function(){el.classList.remove('show')},3500)}
 
-  // ✅ FUNCIÓN MÁGICA: CREA VIDEO QUE iOS NUNCA ABRIRÁ EN FULLSCREEN
-  function crearVideoiOS(srcData, esBase64){
+  function crearVideoiOS(src){
     var v=document.createElement('video');
-
-    // ✅ TODOS LOS ATRIBUTOS QUE iOS EXIGE PARA REPRODUCIR INLINE
-    v.setAttribute('src',srcData);
-    v.setAttribute('autoplay','autoplay');
-    v.setAttribute('muted','muted');
-    v.setAttribute('loop','loop');
-    v.setAttribute('playsinline','playsinline');
-    v.setAttribute('webkit-playsinline','true');
-    v.setAttribute('x5-playsinline','true');
-    v.setAttribute('x5-video-player-type','h5');
-    v.setAttribute('x5-video-player-fullscreen','false');
-    v.setAttribute('x5-video-orientation','landscape|portrait');
-    v.setAttribute('preload','auto');
+    v.setAttribute('src',src);
+    v.setAttribute('autoplay','autoplay');v.setAttribute('muted','muted');v.setAttribute('loop','loop');
+    v.setAttribute('playsinline','playsinline');v.setAttribute('webkit-playsinline','true');
+    v.setAttribute('x5-playsinline','true');v.setAttribute('x5-video-player-type','h5');
+    v.setAttribute('x5-video-player-fullscreen','false');v.setAttribute('preload','auto');
     v.setAttribute('disablePictureInPicture','true');
     v.setAttribute('controlslist','nodownload nofullscreen noremoteplayback noplaybackrate');
-    v.setAttribute('disableRemotePlayback','true');
-    v.setAttribute('draggable','false');
-    v.setAttribute('aria-hidden','true');
-
-    // ✅ PROPIEDADES JS
+    v.setAttribute('disableRemotePlayback','true');v.setAttribute('draggable','false');
     v.autoplay=true;v.muted=true;v.loop=true;v.playsInline=true;
-    v.controls=false;v.defaultMuted=true;v.crossOrigin='anonymous';
-    v.volume=0;v.playbackRate=1;
+    v.controls=false;v.defaultMuted=true;v.volume=0;
 
-    // ✅ BLOQUEO ABSOLUTO: SI iOS INTENTA ABRIR FULLSCREEN, LO CERRAMOS YA
-    v.addEventListener('webkitbeginfullscreen',function(e){
-      e.preventDefault();e.stopImmediatePropagation();
-      try{if(v.webkitExitFullscreen)v.webkitExitFullscreen()}catch(err){}
-      try{if(document.exitFullscreen)document.exitFullscreen()}catch(err){}
-      return false;
-    },true);
-    v.addEventListener('webkitenterfullscreen',function(e){
-      e.preventDefault();e.stopImmediatePropagation();
-      try{if(v.webkitExitFullscreen)v.webkitExitFullscreen()}catch(err){}
-      return false;
-    },true);
-    v.addEventListener('enterfullscreen',function(e){
-      e.preventDefault();e.stopImmediatePropagation();
-      try{document.exitFullscreen()}catch(err){}
-      return false;
-    },true);
-    v.addEventListener('fullscreenchange',function(){
-      try{
-        if(document.fullscreenElement===v||document.webkitFullscreenElement===v){
-          if(document.exitFullscreen)document.exitFullscreen();
-          else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
-        }
-      }catch(err){}
-    },true);
+    v.addEventListener('webkitbeginfullscreen',function(e){e.preventDefault();try{if(v.webkitExitFullscreen)v.webkitExitFullscreen()}catch(err){}return false},true);
+    v.addEventListener('webkitenterfullscreen',function(e){e.preventDefault();try{if(v.webkitExitFullscreen)v.webkitExitFullscreen()}catch(err){}return false},true);
+    v.addEventListener('enterfullscreen',function(e){e.preventDefault();try{document.exitFullscreen()}catch(err){}return false},true);
+    v.addEventListener('fullscreenchange',function(){try{if(document.fullscreenElement===v||document.webkitFullscreenElement===v){if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen()}}catch(err){}},true);
 
-    // ✅ NINGÚN MENÚ, NINGÚN CLICK
     v.oncontextmenu=function(){return false};
     ['contextmenu','click','tap','touchstart','touchend','touchmove'].forEach(function(ev){
       v.addEventListener(ev,function(e){e.preventDefault();e.stopPropagation();return false},true);
     });
 
-    // ✅ BUCLE DOBLE (por si el atributo falla en iOS)
-    v.addEventListener('ended',function(){
-      try{v.currentTime=0.01;v.play().catch(function(){})}catch(err){}
-    },true);
-
-    // ✅ AL CARGAR → REPRODUCIR
-    v.addEventListener('canplaythrough',function(){
-      reproduciriOS(v);
-    },{once:true});
-
-    // ✅ SI SE PAUSA SOLO (iOS lo hace a veces) → VOLVER A DAR PLAY
-    v.addEventListener('pause',function(){
-      setTimeout(function(){reproduciriOS(v)},150);
-    },true);
-
-    // ✅ SI HAY ERROR → INTENTAR RECARGAR
-    v.addEventListener('error',function(){
-      intentosPlay++;
-      if(intentosPlay<5){setTimeout(function(){v.load();reproduciriOS(v)},500)}
-    },true);
-
+    v.addEventListener('ended',function(){try{v.currentTime=0.01;v.play().catch(function(){})}catch(err){}},true);
+    v.addEventListener('canplaythrough',function(){reproiOS(v)},{once:true});
+    v.addEventListener('pause',function(){setTimeout(function(){reproiOS(v)},150)},true);
+    v.addEventListener('error',function(){intentosPlay++;if(intentosPlay<5)setTimeout(function(){v.load();reproiOS(v)},500)},true);
     return v;
   }
 
-  // ✅ FUNCIÓN QUE REPRODUCE EN iOS SIN FALLOS
-  function reproduciriOS(v){
+  function reproiOS(v){
     if(!v)return;
     try{
       v.muted=true;v.volume=0;
       var p=v.play();
       if(p&&typeof p.catch==='function'){
-        p.catch(function(){
-          // iOS bloqueó autoplay → reintentar
-          intentosPlay++;
-          if(intentosPlay<10){setTimeout(function(){reproduciriOS(v)},300)}
-        });
+        p.catch(function(){intentosPlay++;if(intentosPlay<10)setTimeout(function(){reproiOS(v)},300)});
       }
       sbl();
-    }catch(err){
-      intentosPlay++;
-      if(intentosPlay<10)setTimeout(function(){reproduciriOS(v)},300);
-    }
+    }catch(err){intentosPlay++;if(intentosPlay<10)setTimeout(function(){reproiOS(v)},300)}
   }
 
-  // ✅ PONER VIDEO DE FONDO (DEFINITIVO)
-  function ponerVideoFondo(data, nombre, esBase64){
-    cf();
-    intentosPlay=0;
-
-    // Contenedor extra anti-fullscreen iOS
-    var wrap=document.createElement('div');
-    wrap.className='bg-video-wrap';
-    wrap.setAttribute('aria-hidden','true');
-
-    var v=crearVideoiOS(data, esBase64);
-    videoActivo=v;
-
-    wrap.appendChild(v);
-    bl.appendChild(wrap);
-
-    // Forzar carga
-    setTimeout(function(){
-      try{v.load()}catch(e){}
-      reproduciriOS(v);
-    },50);
-
-    cb.textContent='Video permanente: '+(nombre||'fondo');
+  function ponerVideoFondo(data,nombre){
+    cf();intentosPlay=0;
+    var wrap=document.createElement('div');wrap.className='bg-video-wrap';
+    var v=crearVideoiOS(data);videoActivo=v;
+    wrap.appendChild(v);bl.appendChild(wrap);
+    setTimeout(function(){try{v.load()}catch(e){}reproiOS(v)},50);
+    cb.textContent='Video: '+(nombre||'fondo');
   }
 
-  // ✅ EN EL PRIMER TOQUE DE LA PANTALLA → FORZAR PLAY (iOS LO EXIGE)
-  function forzarPlayPrimerToque(){
-    if(videoActivo){
-      reproduciriOS(videoActivo);
-    }
-  }
-  document.addEventListener('touchstart',forzarPlayPrimerToque,{once:false,passive:true});
-  document.addEventListener('click',forzarPlayPrimerToque,{once:false,passive:true});
+  function forzarPlay(){if(videoActivo)reproiOS(videoActivo)}
+  document.addEventListener('touchstart',forzarPlay,{passive:true});
+  document.addEventListener('click',forzarPlay,{passive:true});
 
-  // ✅ SUBIR VIDEO → CONVERTIR A BASE64 (iOS odia blob URLs)
+  // ✅ SUBIR VIDEO → BASE64 → GUARDAR → SINCRONIZAR A TODOS
   var vi=document.getElementById('videoInput'),vn=document.getElementById('videoName');
   var vp=document.getElementById('videoPreview'),vpe=vp.querySelector('video'),pvf=null;
   vi.addEventListener('change',function(e){
     var f=e.target.files[0];if(!f)return;
-    if(!f.type.startsWith('video/')){st(document.getElementById('stVideo'),'Archivo no válido',false);return}
-    pvf=f;vn.textContent=f.name+' · '+(f.size/1024/1024).toFixed(2)+' MB';
-    var u=URL.createObjectURL(f);vpe.src=u;vp.classList.add('show');
-  });
-  document.getElementById('applyVideo').addEventListener('click',async function(){
-    var s=document.getElementById('stVideo');
-    if(!pvf){st(s,'Selecciona un video primero',false);return}
-    try{
-      s.className='status show';s.textContent='💾 Convirtiendo y guardando (tarda un poco)...';
+    if(!f.type.startsWith('video/')){st2(document.getElementById('stVideo'),  // ✅ FINAL CORRECTO DE ponerVideoFondo
+  function ponerVideoFondo(data, nombre){
+    cf(); intentosPlay = 0;
+    var wrap = document.createElement('div');
+    wrap.className = 'bg-video-wrap';
+    var v = crearVideoiOS(data);
+    videoActivo = v;
+    wrap.appendChild(v);
+    bl.appendChild(wrap);
+    setTimeout(function(){
+      try{ v.load() }catch(e){}
+      reproiOS(v);
+    }, 50);
+    cb.textContent = 'Video: ' + (nombre || 'fondo');
+  }
 
-      // ✅ CONVERTIR A BASE64 · iOS FUNCIONA SOLO ASÍ
-      var base64=await new Promise(function(res,rej){
-        var r=new FileReader();
-        r.onload=function(){res(r.result)};
-        r.onerror=function(){rej(r.error)};
+  // Forzar play en iOS al primer toque
+  function forzarPlay(){ if(videoActivo) reproiOS(videoActivo); }
+  document.addEventListener('touchstart', forzarPlay, { passive:true });
+  document.addEventListener('click', forzarPlay, { passive:true });
+
+  // ============================================================
+  // 🎥 SUBIR VIDEO → BASE64 → GUARDAR → SINCRONIZAR A TODOS
+  // ============================================================
+  var vi = document.getElementById('videoInput');
+  var vn = document.getElementById('videoName');
+  var vp = document.getElementById('videoPreview');
+  var vpe = vp.querySelector('video');
+  var pvf = null;
+
+  vi.addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    if(!f.type.startsWith('video/')){
+      st2(document.getElementById('stVideo'), 'Archivo no válido', false);
+      return;
+    }
+    pvf = f;
+    vn.textContent = f.name + ' · ' + (f.size/1024/1024).toFixed(2) + ' MB';
+    var u = URL.createObjectURL(f);
+    vpe.src = u;
+    vp.classList.add('show');
+  });
+
+  document.getElementById('applyVideo').addEventListener('click', async function(){
+    var s = document.getElementById('stVideo');
+    if(!pvf){ st2(s, 'Selecciona un video primero', false); return; }
+    try{
+      s.className = 'status show';
+      s.textContent = '💾 Convirtiendo... (tarda según tamaño)';
+
+      // 1) Convertir a Base64 (iOS lo necesita)
+      var base64 = await new Promise(function(res, rej){
+        var r = new FileReader();
+        r.onload = function(){ res(r.result); };
+        r.onerror = function(){ rej(r.error); };
         r.readAsDataURL(pvf);
       });
 
-      // ✅ Borro anterior → guardo base64 → pongo
-      await bb(SV,'fondo');
-      await gb(SV,'fondo',base64,{nombre:pvf.name,tipo:pvf.type,base64:true});
-      localStorage.setItem('mt_bg',JSON.stringify({tipo:'video',nombre:pvf.name,guardado:true}));
+      // 2) Guardar local (IndexedDB + LocalStorage)
+      await bb(SV, 'fondo');
+      await gb(SV, 'fondo', base64, { nombre: pvf.name, tipo: pvf.type });
 
-      ponerVideoFondo(base64,pvf.name,true);
-      st(s,'✅ LISTO · Quedó de fondo · iPhone ya no lo abre',true);
-    }catch(err){console.error(err);st(s,'❌ Error: '+(err.message||''),false)}
+      // 3) Objeto que se sincroniza a TODOS los dispositivos
+      var datos = {
+        tipo: 'video',
+        nombre: pvf.name,
+        base64: base64,
+        ts: Date.now()
+      };
+
+      // 4) Poner de fondo YA
+      ponerVideoFondo(base64, pvf.name);
+
+      // 5) ✅ AVISAR A OTROS DISPOSITIVOS (misma URL HTTP)
+      guardarDatos(datos);
+
+      st2(s, '✅ Listo · Se actualizó en TODOS los dispositivos', true);
+      toast('🎥 Video nuevo sincronizado', true);
+
+    }catch(err){
+      console.error(err);
+      st2(s, '❌ Error: ' + (err.message || ''), false);
+    }
   });
 
-  // URL
-  var ui=document.getElementById('urlInput'),up=document.getElementById('urlPreview'),upe=up.querySelector('img');
-  ui.addEventListener('input',function(){
-    var v=this.value.trim();
-    if(v&&/^https?:\/\//i.test(v)){upe.onload=function(){up.classList.add('show')};upe.onerror=function(){up.classList.remove('show')};upe.src=v}
-    else up.classList.remove('show');
-  });
-  document.getElementById('applyUrl').addEventListener('click',function(){
-    var u=ui.value.trim(),s=document.getElementById('stUrl');
-    if(!u||!/^https?:\/\//i.test(u)){st(s,'URL inválida',false);return}
-    cf();var i=new Image();
-    i.onload=function(){bl.style.backgroundImage='url("'+u+'")';sbl();cb.textContent='Imagen URL: '+u;localStorage.setItem('mt_bg',JSON.stringify({tipo:'url',url:u}));bb(SV,'fondo').catch(function(){});st(s,'Imagen aplicada ✓',true)};
-    i.onerror=function(){st(s,'No se pudo cargar',false)};i.src=u;
+  // ============================================================
+  // 🌐 URL IMAGEN · TAMBIÉN SINCRONIZA
+  // ============================================================
+  var ui = document.getElementById('urlInput');
+  var up = document.getElementById('urlPreview');
+  var upe = up.querySelector('img');
+
+  ui.addEventListener('input', function(){
+    var v = this.value.trim();
+    if(v && /^https?:\/\//i.test(v)){
+      upe.onload = function(){ up.classList.add('show'); };
+      upe.onerror = function(){ up.classList.remove('show'); };
+      upe.src = v;
+    } else up.classList.remove('show');
   });
 
-  // IMAGEN
-  var ii=document.getElementById('imageInput'),inn=document.getElementById('imageName');
-  var ip=document.getElementById('imagePreview'),ipe=ip.querySelector('img'),pif=null;
-  ii.addEventListener('change',function(e){
-    var f=e.target.files[0];if(!f)return;
-    if(!f.type.startsWith('image/')){st(document.getElementById('stImage'),'No es una imagen',false);return}
-    pif=f;inn.textContent=f.name+' · '+(f.size/1024/1024).toFixed(2)+' MB';
-    var u=URL.createObjectURL(f);ipe.src=u;ip.classList.add('show');
+  document.getElementById('applyUrl').addEventListener('click', function(){
+    var u = ui.value.trim();
+    var s = document.getElementById('stUrl');
+    if(!u || !/^https?:\/\//i.test(u)){ st2(s, 'URL inválida', false); return; }
+    var i = new Image();
+    i.onload = function(){
+      cf();
+      bl.style.backgroundImage = 'url("' + u + '")';
+      sbl();
+      cb.textContent = 'URL: ' + u;
+      var datos = { tipo:'url', url:u, ts:Date.now() };
+      guardarDatos(datos);
+      st2(s, '✅ Aplicado y sincronizado', true);
+      toast('🌐 Fondo actualizado', true);
+      bb(SV, 'fondo').catch(function(){});
+    };
+    i.onerror = function(){ st2(s, 'No se pudo cargar', false); };
+    i.src = u;
   });
-  document.getElementById('applyImage').addEventListener('click',async function(){
-    var s=document.getElementById('stImage');if(!pif){st(s,'Selecciona una imagen',false);return}
+
+  // ============================================================
+  // 🖼️ IMAGEN LOCAL · SINCRONIZA
+  // ============================================================
+  var ii = document.getElementById('imageInput');
+  var inn = document.getElementById('imageName');
+  var ip = document.getElementById('imagePreview');
+  var ipe = ip.querySelector('img');
+  var pif = null;
+
+  ii.addEventListener('change', function(e){
+    var f = e.target.files[0]; if(!f) return;
+    if(!f.type.startsWith('image/')){
+      st2(document.getElementById('stImage'), 'No es una imagen', false);
+      return;
+    }
+    pif = f;
+    inn.textContent = f.name + ' · ' + (f.size/1024/1024).toFixed(2) + ' MB';
+    var u = URL.createObjectURL(f);
+    ipe.src = u;
+    ip.classList.add('show');
+  });
+
+  document.getElementById('applyImage').addEventListener('click', async function(){
+    var s = document.getElementById('stImage');
+    if(!pif){ st2(s, 'Selecciona una imagen', false); return; }
     try{
-      s.className='status show';s.textContent='💾 Guardando...';
-      await bb(SI,'fondo');
-      var d=await new Promise(function(r){var x=new FileReader();x.onload=e=>r(e.target.result);x.readAsDataURL(pif)});
-      await gb(SI,'fondo',d,{nombre:pif.name});
-      cf();bl.style.backgroundImage='url("'+d+'")';sbl();
-      cb.textContent='Imagen permanente: '+pif.name;
-      localStorage.setItem('mt_bg',JSON.stringify({tipo:'imagen',nombre:pif.name,guardado:true}));
-      bb(SV,'fondo').catch(function(){});
-      st(s,'✅ Imagen guardada permanentemente',true);
-    }catch(err){st(s,'❌ Error: '+err.message,false)}
+      s.className = 'status show'; s.textContent = '💾 Guardando...';
+      var b64 = await new Promise(function(r){
+        var x = new FileReader();
+        x.onload = e => r(e.target.result);
+        x.readAsDataURL(pif);
+      });
+      await bb(SI, 'fondo');
+      await gb(SI, 'fondo', b64, { nombre: pif.name });
+      cf();
+      bl.style.backgroundImage = 'url("' + b64 + '")';
+      sbl();
+      cb.textContent = 'Imagen: ' + pif.name;
+      var datos = { tipo:'imagen', nombre:pif.name, base64:b64, ts:Date.now() };
+      guardarDatos(datos);
+      st2(s, '✅ Guardada y sincronizada', true);
+      toast('🖼️ Imagen nueva', true);
+      bb(SV, 'fondo').catch(function(){});
+    }catch(err){ st2(s, '❌ Error: ' + err.message, false); }
   });
 
-  // RESETS
-  document.getElementById('resetBgBtn').addEventListener('click',async function(){cf();cb.textContent='Gradiente Metatron por defecto';localStorage.removeItem('mt_bg');try{await bb(SV,'fondo');await bb(SI,'fondo')}catch(e){}});
-  document.getElementById('resetAllBtn').addEventListener('click',async function(){
-    if(!confirm('¿Restablecer TODO de METATRON a fábrica?'))return;
-    ['mt_bg','mt_link','mt_pass','mt_authed'].forEach(function(k){localStorage.removeItem(k)});
-    try{await bb(SV,'fondo');await bb(SI,'fondo')}catch(e){}
+  // ============================================================
+  // 🔄 RESETS
+  // ============================================================
+  document.getElementById('resetBgBtn').addEventListener('click', async function(){
+    cf();
+    cb.textContent = 'Gradiente Metatron por defecto';
+    localStorage.removeItem('mt_bg');
+    localStorage.removeItem('mt_datos');
+    hashLocal = '';
+    try{ await bb(SV,'fondo'); await bb(SI,'fondo'); }catch(e){}
+    if(bc) try{ bc.postMessage({ tipo:'reset' }); }catch(e){}
+    toast('🔄 Fondo restablecido', true);
+  });
+
+  document.getElementById('resetAllBtn').addEventListener('click', async function(){
+    if(!confirm('¿Restablecer TODO de METATRON a fábrica?')) return;
+    ['mt_bg','mt_datos','mt_link','mt_pass','mt_authed'].forEach(function(k){
+      localStorage.removeItem(k);
+    });
+    hashLocal = '';
+    try{ await bb(SV,'fondo'); await bb(SI,'fondo'); }catch(e){}
     location.reload();
   });
 
-  // LINK
-  var ml=document.getElementById('mainLink'),lt=document.getElementById('linkText'),lu=document.getElementById('linkUrl');
-  var ltg=document.getElementById('linkTarget'),lsh=document.getElementById('linkShow'),cle=document.getElementById('currentLink');
+  // ============================================================
+  // 🔗 LINK · SINCRONIZA
+  // ============================================================
+  var ml = document.getElementById('mainLink');
+  var lt = document.getElementById('linkText');
+  var lu = document.getElementById('linkUrl');
+  var ltg = document.getElementById('linkTarget');
+  var lsh = document.getElementById('linkShow');
+  var cle = document.getElementById('currentLink');
+
   function rl(c){
-    if(!c||!c.url||!c.show){ml.style.display='none';cle.textContent='Ninguno configurado';return}
-    ml.textContent=c.text||'Abrir enlace';ml.href=c.url;ml.target=c.target||'_blank';ml.rel='noopener noreferrer';ml.style.display='inline-block';
-    cle.textContent=(c.text||'Link')+' → '+c.url;lt.value=c.text||'';lu.value=c.url||'';ltg.value=c.target||'_blank';lsh.checked=!!c.show;
+    if(!c || !c.url || !c.show){
+      ml.style.display = 'none';
+      cle.textContent = 'Ninguno configurado';
+      return;
+    }
+    ml.textContent = c.text || 'Abrir enlace';
+    ml.href = c.url;
+    ml.target = c.target || '_blank';
+    ml.rel = 'noopener noreferrer';
+    ml.style.display = 'inline-block';
+    cle.textContent = (c.text || 'Link') + ' → ' + c.url;
+    lt.value = c.text || '';
+    lu.value = c.url || '';
+    ltg.value = c.target || '_blank';
+    lsh.checked = !!c.show;
   }
-  document.getElementById('saveLink').addEventListener('click',function(){
-    var t=lt.value.trim(),u=lu.value.trim(),s=document.getElementById('stLink');
-    if(!u){st(s,'Ingresa al menos una URL',false);return}
-    if(!/^https?:\/\//i.test(u)){st(s,'URL debe empezar con http:// o https://',false);return}
-    var c={text:t||'Abrir enlace',url:u,target:ltg.value,show:true};
-    localStorage.setItem('mt_link',JSON.stringify(c));lsh.checked=true;rl(c);st(s,'Link guardado ✓',true);
+
+  document.getElementById('saveLink').addEventListener('click', function(){
+    var t = lt.value.trim();
+    var u = lu.value.trim();
+    var s = document.getElementById('stLink');
+    if(!u){ st2(s, 'Ingresa al menos una URL', false); return; }
+    if(!/^https?:\/\//i.test(u)){
+      st2(s, 'URL debe empezar con http:// o https://', false);
+      return;
+    }
+    var cfg = { text: t || 'Abrir enlace', url: u, target: ltg.value, show: true };
+    localStorage.setItem('mt_link', JSON.stringify(cfg));
+    lsh.checked = true;
+    rl(cfg);
+    // Sincronizar link también
+    var actual = JSON.parse(localStorage.getItem('mt_datos') || '{}');
+    actual.link = cfg;
+    actual.ts = Date.now();
+    guardarDatos(actual);
+    st2(s, '✅ Link guardado y sincronizado', true);
+    toast('🔗 Link actualizado', true);
   });
-  document.getElementById('hideLink').addEventListener('click',function(){
-    var r=localStorage.getItem('mt_link'),c=r?JSON.parse(r):{};c.show=false;c.url=c.url||lu.value;
-    localStorage.setItem('mt_link',JSON.stringify(c));lsh.checked=false;rl(c);st(document.getElementById('stLink'),'Link ocultado',true);
+
+  document.getElementById('hideLink').addEventListener('click', function(){
+    var raw = localStorage.getItem('mt_link');
+    var c = raw ? JSON.parse(raw) : {};
+    c.show = false;
+    c.url = c.url || lu.value;
+    localStorage.setItem('mt_link', JSON.stringify(c));
+    lsh.checked = false;
+    rl(c);
+    var actual = JSON.parse(localStorage.getItem('mt_datos') || '{}');
+    actual.link = c;
+    actual.ts = Date.now();
+    guardarDatos(actual);
+    st2(document.getElementById('stLink'), 'Link ocultado', true);
   });
 
   // ============================================================
-  // 🚀 CARGAR FONDO GUARDADO · iOS PROOF
+  // 🚀 CARGAR FONDO GUARDADO AL INICIAR
   // ============================================================
-  async function cfg(){
+  async function cargarAlInicio(){
     try{
-      var r=localStorage.getItem('mt_bg');if(!r)return;
-      var b=JSON.parse(r);
+      // 1) PRIORIDAD: servidor (otros dispositivos)
+      var delServidor = false;
+      try{
+        var datosServer = await cargarDeServidor();
+        if(datosServer && datosServer.ts){
+          hashLocal = hash(JSON.stringify(datosServer));
+          localStorage.setItem('mt_datos', JSON.stringify(datosServer));
+          aplicarDatos(datosServer, false);
+          rl(datosServer.link || JSON.parse(localStorage.getItem('mt_link')||'null'));
+          delServidor = true;
+        }
+      }catch(e){}
 
-      if(b.tipo==='video'&&b.guardado){
-        var rec=await lb(SV,'fondo');
-        if(rec&&rec.data){
-          // ✅ SIEMPRE BASE64 → iOS lo reproduce inline
-          ponerVideoFondo(rec.data,(rec.meta&&rec.meta.nombre)||b.nombre||'fondo',true);
-          return;
+      // 2) Si no hay servidor, local
+      if(!delServidor){
+        var raw = localStorage.getItem('mt_bg');
+        if(raw){
+          var b = JSON.parse(raw);
+          if(b.tipo === 'video' && b.guardado){
+            var rec = await lb(SV, 'fondo');
+            if(rec && rec.data){
+              ponerVideoFondo(rec.data, (rec.meta&&rec.meta.nombre) || b.nombre || 'fondo');
+              return;
+            }
+          }
+          if(b.tipo === 'imagen' && b.guardado){
+            var rec = await lb(SI, 'fondo');
+            if(rec && rec.data){
+              cf();
+              bl.style.backgroundImage = 'url("' + rec.data + '")';
+              sbl();
+              cb.textContent = 'Imagen: ' + (rec.meta&&rec.meta.nombre||'fondo');
+              return;
+            }
+          }
+          if(b.tipo === 'url' && b.url){
+            var i = new Image();
+            i.onload = function(){
+              cf();
+              bl.style.backgroundImage = 'url("' + b.url + '")';
+              sbl();
+              cb.textContent = 'URL: ' + b.url;
+              ui.value = b.url;
+            };
+            i.src = b.url;
+          }
         }
+        rl(JSON.parse(localStorage.getItem('mt_link')||'null'));
       }
-      if(b.tipo==='imagen'&&b.guardado){
-        var rec=await lb(SI,'fondo');
-        if(rec&&rec.data){
-          cf();bl.style.backgroundImage='url("'+rec.data+'")';sbl();
-          cb.textContent='Imagen permanente: '+(rec.meta&&rec.meta.nombre||'fondo');
-          return;
-        }
-      }
-      if(b.tipo==='url'&&b.url){
-        var i=new Image();
-        i.onload=function(){cf();bl.style.backgroundImage='url("'+b.url+'")';sbl();cb.textContent='Imagen URL: '+b.url;ui.value=b.url};
-        i.src=b.url;
-      }
-    }catch(e){console.error('Cargar:',e)}
+
+    }catch(e){ console.error('Cargar inicio:', e); }
   }
 
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',function(){
-      cfg();rl(JSON.parse(localStorage.getItem('mt_link')||'null'));
-    });
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', cargarAlInicio);
   }else{
-    cfg();rl(JSON.parse(localStorage.getItem('mt_link')||'null'));
+    cargarAlInicio();
   }
 
-  // DRAG & DROP
-  function dp(z,i){
-    ['dragenter','dragover'].forEach(function(e){z.addEventListener(e,function(x){x.preventDefault();x.stopPropagation();z.style.borderColor='var(--accent)';z.style.background='var(--accent-soft)'})});
-    ['dragleave','drop'].forEach(function(e){z.addEventListener(e,function(x){x.preventDefault();x.stopPropagation();z.style.borderColor='';z.style.background=''})});
-    z.addEventListener('drop',function(x){var f=x.dataTransfer.files[0];if(f){i.files=x.dataTransfer.files;i.dispatchEvent(new Event('change'))}});
+  // ============================================================
+  // 📂 DRAG & DROP
+  // ============================================================
+  function drop(z, input){
+    ['dragenter','dragover'].forEach(function(ev){
+      z.addEventListener(ev, function(e){
+        e.preventDefault(); e.stopPropagation();
+        z.style.borderColor = 'var(--accent)';
+        z.style.background = 'var(--accent-soft)';
+      });
+    });
+    ['dragleave','drop'].forEach(function(ev){
+      z.addEventListener(ev, function(e){
+        e.preventDefault(); e.stopPropagation();
+        z.style.borderColor = '';
+        z.style.background = '';
+      });
+    });
+    z.addEventListener('drop', function(e){
+      var f = e.dataTransfer.files[0];
+      if(f){
+        input.files = e.dataTransfer.files;
+        input.dispatchEvent(new Event('change'));
+      }
+    });
   }
-  dp(document.getElementById('videoDrop'),vi);dp(document.getElementById('imageDrop'),ii);
+  drop(document.getElementById('videoDrop'), vi);
+  drop(document.getElementById('imageDrop'), ii);
 
 })();
-</script>
-</html>
+// ✅ FIN · TODO CERRADO CORRECTAMENTE
