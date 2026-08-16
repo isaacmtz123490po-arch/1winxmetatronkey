@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Self-Signed Certificate Generator</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f0f4f8;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2rem 1rem;
+        color: #2d3748;
+      }
+
+      .container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.10);
+        padding: 2rem;
+        width: 100%;
+        max-width: 600px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid #4f46e5;
+      }
+
+      .form-group {
+        margin-bottom: 1.25rem;
+      }
+
+      .form-group > label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #4a5568;
+        margin-bottom: 0.4rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      /* ── Inputs ───────────────────────────────────── */
+      .input-field {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        border: 1.5px solid #cbd5e0;
+        border-radius: 7px;
+        font-size: 0.95rem;
+        background: #fafafa;
+        color: #2d3748;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .input-field:focus {
+        outline: none;
+        border-color: #4f46e5;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+      }
+      .input-field:disabled { opacity: 0.45; cursor: not-allowed; }
+
+      .input-short {
+        width: 90px;
+        padding: 0.45rem 0.6rem;
+        border: 1.5px solid #cbd5e0;
+        border-radius: 7px;
+        font-size: 0.9rem;
+        background: #fafafa;
+        color: #2d3748;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .input-short:disabled { opacity: 0.45; cursor: not-allowed; }
+      .input-short:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+      }
+
+      .input-date {
+        padding: 0.45rem 0.6rem;
+        border: 1.5px solid #cbd5e0;
+        border-radius: 7px;
+        font-size: 0.9rem;
+        background: #fafafa;
+        color: #2d3748;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+      .input-date:disabled { opacity: 0.45; cursor: not-allowed; }
+      .input-date:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+      }
+
+      /* ── SAN ──────────────────────────────────────── */
+      .san-row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: stretch;
+      }
+      .san-row .input-field { flex: 1; }
+
+      .san-list {
+        list-style: none;
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .san-list li {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #eef2ff;
+        border: 1px solid #c7d2fe;
+        border-radius: 6px;
+        padding: 0.35rem 0.4rem 0.35rem 0.75rem;
+      }
+
+      .mono { font-family: 'Courier New', Courier, monospace; font-size: 0.88rem; }
+
+      .btn-remove {
+        background: none;
+        border: none;
+        color: #e53e3e;
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 0.2rem 0.45rem;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      .btn-remove:hover { background: #fff5f5; }
+
+      /* ── Expiry ────────────────────────────────────── */
+      .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .radio-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.92rem;
+        cursor: pointer;
+        flex-wrap: wrap;
+      }
+      .radio-label input[type="radio"] { flex-shrink: 0; accent-color: #4f46e5; }
+      .hint-inline { font-size: 0.8rem; color: #718096; }
+
+      /* ── Hint ──────────────────────────────────────── */
+      .hint {
+        margin-top: 0.3rem;
+        font-size: 0.8rem;
+        color: #718096;
+      }
+
+      /* ── Buttons ───────────────────────────────────── */
+      .btn-primary {
+        display: block;
+        width: 100%;
+        padding: 0.72rem;
+        background: #4f46e5;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 0.25rem;
+        transition: background 0.15s, transform 0.08s;
+      }
+      .btn-primary:hover { background: #4338ca; }
+      .btn-primary:active { transform: scale(0.99); }
+
+      .btn-secondary {
+        padding: 0.55rem 1rem;
+        background: #4f46e5;
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.15s;
+        white-space: nowrap;
+      }
+      .btn-secondary:hover { background: #4338ca; }
+
+      /* ── Error ─────────────────────────────────────── */
+      .alert-error {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: #fff5f5;
+        border: 1.5px solid #fed7d7;
+        border-radius: 8px;
+        color: #c53030;
+        font-size: 0.9rem;
+      }
+
+      /* ── Result / download ─────────────────────────── */
+      .result-box {
+        margin-top: 1.25rem;
+        padding: 1rem;
+        background: #f0fdf4;
+        border: 1.5px solid #bbf7d0;
+        border-radius: 10px;
+      }
+      .result-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #276749;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .btn-download {
+        display: block;
+        width: 100%;
+        padding: 0.65rem 0.9rem;
+        background: #059669;
+        color: #fff;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        text-align: left;
+        font-family: 'Courier New', Courier, monospace;
+        margin-bottom: 0.5rem;
+        transition: background 0.15s;
+      }
+      .btn-download:hover { background: #047857; }
+      .btn-download:last-child { margin-bottom: 0; }
+      .btn-download-chain { background: #0369a1; }
+      .btn-download-chain:hover { background: #075985; }
+
+      /* ── Mode tabs ─────────────────────────────────── */
+      .tabs {
+        display: flex;
+        gap: 0.4rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 0;
+      }
+      .tab-btn {
+        padding: 0.55rem 1rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 7px 7px 0 0;
+        background: #e2e8f0;
+        color: #4a5568;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        margin-bottom: -2px;
+        border-bottom: 2px solid transparent;
+      }
+      .tab-btn:hover { background: #cbd5e0; }
+      .tab-btn.active {
+        background: #fff;
+        color: #4f46e5;
+        border: 2px solid #e2e8f0;
+        border-bottom-color: #fff;
+      }
+
+      /* ── CA section ────────────────────────────────── */
+      .ca-section {
+        background: #f8faff;
+        border: 1.5px solid #c7d2fe;
+        border-radius: 10px;
+        padding: 1rem 1rem 0.25rem;
+        margin-bottom: 1.25rem;
+      }
+      .ca-section-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #4338ca;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 0.75rem;
+      }
+
+      /* ── File picker ────────────────────────────────── */
+      .file-pick-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+      .btn-file {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: #4f46e5;
+        color: #fff;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 0.88rem;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: background 0.15s;
+        user-select: none;
+      }
+      .btn-file:hover { background: #4338ca; }
+      .file-hidden { display: none; }
+      .file-chosen {
+        font-size: 0.88rem;
+        color: #276749;
+        font-family: 'Courier New', Courier, monospace;
+      }
+    </style>
+  </head>
+  <body></body>
+</html>
