@@ -1,14 +1,18 @@
-﻿#ifndef KMBOX_NET_H
+#ifndef KMBOX_NET_H
 #define KMBOX_NET_H
-#define WIN32_LEAN_AND_MEAN
-#define _WINSOCKAPI_
+
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <winsock2.h>
-#include <Windows.h>
-#include <stdio.h>
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
 #include <cmath>
 #pragma warning(disable : 4996)
 
