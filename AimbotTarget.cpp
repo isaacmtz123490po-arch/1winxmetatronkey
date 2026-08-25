@@ -1,13 +1,16 @@
-#define WIN32_LEAN_AND_MEAN
-#define _WINSOCKAPI_
-#include <winsock2.h>
-#include <Windows.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <sys/types.h>
 
 #include <cmath>
 #include <limits>
 #include <algorithm>
 #include <numeric>
 #include <mutex>
+
 #include <opencv2/opencv.hpp>
 
 #include "sunone_aimbot_2.h"
