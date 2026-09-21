@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// TÚNEL AUTO-REEMPLAZO
+// TÚNEL AUTO-REEMPLAZ
 // Se conecta a GitHub → descarga archivo → SE REEMPLAZA A SÍ MISMO
 // Opcionalmente: se AUTODESTRUYE al terminar
 // ============================================================
