@@ -82,10 +82,6 @@
   .msg.ai{align-self:flex-start;background:var(--panel2);border:1px solid var(--line-dim);border-bottom-left-radius:0}
   .msg.ai .src{display:block;margin-top:8px;font-size:.7rem;color:var(--ink-dim);border-top:1px dotted var(--line-dim);padding-top:6px}
   .msg.typing{display:flex;gap:5px;align-items:center;padding:12px 14px}
-  .msg.typing i{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);animation:tp 1.2s infinite}
-  .msg.typing i:nth-child(2){animation-delay:.2s}
-  .msg.typing i:nth-child(3){animation-delay:.4s}
-  @keyframes tp{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
   .chat-input-row{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
   .chat-input-row input{flex:1;padding:9px 12px;background:var(--bg2);border:1px solid var(--line-dim);color:var(--ink);border-radius:3px;font-family:inherit;font-size:.88rem}
   .chat-input-row input:focus{outline:none;border-color:var(--gold)}
@@ -107,8 +103,10 @@
   .settings{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden}
   .settings-toggle{width:100%;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;color:var(--gold-bright);font-size:.9rem;font-family:'Space Grotesk',sans-serif}
   .settings-toggle:hover{background:rgba(201,168,118,.04)}
-  .settings-body{display:none;padding:16px;border-top:1px solid var(--line)}
+  .settings-body{display:none;padding:16px;border-top:1px solid var(--line);overflow-x:hidden}
   .settings.open .settings-body{display:block}
+  .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:820px){.settings-grid{grid-template-columns:1fr}}
   .settings.open .settings-toggle .arr{transform:rotate(180deg)}
   .arr{transition:transform .25s}
   .form-group{margin-bottom:12px}
@@ -124,8 +122,6 @@
   .provider-tag{font-size:.66rem;padding:3px 8px;border-radius:10px;background:var(--panel2);color:var(--violet-soft);border:1px solid var(--line-dim);text-align:center}
   .status-line{font-size:.74rem;color:var(--ink-dim);margin-top:6px}
   .status-line.ok{color:var(--success)} .status-line.err{color:var(--error)}
-  .check{display:flex;gap:7px;align-items:center;color:var(--ink-dim);font-size:.8rem;margin:10px 0}
-  .check input{width:auto}
   .mem-count{font-size:.74rem;color:var(--gold-bright);font-family:'JetBrains Mono',monospace}
 
   /* REDES */
@@ -137,7 +133,7 @@
   .social-name{font-size:.8rem;color:var(--ink);font-weight:500}
   .social-handle{font-size:.68rem;color:var(--ink-dim);font-family:'JetBrains Mono',monospace;word-break:break-all}
 
-  /* ADMIN (oculto) */
+  /* ADMIN */
   #admin-trigger{position:fixed;bottom:calc(var(--safe-bottom) + 14px);right:14px;width:32px;height:32px;display:flex;flex-direction:column;justify-content:center;gap:4px;align-items:center;cursor:pointer;z-index:50;opacity:.12;transition:opacity .3s;border-radius:50%}
   #admin-trigger:hover{opacity:.55}
   #admin-trigger span{width:15px;height:1px;background:var(--ink-dim)}
@@ -200,7 +196,7 @@
 <div id="intro">
   <div class="intro-logo"><img src="https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/dce47facda534ee38450d672c49386c7.jpeg~tplv-0es2k971ck-image.image?rcl=2026092511474507AB5AF390322F1400E1&rk3s=8e244e95&rrcfp=02a80fc2&x-expires=1792900111&x-signature=lNSYIXG4OBPaU0a3XNkHFlK%2Fgq8%3D" alt="Logo"></div>
   <h1 class="intro-title">METATRON</h1>
-  <div class="intro-sub">IA · REDES · MEMORIA</div>
+  <div class="intro-sub">IA · REDES · MEMORIA APRENDIDA</div>
   <div class="intro-skip">CLIC O TECLA PARA SALTAR</div>
 </div>
 
@@ -216,81 +212,81 @@
 
 <main id="top">
   <section class="hero wrap" style="border-top:none">
-    <h1>Un asistente que aprende y contesta sin internet.</h1>
-    <p>Combina cualquier API de IA + Ollama + memoria propia. Sin conexión, responde desde lo aprendido.</p>
+    <h1>Asistente IA Colaborativo + Aprendizaje Local</h1>
+    <p>Ejecuta tus APIs en paralelo, Ollama y aprendizaje continuo. Sin internet, responde desde memoria local.</p>
   </section>
 
-  <!-- AGENTE IA (combinado) -->
+  <!-- AGENTE IA -->
   <section id="agente">
     <div class="wrap">
-      <div class="section-head"><h2>Agente IA</h2><p>Un solo asistente. Usa en cadena: reglas locales → memoria aprendida → Ollama → cualquier API → búsqueda web. Si no hay conexión, contesta desde memoria.</p></div>
+      <div class="section-head"><h2>Agente IA Multimodelo</h2><p>Combina dinámicamente: Aprendizaje directo → Reglas → Ollama → Consulta Múltiple de APIs en paralelo → Búsqueda Web.</p></div>
       <div class="agent-layout">
         <div class="chat-panel">
           <div class="chat-header">
-            <h3>Asistente</h3>
+            <h3>Asistente Metatron</h3>
             <div class="agent-status"><span class="status-dot" id="agent-dot"></span><span id="agent-status-text">En línea</span></div>
           </div>
           <div class="chat-messages" id="chat-messages">
-            <div class="msg ai" id="welcome-msg">Hola. Pregúntame lo que sea. Aprendo de cada conversación y te respondo incluso sin internet.</div>
+            <div class="msg ai" id="welcome-msg">Hola. Puedes preguntarme o enseñarme datos directamente diciéndome: "Aprende que...", "Recuerda que..." o "Mi clave es...". Mis APIs trabajarán juntas para responderte.</div>
           </div>
           <div class="chat-input-row">
-            <input id="chat-input" type="text" placeholder="Escribe y presiona Enter…" autocomplete="off">
+            <input id="chat-input" type="text" placeholder="Escribe tu consulta o enséñame algo..." autocomplete="off">
             <button class="btn small cyan" id="chat-send">Enviar</button>
           </div>
         </div>
         <div class="activity-panel">
-          <div class="activity-header"><h3>Actividad</h3><span class="ticker mono" id="ticker">● 1s</span></div>
-          <div class="activity-log" id="activity-log"><div class="log-entry"><span class="log-time">--:--:--</span><span class="log-text">Iniciando…</span></div></div>
+          <div class="activity-header"><h3>Actividad y Procesos</h3><span class="ticker mono" id="ticker">● 1s</span></div>
+          <div class="activity-log" id="activity-log"><div class="log-entry"><span class="log-time">--:--:--</span><span class="log-text">Iniciando sistema…</span></div></div>
         </div>
       </div>
 
       <!-- SETTINGS compacto -->
       <div class="settings" id="settings">
-        <button class="settings-toggle" id="settings-toggle">⚙️ Ajustes del asistente (APIs, Ollama, memoria) <span class="arr">▾</span></button>
+        <button class="settings-toggle" id="settings-toggle">⚙️ Configuración de APIs, Ollama y Memoria Aprendida <span class="arr">▾</span></button>
         <div class="settings-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="settings-grid">
             <div>
-              <div class="panel-section-title" style="margin-bottom:8px">API keys (formato OpenAI)</div>
+              <div class="panel-section-title" style="margin-bottom:8px">APIs Configuradas (Se ejecutan en conjunto)</div>
               <div class="provider-row">
                 <span class="provider-tag">API 1</span>
-                <input id="p1-name" placeholder="Nombre" value="OpenAI">
-                <input id="p1-key" type="password" placeholder="Pega tu API key" style="grid-column:2/-1">
+                <input id="p1-name" placeholder="Nombre" value="Gemini">
+                <input id="p1-key" type="password" placeholder="Pega tu API Key de Gemini" style="grid-column:2/-1">
               </div>
               <div class="provider-row">
                 <span class="provider-tag">API 2</span>
-                <input id="p2-name" placeholder="Nombre" value="Groq">
-                <input id="p2-key" type="password" placeholder="Pega tu API key" style="grid-column:2/-1">
+                <input id="p2-name" placeholder="Nombre" value="OpenAI">
+                <input id="p2-key" type="password" placeholder="Pega tu API Key de OpenAI" style="grid-column:2/-1">
               </div>
               <div class="provider-row" style="border-bottom:none">
                 <span class="provider-tag">API 3</span>
-                <input id="p3-name" placeholder="Nombre" value="Otra">
-                <input id="p3-key" type="password" placeholder="Pega tu API key" style="grid-column:2/-1">
+                <input id="p3-name" placeholder="Nombre" value="Groq">
+                <input id="p3-key" type="password" placeholder="Pega tu API Key de Groq / OpenRouter" style="grid-column:2/-1">
               </div>
-              <div class="status-line" style="margin-top:6px">Solo necesitas la key. El endpoint se detecta automáticamente.</div>
+              <div class="status-line ok" style="margin-top:8px">💡 Agrega tus API keys. Las APIs activas responderán juntas para darte la mejor respuesta.</div>
               <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
                 <button class="btn small" id="save-provs">Guardar APIs</button>
                 <span id="prov-msg" style="font-size:.74rem;color:var(--success)"></span>
               </div>
 
-              <div class="panel-section-title" style="margin:16px 0 8px">Ollama (modelo local)</div>
-              <div class="form-group"><label>Dirección</label><div class="row"><input id="ollama-ep" value="http://localhost:11434" spellcheck="false"><button class="btn small secondary" id="ollama-refresh">↻</button></div></div>
-              <div class="form-group"><label>Modelo</label><select id="ollama-model"><option value="">Pulsa ↻ para cargar</option></select></div>
-              <div class="status-line" id="ollama-status">Ollama es opcional. Si está activo, se usa antes que las APIs.</div>
+              <div class="panel-section-title" style="margin:16px 0 8px">Ollama (Servidor Local)</div>
+              <div class="form-group"><label>Dirección API</label><div class="row"><input id="ollama-ep" value="http://localhost:11434" spellcheck="false"><button class="btn small secondary" id="ollama-refresh">↻ Conectar</button></div></div>
+              <div class="form-group"><label>Modelo Seleccionado</label><select id="ollama-model"><option value="">Pulsa ↻ para detectar</option></select></div>
+              <div class="status-line" id="ollama-status">Si Ollama está activo, se consulta como fuente local prioritaria.</div>
             </div>
 
             <div>
-              <div class="panel-section-title" style="margin-bottom:8px">Memoria (aprendizaje automático)</div>
-              <div class="status-line ok" style="margin:0 0 8px">✓ Guarda automáticamente cada respuesta</div>
-              <div class="mem-count" id="mem-count">0 respuestas guardadas</div>
-              <div class="form-group" style="margin-top:12px"><label>Añadir conocimiento manual</label><input id="mem-q" placeholder="Pregunta o tema"><div style="height:6px"></div><textarea id="mem-a" rows="2" placeholder="Respuesta o información…"></textarea></div>
-              <button class="btn small" id="add-mem">Guardar en memoria</button>
+              <div class="panel-section-title" style="margin-bottom:8px">Base de Conocimiento / Memoria IA</div>
+              <div class="status-line ok" style="margin:0 0 8px">✓ La IA aprende de tus instrucciones y de cada respuesta recibida.</div>
+              <div class="mem-count" id="mem-count">0 elementos guardados</div>
+              <div class="form-group" style="margin-top:12px"><label>Añadir conocimiento explícito</label><input id="mem-q" placeholder="Pregunta o concepto (ej: IP Servidor)"><div style="height:6px"></div><textarea id="mem-a" rows="2" placeholder="Respuesta o dato a aprender (ej: 192.168.1.100)"></textarea></div>
+              <button class="btn small" id="add-mem">Enseñar a la IA</button>
               <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn small secondary" id="export-mem" style="padding:5px 10px;font-size:.72rem">Exportar</button>
-                <button class="btn small secondary" id="clear-mem" style="padding:5px 10px;font-size:.72rem">Borrar memoria</button>
+                <button class="btn small secondary" id="export-mem" style="padding:5px 10px;font-size:.72rem">Exportar Memoria</button>
+                <button class="btn small secondary" id="clear-mem" style="padding:5px 10px;font-size:.72rem">Borrar Memoria</button>
                 <input id="import-file" type="file" accept="application/json,.json" class="hidden">
-                <button class="btn small secondary" id="import-mem" style="padding:5px 10px;font-size:.72rem">Importar</button>
+                <button class="btn small secondary" id="import-mem" style="padding:5px 10px;font-size:.72rem">Importar Memoria</button>
               </div>
-              <div class="status-line" id="mem-status">La memoria se usa para responder sin conexión y como contexto para la IA.</div>
+              <div class="status-line" id="mem-status">La memoria se usa como conocimiento fuera de línea y contexto para las APIs.</div>
             </div>
           </div>
         </div>
@@ -301,25 +297,25 @@
   <!-- REDES -->
   <section id="redes">
     <div class="wrap">
-      <div class="section-head"><h2>Redes Sociales</h2><p>Logos oficiales. Edita las URLs desde el panel de administración (3 puntitos abajo derecha).</p></div>
+      <div class="section-head"><h2>Redes Sociales y Enlaces</h2><p>Gestiona tus enlaces desde el panel de administración (3 puntos abajo a la derecha).</p></div>
       <div class="social-grid" id="social-grid"></div>
     </div>
   </section>
 </main>
 
-<footer class="wrap"><span>© 2026 Metatron</span><span>IA combinada · Memoria offline · Redes</span></footer>
+<footer class="wrap"><span>© 2026 Metatron</span><span>IA Colaborativa · Memoria Aprendida</span></footer>
 
 <button id="admin-trigger" aria-label="Admin"><span></span><span></span><span></span></button>
 
 <div id="admin-modal">
   <div class="modal-inner">
-    <div class="modal-header"><h3 id="modal-title">Acceso restringido</h3><button class="modal-close" id="modal-close">✕</button></div>
+    <div class="modal-header"><h3 id="modal-title">Panel de Control</h3><button class="modal-close" id="modal-close">✕</button></div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-footer" id="modal-footer" style="display:none">
       <div class="save-message" id="save-status"></div>
       <div class="footer-buttons">
         <button class="btn secondary small" id="btn-reset">Restablecer</button>
-        <button class="btn small" id="btn-save">Guardar</button>
+        <button class="btn small" id="btn-save">Guardar Cambios</button>
       </div>
     </div>
   </div>
@@ -330,7 +326,7 @@
 'use strict';
 var DEFAULT_PIN="metatron2026";
 var PIN_KEY="mt_pin", LOCALAI_KEY="mt_localai", SOCIAL_KEY="mt_social", PROV_KEY="mt_prov", ACCESS_KEY="mt_access";
-var MEM_KEY="mt_memory_v1", OLLAMA_EP="mt_ollama_ep", OLLAMA_MOD="mt_ollama_mod", AUTO_KEY="mt_autolearn";
+var MEM_KEY="mt_memory_v1", OLLAMA_EP="mt_ollama_ep", OLLAMA_MOD="mt_ollama_mod";
 
 var DEFAULT_SOCIAL=[
   {id:"github",name:"GitHub",short:"GH",color:"#f0f6fc",textColor:"#0d1117",url:"https://github.com/",icon:"https://cdn.simpleicons.org/github/ffffff"},
@@ -338,19 +334,20 @@ var DEFAULT_SOCIAL=[
   {id:"instagram",name:"Instagram",short:"IG",color:"#e1306c",textColor:"#fff",url:"https://instagram.com/",icon:"https://cdn.simpleicons.org/instagram/e1306c"},
   {id:"telegram",name:"Telegram",short:"TG",color:"#0088cc",textColor:"#fff",url:"https://t.me/",icon:"https://cdn.simpleicons.org/telegram/26a5e4"},
   {id:"x",name:"X / Twitter",short:"X",color:"#e7e9ea",textColor:"#000",url:"https://x.com/",icon:"https://cdn.simpleicons.org/x/ffffff"},
-  {id:"onlyfans",name:"OnlyFans",short:"OF",color:"#00aff0",textColor:"#fff",url:"",icon:"https://cdn.simpleicons.org/onlyfans/00aff0"},
   {id:"youtube",name:"YouTube",short:"YT",color:"#ff0000",textColor:"#fff",url:"https://youtube.com/",icon:"https://cdn.simpleicons.org/youtube/ff0000"},
-  {id:"xnxx",name:"XNXX",short:"XN",color:"#ffb000",textColor:"#000",url:"",icon:""},
-  {id:"roja",name:"Roja Directa",short:"RD",color:"#e50914",textColor:"#fff",url:"",icon:""},
   {id:"tiktok",name:"TikTok",short:"TT",color:"#010101",textColor:"#fe2c55",url:"https://tiktok.com/",icon:"https://cdn.simpleicons.org/tiktok/ffffff"}
 ];
-var DEFAULT_LOCALAI={name:"Lobo IA",greeting:"Hola. Pregúntame lo que sea. Aprendo de cada conversación.",fallback:"No tengo una respuesta programada. Déjame buscar o usar lo que he aprendido.",rules:[
-  {keyword:"hola",response:"¡Hola! ¿En qué puedo ayudarte?"},
-  {keyword:"quién eres|quien eres",response:"Soy el asistente Metatron. Combino APIs, Ollama y memoria propia. Aprendo de cada charla."},
-  {keyword:"qué haces|que haces|modos",response:"Uso en cadena: reglas locales → memoria aprendida → Ollama → APIs → búsqueda web. Sin internet, respondo desde memoria."},
-  {keyword:"memoria|aprendes|offline|sin internet",response:"Guardo cada pregunta y respuesta. Si no hay conexión, busco en mi memoria y contesto desde ahí."},
-  {keyword:"redes|instagram|facebook|github",response:"Baja a la sección 'Redes Sociales' para ver todos mis enlaces."}
-]};
+
+var DEFAULT_LOCALAI={
+  name:"Metatron Core",
+  greeting:"Hola. Puedes preguntarme lo que sea. Aprendo de cada conversación.",
+  fallback:"No tengo esa información en mi memoria aún. Si me la enseñas, la recordaré.",
+  rules:[
+    {keyword:"hola|saludos|buenas",response:"¡Hola! ¿En qué te puedo ayudar hoy?"},
+    {keyword:"quién eres|quien eres",response:"Soy Metatron, un asistente IA que combina APIs externas, Ollama y memoria de aprendizaje local."},
+    {keyword:"redes|redes sociales",response:"Puedes ver mis redes sociales en la sección inferior de esta página."}
+  ]
+};
 
 function $(id){return document.getElementById(id);}
 function esc(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
@@ -361,260 +358,507 @@ function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}
 var localAI=loadJSON(LOCALAI_KEY,DEFAULT_LOCALAI);
 var socials=loadJSON(SOCIAL_KEY,DEFAULT_SOCIAL);
 var accessEnabled=loadJSON(ACCESS_KEY,true);
-var memory=loadJSON(MEM_KEY,[]); // [{q,a,date}]
+var memory=loadJSON(MEM_KEY,[]);
 var busy=false;
 
 /* ---------- REDES ---------- */
 function renderSocials(){
-  var g=$("social-grid");g.innerHTML="";
+  var g=$("social-grid");if(!g)return;g.innerHTML="";
   socials.forEach(function(s){
     var has=s.url&&s.url.trim()!=="";
     var c=document.createElement(has?"a":"div");
     if(has){c.href=s.url;c.target="_blank";c.rel="noopener";}
     c.className="social-card"+(has?"":" disabled");
-    var h=has?s.url.replace(/^https?:\/\//,"").replace(/\/$/,""):"sin enlace";
+    var h=has?s.url.replace(/^https?:\/\//,"").replace(/\/$/,""):"Sin enlace";
     var logo=s.icon?'<div class="social-logo" style="background:rgba(255,255,255,.04)"><img src="'+s.icon+'" alt="'+esc(s.name)+'" style="width:24px;height:24px;object-fit:contain"></div>':'<div class="social-logo" style="background:'+s.color+';color:'+s.textColor+'">'+s.short+'</div>';
     c.innerHTML=logo+'<div class="social-name">'+esc(s.name)+'</div><div class="social-handle">'+esc(h)+'</div>';
     g.appendChild(c);
   });
 }
 
-/* ---------- LOG ---------- */
+/* ---------- LOGS DE ACTIVIDAD ---------- */
 var logEl=$("activity-log"),tickerEl=$("ticker"),agentDot=$("agent-dot"),agentStatusText=$("agent-status-text");
 var hb=0;
 function nowT(){var d=new Date();function p(n){return(n<10?"0":"")+n;}return p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());}
 function log(t,type){type=type||"";var e=document.createElement("div");e.className="log-entry";e.innerHTML='<span class="log-time mono">'+nowT()+'</span><span class="log-text '+type+'">'+esc(t)+'</span>';logEl.insertBefore(e,logEl.firstChild);while(logEl.children.length>40)logEl.removeChild(logEl.lastChild);}
-setInterval(function(){hb++;tickerEl.textContent="● "+hb+"s";if(busy){var p=["Procesando…","Consultando fuentes…","Buscando en memoria…","Generando…"];log(p[hb%p.length],"");}},1000);
-function setStatus(b,t){busy=b;if(b){agentDot.className="status-dot thinking";agentStatusText.textContent=t||"Pensando…";}else{agentDot.className=navigator.onLine?"status-dot":"status-dot offline";agentStatusText.textContent=navigator.onLine?"En línea":"Sin conexión (modo memoria)";}}
-window.addEventListener("online",function(){setStatus(false);log("Conexión restaurada","ok");});
-window.addEventListener("offline",function(){setStatus(false);log("Sin conexión → modo memoria","err");});
+setInterval(function(){hb++;if(tickerEl)tickerEl.textContent="● "+hb+"s";},1000);
 
-/* ---------- MEMORIA (aprendizaje + offline) ---------- */
-function updateMemCount(){var el=$("mem-count");if(el)el.textContent=memory.length+" respuestas guardadas";}
-function saveMemory(){saveJSON(MEM_KEY,memory.slice(-200));updateMemCount();}
-function addMem(q,a){q=String(q||"").trim();a=String(a||"").trim();if(!q||!a)return false;memory.push({q:q,a:a,date:Date.now()});saveMemory();return true;}
-// Buscar mejor coincidencia en memoria (por palabras)
-function findInMemory(question){
-  if(!memory.length)return null;
-  var q=question.toLowerCase().split(/\W+/).filter(function(w){return w.length>3;});
-  if(!q.length)return null;
-  var best=null,bestScore=0;
-  memory.forEach(function(m){
-    var mq=m.q.toLowerCase();var score=0;
-    q.forEach(function(w){if(mq.indexOf(w)!==-1)score++;});
-    if(score>bestScore){bestScore=score;best=m;}
-  });
-  // Umbral: al menos 1 palabra de 4+ letras coincide, y >30% de las palabras
-  if(best&&bestScore>=1&&bestScore/q.length>=0.3)return best;
+function setStatus(b,t){
+  busy=b;
+  if(b){agentDot.className="status-dot thinking";agentStatusText.textContent=t||"Procesando…";}
+  else{agentDot.className=navigator.onLine?"status-dot":"status-dot offline";agentStatusText.textContent=navigator.onLine?"En línea":"Sin conexión (Modo Memoria)";}
+}
+window.addEventListener("online",function(){setStatus(false);log("Conexión restaurada","ok");});
+window.addEventListener("offline",function(){setStatus(false);log("Modo sin conexión activo","err");});
+
+/* ---------- SISTEMA DE APRENDIZAJE Y MEMORIA LOCAL ---------- */
+function updateMemCount(){var el=$("mem-count");if(el)el.textContent=memory.length+" elementos aprendidos";}
+function saveMemory(){saveJSON(MEM_KEY,memory.slice(-500));updateMemCount();}
+
+function addMem(q,a){
+  q=String(q||"").trim();a=String(a||"").trim();
+  if(!q||!a)return false;
+  // Evitar duplicados exactos
+  var exists = memory.some(function(m){ return m.q.toLowerCase() === q.toLowerCase() && m.a.toLowerCase() === a.toLowerCase(); });
+  if(!exists){
+    memory.push({q:q,a:a,date:Date.now()});
+    saveMemory();
+    // También generar una regla dinámica si es una enseñanza corta
+    if(q.length < 50) {
+      localAI.rules.unshift({keyword: q.toLowerCase(), response: a});
+      saveJSON(LOCALAI_KEY, localAI);
+    }
+  }
+  return true;
+}
+
+// Detección explícita cuando el usuario enseña a la IA
+function checkDirectTeaching(text){
+  var lower = text.toLowerCase().trim();
+  var match = lower.match(/^(?:aprende que|recuerda que|guarda que|mi)\s+(.+?)\s+(?:es|son|se llama|igual a|=|:)\s+(.+)$/i);
+  if(match){
+    var key = match[1].trim();
+    var val = match[2].trim();
+    addMem(key, val);
+    log("Aprender: "+key+" → "+val, "mem");
+    return "🧠 **Aprendido exitosamente**: Guardé que **"+key+"** es **"+val+"**. Ahora lo recordaré en el futuro.";
+  }
   return null;
 }
+
+// Búsqueda en memoria aprendida
+function findInMemory(question){
+  if(!memory.length)return null;
+  var qWords=question.toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
+  if(!qWords.length)return null;
+
+  var best=null, bestScore=0;
+  memory.forEach(function(m){
+    var mq=m.q.toLowerCase();
+    var score=0;
+    qWords.forEach(function(w){
+      if(mq.indexOf(w)!==-1) score+=2;
+    });
+    if(mq.indexOf(question.toLowerCase())!==-1) score+=5;
+    if(score>bestScore){bestScore=score;best=m;}
+  });
+
+  if(best && bestScore>=2) return best;
+  return null;
+}
+
 function memContext(){
   if(!memory.length)return"";
-  return"Conversaciones anteriores aprendidas (memoria):\n"+memory.slice(-15).map(function(m){return"- P: "+m.q+"\n  R: "+m.a;}).join("\n").slice(-6000);
+  return "Memoria de datos aprendidos previamente:\n" + memory.slice(-10).map(function(m){ return "- " + m.q + ": " + m.a; }).join("\n");
 }
+
 $("add-mem").addEventListener("click",function(){
-  if(addMem($("mem-q").value,$("mem-a").value)){$("mem-q").value="";$("mem-a").value="";$("mem-status").textContent="✓ Guardado en memoria.";$("mem-status").className="status-line ok";log("Memoria: conocimiento añadido","mem");}
-  else{$("mem-status").textContent="Escribe pregunta y respuesta.";$("mem-status").className="status-line err";}
+  if(addMem($("mem-q").value,$("mem-a").value)){
+    $("mem-q").value="";$("mem-a").value="";
+    $("mem-status").textContent="✓ Guardado en memoria local.";
+    $("mem-status").className="status-line ok";
+    log("Memoria manual agregada","mem");
+  } else {
+    $("mem-status").textContent="Ingresa pregunta/clave y respuesta.";
+    $("mem-status").className="status-line err";
+  }
 });
 $("clear-mem").addEventListener("click",function(){if(memory.length&&confirm("¿Borrar toda la memoria aprendida?")){memory=[];saveMemory();log("Memoria borrada","err");}});
-$("export-mem").addEventListener("click",function(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(memory,null,2)],{type:"application/json"}));a.download="memoria-metatron.json";a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},1000);});
+$("export-mem").addEventListener("click",function(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(memory,null,2)],{type:"application/json"}));a.download="memoria-metatron.json";a.click();});
 $("import-mem").addEventListener("click",function(){$("import-file").click();});
-$("import-file").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(Array.isArray(d)){d.forEach(function(x){if(x&&x.q&&x.a)memory.push({q:String(x.q),a:String(x.a),date:x.date||Date.now()});});saveMemory();log("Memoria importada","mem");}}catch(err){log("Error importando: "+err.message,"err");}};r.readAsText(f);e.target.value="";});
+$("import-file").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(Array.isArray(d)){d.forEach(function(x){if(x&&x.q&&x.a)addMem(x.q,x.a);});saveMemory();log("Memoria importada","mem");}}catch(err){log("Error al importar memoria","err");}};r.readAsText(f);e.target.value="";});
 
+/* ---------- APIs DE IA (EJECUCIÓN COLABORATIVA / PARALELA) ---------- */
+function provUrl(p){
+  var n=(p.name||"").toLowerCase();
+  if(n.indexOf("gemini")!==-1||n.indexOf("google")!==-1) return "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+  if(n.indexOf("groq")!==-1) return "https://api.groq.com/openai/v1/chat/completions";
+  if(n.indexOf("openrouter")!==-1) return "https://openrouter.ai/api/v1/chat/completions";
+  if(n.indexOf("deepseek")!==-1) return "https://api.deepseek.com/chat/completions";
+  return "https://api.openai.com/v1/chat/completions";
+}
 
-/* ---------- APIs (cualquier OpenAI-compatible) ---------- */
-function provUrl(p){var n=(p.name||"").toLowerCase();if(n.indexOf("groq")!==-1)return"https://api.groq.com/openai/v1/chat/completions";if(n.indexOf("openrouter")!==-1)return"https://openrouter.ai/api/v1/chat/completions";if(n.indexOf("mistral")!==-1)return"https://api.mistral.ai/v1/chat/completions";if(n.indexOf("together")!==-1)return"https://api.together.xyz/v1/chat/completions";return"https://api.openai.com/v1/chat/completions";}
-function loadProvs(){return loadJSON(PROV_KEY,[{name:"OpenAI",key:""},{name:"Groq",key:""},{name:"Otra",key:""}]);}
-function fillProvs(){var p=loadProvs();for(var i=1;i<=3;i++){if(p[i-1]){$("p"+i+"-name").value=p[i-1].name||"";$("p"+i+"-key").value=p[i-1].key||"";}}}
-$("save-provs").addEventListener("click",function(){var p=[];for(var i=1;i<=3;i++){p.push({name:$("p"+i+"-name").value.trim(),key:$("p"+i+"-key").value.trim()});}saveJSON(PROV_KEY,p);$("prov-msg").textContent="✓ Guardadas";log("APIs guardadas: "+p.filter(function(x){return x.key;}).length+" con key","ok");setTimeout(function(){$("prov-msg").textContent="";},2500);});
+function loadProvs(){
+  var saved=loadJSON(PROV_KEY,null);
+  if(saved && Array.isArray(saved) && saved.length > 0) return saved.slice(0,3);
+  return [
+    {name:"Gemini", key:""},
+    {name:"OpenAI", key:""},
+    {name:"Groq", key:""}
+  ];
+}
 
-/* ---------- Ollama ---------- */
-function getOllamaEP(){var raw=$("ollama-ep").value.trim().replace(/\/+$/,"");var u;try{u=new URL(raw);}catch(e){throw new Error("Dirección inválida");}if(!["http:","https:"].includes(u.protocol)||!u.hostname)throw new Error("Usa http(s) válido");return u.origin+u.pathname.replace(/\/+$/,"");}
-function setOllama(t,k){var el=$("ollama-status");el.textContent=t;el.className="status-line "+(k||"");}
-$("ollama-refresh").addEventListener("click",function(){
-  var btn=this;btn.disabled=true;setOllama("Conectando…");
-  try{var base=getOllamaEP();try{localStorage.setItem(OLLAMA_EP,base);}catch(e){}
-    fetch(base+"/api/tags").then(function(r){if(!r.ok)throw new Error("Estado "+r.status);return r.json();}).then(function(d){
-      var items=Array.isArray(d.models)?d.models:[];var sel=$("ollama-model"),prior=(function(){try{return localStorage.getItem(OLLAMA_MOD)||"";}catch(e){return"";}})();
-      sel.innerHTML="";if(!items.length){sel.add(new Option("Sin modelos",""));setOllama("Ollama activo pero sin modelos.","err");return;}
-      items.forEach(function(x){if(x&&x.name)sel.add(new Option(x.name,x.name));});
-      if([].some.call(sel.options,function(o){return o.value===prior;}))sel.value=prior;
-      try{localStorage.setItem(OLLAMA_MOD,sel.value);}catch(e){}
-      setOllama("Conectado · "+items.length+" modelo(s).","ok");log("Ollama: "+items.length+" modelos","ok");
-    }).catch(function(e){setOllama(e.message==="Failed to fetch"?"Sin conexión (CORS: arranca con OLLAMA_ORIGINS=*)":e.message,"err");log("Ollama: sin conexión","err");});
-  }catch(e){setOllama(e.message,"err");}finally{btn.disabled=false;}
+function fillProvs(){
+  var p=loadProvs();
+  for(var i=1;i<=3;i++){
+    if(p[i-1]){
+      $("p"+i+"-name").value=p[i-1].name||"";
+      $("p"+i+"-key").value=p[i-1].key||"";
+    }
+  }
+}
+
+$("save-provs").addEventListener("click",function(){
+  var p=[];
+  for(var i=1;i<=3;i++){
+    p.push({name:$("p"+i+"-name").value.trim(), key:$("p"+i+"-key").value.trim()});
+  }
+  saveJSON(PROV_KEY,p);
+  $("prov-msg").textContent="✓ Guardadas correctamente";
+  log("APIs guardadas: "+p.filter(function(x){return x.key;}).length+" activas","ok");
+  setTimeout(function(){$("prov-msg").textContent="";},2500);
 });
-$("ollama-model").addEventListener("change",function(){try{localStorage.setItem(OLLAMA_MOD,this.value);}catch(e){}});
+
+// Función de consulta a una API individual
+function callSingleAPI(p, question, ctx) {
+  return new Promise(function(resolve, reject) {
+    var n=(p.name||"").toLowerCase();
+    var model="gpt-3.5-turbo";
+    if(n.indexOf("gemini")!==-1||n.indexOf("google")!==-1) model="gemini-2.0-flash";
+    else if(n.indexOf("groq")!==-1) model="llama-3.3-70b-versatile";
+    else if(n.indexOf("deepseek")!==-1) model="deepseek-chat";
+
+    log("Consultando API → " + p.name, "ai");
+
+    fetch(provUrl(p), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + p.key
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {role: "system", content: "Eres un asistente útil que responde en español. Usa este contexto si ayuda:\n" + ctx},
+          {role: "user", content: question}
+        ],
+        max_tokens: 600,
+        temperature: 0.6
+      })
+    })
+    .then(function(r){
+      if(!r.ok) throw new Error("Status " + r.status);
+      return r.json();
+    })
+    .then(function(j){
+      var txt = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+      if(!txt) throw new Error("Respuesta vacía");
+      log(p.name + " respondió con éxito", "ok");
+      resolve({ provider: p.name, text: txt.trim() });
+    })
+    .catch(function(err){
+      log(p.name + " falló: " + err.message, "err");
+      reject(err);
+    });
+  });
+}
+
+// Ejecutar TODAS las APIs activas simultáneamente en conjunto
+function askMultiAPI(question){
+  return new Promise(function(res, rej){
+    var provs = loadProvs().filter(function(p){ return p.key && p.key.trim() !== ""; });
+    if(!provs.length){ rej(new Error("Sin APIs configuradas")); return; }
+
+    var ctx = memContext();
+    var promises = provs.map(function(p){ return callSingleAPI(p, question, ctx); });
+
+    Promise.allSettled(promises).then(function(results){
+      var successful = results.filter(function(r){ return r.status === "fulfilled"; }).map(function(r){ return r.value; });
+
+      if(!successful.length){
+        rej(new Error("Todas las APIs configuradas fallaron"));
+        return;
+      }
+
+      // Si múltiples APIs respondieron, combinamos información o tomamos la más completa
+      if(successful.length === 1){
+        res({ text: successful[0].text, via: successful[0].provider });
+      } else {
+        var names = successful.map(function(s){ return s.provider; }).join(" + ");
+        // Elegimos la respuesta con mejor extensión/detalle
+        successful.sort(function(a,b){ return b.text.length - a.text.length; });
+        res({ text: successful[0].text, via: names + " (Sintetizado en conjunto)" });
+      }
+    });
+  });
+}
+
+/* ---------- OLLAMA (SERVIDOR LOCAL) ---------- */
+function getOllamaEP(){
+  var raw=$("ollama-ep").value.trim().replace(/\/+$/,"");
+  try{ var u=new URL(raw); return u.origin+u.pathname.replace(/\/+$/,""); }
+  catch(e){ throw new Error("URL de Ollama inválida"); }
+}
+
+$("ollama-refresh").addEventListener("click",function(){
+  var btn=this; btn.disabled=true;
+  try {
+    var base=getOllamaEP();
+    fetch(base+"/api/tags").then(function(r){ return r.json(); }).then(function(d){
+      var items=Array.isArray(d.models)?d.models:[];
+      var sel=$("ollama-model"); sel.innerHTML="";
+      if(!items.length){ sel.add(new Option("Sin modelos","")); return; }
+      items.forEach(function(x){ sel.add(new Option(x.name, x.name)); });
+      log("Ollama: "+items.length+" modelos encontrados","ok");
+    }).catch(function(){ log("Ollama fuera de línea","err"); })
+    .finally(function(){ btn.disabled=false; });
+  } catch(e){ btn.disabled=false; }
+});
+
 function askOllama(question){
   return new Promise(function(res,rej){
-    var model=$("ollama-model").value;if(!model){rej(new Error("sin modelo"));return;}
+    var model=$("ollama-model").value;
+    if(!model){rej(new Error("Sin modelo Ollama"));return;}
     var base=getOllamaEP();
-    log("Ollama → "+model,"ai");
-    fetch(base+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:model,messages:[{role:"system",content:"Eres un asistente útil. Responde en español. Usa la memoria como referencia."+(memContext()?"\n\n"+memContext():"")},{role:"user",content:question}],stream:false})}).then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d};});}).then(function(x){if(!x.ok)throw new Error(x.d&&x.d.error?x.d.error:"error ollama");var a=x.d&&x.d.message&&x.d.message.content?x.d.message.content.trim():"";if(!a)throw new Error("vacío");log("Ollama respondió","ok");res(a);}).catch(function(e){log("Ollama falló","err");rej(e.message==="Failed to fetch"?new Error("sin conexión ollama"):e);});
+    log("Consultando Ollama → "+model,"ai");
+    fetch(base+"/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:model,
+        messages:[
+          {role:"system",content:"Eres un asistente en español. " + memContext()},
+          {role:"user",content:question}
+        ],
+        stream:false
+      })
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var a=d.message&&d.message.content?d.message.content.trim():"";
+      if(!a)throw new Error("Vacío");
+      res({text:a, via:"Ollama Local ("+model+")"});
+    })
+    .catch(rej);
   });
 }
 
-/* ---------- APIs en cadena ---------- */
-function askAPI(question){
-  return new Promise(function(res,rej){
-    var provs=loadProvs().filter(function(p){return p.key;});
-    if(!provs.length){rej(new Error("sin APIs configuradas"));return;}
-    var ctx=memContext();
-    var chain=Promise.reject(null);
-    provs.forEach(function(p){chain=chain.catch(function(){
-      log("API → "+p.name,"ai");
-      return fetch(provUrl(p),{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+p.key},body:JSON.stringify({model:"gpt-3.5-turbo",messages:[{role:"system",content:"Eres un asistente útil. Responde en español."+(ctx?"\n\n"+ctx:"")},{role:"user",content:question}],max_tokens:500,temperature:0.5})}).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}).then(function(j){var t=j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;if(!t)throw new Error("vacío");log(p.name+" respondió","ok");return t;});
-    });});
-    chain.then(res).catch(function(){log("Todas las APIs fallaron","err");rej(new Error("apis fallaron"));});
-  });
-}
-
-/* ---------- Búsqueda web (fallback) ---------- */
+/* ---------- BÚSQUEDA WEB FALLBACK ---------- */
 function askWebSearch(question){
   return new Promise(function(res){
     if(!navigator.onLine){res(null);return;}
     log("Buscando en Wikipedia…","search");
-    fetch("https://es.wikipedia.org/w/api.php?action=opensearch&search="+encodeURIComponent(question)+"&limit=2&namespace=0&format=json&origin=*").then(function(r){return r.json();}).then(function(d){
+    fetch("https://es.wikipedia.org/w/api.php?action=opensearch&search="+encodeURIComponent(question)+"&limit=1&namespace=0&format=json&origin=*")
+    .then(function(r){return r.json();})
+    .then(function(d){
       var t=d[1]||[];if(!t.length){res(null);return;}
-      fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(t[0])).then(function(r){return r.json();}).then(function(s){
-        log("Wikipedia: "+t[0],"ok");res("📖 "+(s.title||t[0])+"\n\n"+(s.extract||""));
-      }).catch(function(){res(null);});
+      fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(t[0]))
+      .then(function(r){return r.json();})
+      .then(function(s){ res({text: "📖 **" + (s.title||t[0]) + "**\n\n" + (s.extract||""), via: "Wikipedia Web"}); })
+      .catch(function(){res(null);});
     }).catch(function(){res(null);});
   });
 }
 
-/* ---------- CHAT ---------- */
-function appendMsg(text,cls,src){var c=$("chat-messages");var m=document.createElement("div");m.className="msg "+cls;m.textContent=text;if(src){var s=document.createElement("span");s.className="src";s.textContent=src;m.appendChild(s);}c.appendChild(m);c.scrollTop=c.scrollHeight;return m;}
+/* ---------- FLUJO DEL AGENTE PRINCIPAL ---------- */
+function appendMsg(text,cls,src){
+  var c=$("chat-messages");
+  var m=document.createElement("div");
+  m.className="msg "+cls;
+  m.textContent=text;
+  if(src){
+    var s=document.createElement("span");
+    s.className="src";
+    s.textContent="Fuente: "+src;
+    m.appendChild(s);
+  }
+  c.appendChild(m);
+  c.scrollTop=c.scrollHeight;
+  return m;
+}
+
 function localRuleMatch(q){
   q=q.toLowerCase();
-  for(var i=0;i<localAI.rules.length;i++){var r=localAI.rules[i];if(!r.keyword||!r.response)continue;
-    var ks=r.keyword.split("|");for(var j=0;j<ks.length;j++){if(ks[j].trim()&&q.indexOf(ks[j].trim().toLowerCase())!==-1){log("Regla local: '"+ks[j].trim()+"'","mem");return r.response;}}}
+  for(var i=0;i<localAI.rules.length;i++){
+    var r=localAI.rules[i];
+    if(!r.keyword||!r.response)continue;
+    var ks=r.keyword.split("|");
+    for(var j=0;j<ks.length;j++){
+      if(ks[j].trim() && q.indexOf(ks[j].trim().toLowerCase())!==-1){
+        log("Regla local emparejada: '"+ks[j].trim()+"'","mem");
+        return r.response;
+      }
+    }
+  }
   return null;
 }
+
 function askAgent(question){
   appendMsg(question,"user");
-  var typing=document.createElement("div");typing.className="msg ai";
-  typing.innerHTML='<div class="thinking-wrap"><div class="thinking-dots"><i></i><i></i><i></i></div><div class="thinking-step" id="thinking-step">Analizando…</div><div class="progress-bar"><i></i></div></div>';
-  $("chat-messages").appendChild(typing);$("chat-messages").scrollTop=$("chat-messages").scrollHeight;
-  function setStep(t){var s=$("thinking-step");if(s)s.textContent=t;log(t,"search");}
-  setStatus(true,"Pensando…");log("→ "+question,"ai");
 
-  var finish=function(text,via){
+  // 1. Verificar si el usuario está enseñando algo directo
+  var teachResult = checkDirectTeaching(question);
+  if(teachResult){
+    setTimeout(function(){ appendMsg(teachResult, "ai", "Sistema de Aprendizaje Local"); }, 300);
+    return;
+  }
+
+  var typing=document.createElement("div");
+  typing.className="msg ai";
+  typing.innerHTML='<div class="thinking-wrap"><div class="thinking-dots"><i></i><i></i><i></i></div><div class="thinking-step" id="thinking-step">Procesando consulta...</div><div class="progress-bar"><i></i></div></div>';
+  $("chat-messages").appendChild(typing);
+  $("chat-messages").scrollTop=$("chat-messages").scrollHeight;
+
+  function setStep(t){ var s=$("thinking-step"); if(s)s.textContent=t; }
+  setStatus(true,"Pensando…");
+
+  var finish = function(text, via){
     typing.remove();
-    // Efecto máquina de escribir al responder
-    var m=document.createElement("div");m.className="msg ai";
-    var src=document.createElement("span");src.className="src";src.textContent="Respondido por: "+via;
-    var txt=document.createElement("span");m.appendChild(txt);m.appendChild(src);
-    $("chat-messages").appendChild(m);$("chat-messages").scrollTop=$("chat-messages").scrollHeight;
-    var i=0;var cursor=document.createElement("span");cursor.className="type-cursor";m.insertBefore(cursor,src);
-    var timer=setInterval(function(){
-      if(i<text.length){txt.textContent+=text.charAt(i);i++;$("chat-messages").scrollTop=$("chat-messages").scrollHeight;}
-      else{clearInterval(timer);cursor.remove();}
-    },12);
-    // Guardado automático en memoria
-    addMem(question,text);
-    log("✓ Entregado ("+via+") · guardado en memoria","ok");setStatus(false);
+    var m = appendMsg("", "ai", via);
+    var txtSpan = document.createElement("span");
+    m.insertBefore(txtSpan, m.firstChild);
+
+    // Efecto de mecanografía
+    var i = 0;
+    var timer = setInterval(function(){
+      if(i < text.length){
+        txtSpan.textContent += text.charAt(i);
+        i++;
+        $("chat-messages").scrollTop = $("chat-messages").scrollHeight;
+      } else {
+        clearInterval(timer);
+      }
+    }, 10);
+
+    // Guardado automático en la memoria aprendida
+    addMem(question, text);
+    setStatus(false);
+    log("Respuesta entregada por: " + via, "ok");
   };
-  var failOffline=function(){
-    var m=findInMemory(question);
-    if(m){finish(m.a,"Memoria (sin conexión)");log("Respuesta desde memoria","mem");}
-    else{typing.remove();appendMsg(localAI.fallback+" (Sin conexión y sin coincidencia en memoria. Conecta a internet o dime la respuesta y la aprenderé.)","ai");setStatus(false);}
-  };
 
-  // 1. Regla local exacta
-  var rule=localRuleMatch(question);
-  if(rule){setTimeout(function(){finish(rule,"Regla local");},400);return;}
+  // 2. Coincidencia con Reglas Locales
+  var rule = localRuleMatch(question);
+  if(rule){ setTimeout(function(){ finish(rule, "Regla Local"); }, 300); return; }
 
-  // 2. Memoria (incluso online, si hay coincidencia fuerte, la muestra)
-  var mem=findInMemory(question);
-  if(mem&&!navigator.onLine){finish(mem.a,"Memoria (sin conexión)");log("Modo offline → memoria","mem");return;}
+  // 3. Coincidencia en Memoria Aprendida
+  var mem = findInMemory(question);
+  if(!navigator.onLine && mem){ finish(mem.a, "Memoria Aprendida (Sin Conexión)"); return; }
 
-  // 3. Cadena animada: Ollama → APIs → búsqueda web → memoria/fallback
-  var chain=Promise.reject(null);
-  chain=chain.catch(function(){setStep("Consultando Ollama (modelo local)…");return askOllama(question).then(function(a){return{text:a,via:"Ollama"};});});
-  chain=chain.catch(function(){setStep("Probando APIs de IA…");return askAPI(question).then(function(a){return{text:a,via:"API"};});});
-  chain=chain.catch(function(){setStep("Buscando en la web…");return askWebSearch(question).then(function(a){if(!a)throw new Error("sin búsqueda");return{text:a,via:"Búsqueda web"};});});
-  chain.then(function(r){finish(r.text,r.via);}).catch(function(){
-    // Todo falló: usar memoria o fallback
-    if(mem){finish(mem.a,"Memoria (todo lo demás falló)");log("Fallback → memoria","mem");}
-    else{typing.remove();appendMsg(localAI.fallback+" (No pude conectar con ninguna fuente. Si me das la respuesta, la aprenderé para la próxima.)","ai");setStatus(false);log("Sin fuentes disponibles","err");}
+  // 4. Cadena de Ejecución: Ollama → Múltiples APIs en conjunto → Búsqueda Web → Memoria/Fallback
+  setStep("Consultando servidor Ollama...");
+  askOllama(question)
+  .catch(function(){
+    setStep("Consultando APIs en paralelo...");
+    return askMultiAPI(question);
+  })
+  .catch(function(){
+    setStep("Buscando en la Web...");
+    return askWebSearch(question);
+  })
+  .then(function(res){
+    if(res && res.text) finish(res.text, res.via);
+    else throw new Error("Sin respuesta");
+  })
+  .catch(function(){
+    if(mem){
+      finish(mem.a, "Memoria Local (Fallback)");
+    } else {
+      typing.remove();
+      appendMsg(localAI.fallback + " (No hay conexión disponible y no tengo este dato guardado).", "ai", "IA Local");
+      setStatus(false);
+    }
   });
 }
-$("chat-send").addEventListener("click",function(){var v=$("chat-input").value.trim();if(!v||busy)return;$("chat-input").value="";askAgent(v);});
-$("chat-input").addEventListener("keydown",function(e){if(e.key==="Enter")$("chat-send").click();});
 
-/* Settings toggle */
+$("chat-send").addEventListener("click",function(){
+  var v=$("chat-input").value.trim();
+  if(!v||busy)return;
+  $("chat-input").value="";
+  askAgent(v);
+});
+
+$("chat-input").addEventListener("keydown",function(e){if(e.key==="Enter")$("chat-send").click();});
 $("settings-toggle").addEventListener("click",function(){$("settings").classList.toggle("open");});
 
-/* ---------- ADMIN (oculto) ---------- */
+/* ---------- PANEL DE ADMINISTRACIÓN ---------- */
 var modal=$("admin-modal");
 function openAdmin(){modal.style.display="flex";void modal.offsetWidth;modal.classList.add("open");if(!accessEnabled){showPanel();return;}showPinScreen();}
 function closeAdmin(){modal.classList.remove("open");setTimeout(function(){modal.style.display="none";},300);}
+
 function showPinScreen(){
-  $("modal-title").textContent="Acceso restringido";$("modal-footer").style.display="none";
-  $("modal-body").innerHTML='<div class="pin-wrapper"><p style="font-size:.88rem;color:var(--ink-dim)">Introduce la clave</p><input type="password" class="pin-input" id="pin-input" placeholder="••••••••" autocomplete="off"><div class="pin-hint">Letras, números y símbolos</div><div class="card-error" id="pin-error"></div><button class="btn small" id="pin-submit" style="margin-top:12px">Entrar</button></div>';
+  $("modal-title").textContent="Acceso Restringido";$("modal-footer").style.display="none";
+  $("modal-body").innerHTML='<div class="pin-wrapper"><p style="font-size:.88rem;color:var(--ink-dim)">Introduce la clave PIN</p><input type="password" class="pin-input" id="pin-input" placeholder="••••••••" autocomplete="off"><div class="pin-hint">Clave por defecto: metatron2026</div><div class="card-error" id="pin-error"></div><button class="btn small" id="pin-submit" style="margin-top:12px">Entrar</button></div>';
   var inp=$("pin-input");setTimeout(function(){inp.focus();},100);
   function att(){if(inp.value===getPin())showPanel();else{$("pin-error").textContent="Clave incorrecta";inp.value="";inp.focus();}}
-  $("pin-submit").addEventListener("click",att);inp.addEventListener("keydown",function(e){if(e.key==="Enter")att();});
+  $("pin-submit").addEventListener("click",att);
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")att();});
 }
-function showSaveMsg(t,err){var s=$("save-status");s.textContent=t;s.className="save-message"+(err?" error":"");clearTimeout(window._st);window._st=setTimeout(function(){s.textContent="";},3500);}
+
+function showSaveMsg(t,err){
+  var s=$("save-status");s.textContent=t;s.className="save-message"+(err?" error":"");
+  setTimeout(function(){s.textContent="";},3000);
+}
+
 function showPanel(){
-  $("modal-title").textContent="Panel · IA Local + Redes + Acceso";$("modal-footer").style.display="flex";
-  var rh="";for(var i=0;i<5;i++){var r=localAI.rules[i]||{keyword:"",response:""};rh+='<div class="rule-row"><input id="rk'+i+'" placeholder="palabra clave (varias con |)" value="'+esc(r.keyword||"")+'"><input id="rr'+i+'" placeholder="respuesta" value="'+esc(r.response||"")+'"></div>';}
+  $("modal-title").textContent="Panel de Control General";$("modal-footer").style.display="flex";
+  var rh="";for(var i=0;i<5;i++){var r=localAI.rules[i]||{keyword:"",response:""};rh+='<div class="rule-row"><input id="rk'+i+'" placeholder="Palabra clave" value="'+esc(r.keyword||"")+'"><input id="rr'+i+'" placeholder="Respuesta" value="'+esc(r.response||"")+'"></div>';}
   var sh="";socials.forEach(function(s,idx){sh+='<div class="social-edit-row"><span class="se-name">'+esc(s.short)+'·'+esc(s.name)+'</span><input id="surl'+idx+'" placeholder="https://…" value="'+esc(s.url||"")+'"></div>';});
+
   $("modal-body").innerHTML=
-    '<div class="panel-section"><div class="panel-section-title">IA Local — reglas</div>'+
-    '<div class="form-group"><label>Nombre</label><input id="f-name" value="'+esc(localAI.name||"")+'"></div>'+
-    '<div class="form-group"><label>Saludo</label><input id="f-greeting" value="'+esc(localAI.greeting||"")+'"></div>'+
-    '<div class="form-group"><label>Respuesta por defecto</label><input id="f-fallback" value="'+esc(localAI.fallback||"")+'"></div>'+
-    '<label style="font-size:.76rem;color:var(--ink-dim)">Reglas: palabra → respuesta</label>'+rh+'</div>'+
-    '<div class="panel-section"><div class="panel-section-title">Redes — URLs</div>'+sh+'</div>'+
-    '<div class="panel-section"><div class="panel-section-title">Acceso</div>'+
-    '<div class="toggle-row"><span>Activar protección con clave</span><div class="toggle-switch '+(accessEnabled?"active":"")+'" id="f-access"></div></div>'+
-    '<label style="font-size:.76rem;color:var(--ink-dim);display:block;margin:8px 0 4px">Clave actual</label>'+
-    '<div class="key-display-row"><input id="f-pin" value="'+esc(getPin())+'" readonly><button class="btn small cyan" id="f-gen" type="button" style="flex-shrink:0">Generar</button></div></div>'+
-    '<div class="panel-section"><div class="panel-section-title">Seguridad</div><div class="form-group"><label>Nueva clave manual (vacío = no cambiar)</label><input id="f-newpin" type="text"></div></div>';
-  $("f-access").addEventListener("click",function(){this.classList.toggle("active");accessEnabled=this.classList.contains("active");try{saveJSON(ACCESS_KEY,accessEnabled);}catch(e){}showSaveMsg(accessEnabled?"✓ Protección activada":"✓ Acceso directo");});
-  $("f-gen").addEventListener("click",function(){var c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",k="";for(var i=0;i<6;i++)k+=c[Math.floor(Math.random()*c.length)];$("f-pin").value=k;try{localStorage.setItem(PIN_KEY,k);}catch(e){}showSaveMsg("✓ Nueva clave: "+k);});
+    '<div class="panel-section"><div class="panel-section-title">Reglas de Respuesta Local</div>'+
+    '<div class="form-group"><label>Mensaje de Bienvenida</label><input id="f-greeting" value="'+esc(localAI.greeting||"")+'"></div>'+
+    '<div class="form-group"><label>Respuesta por Defecto</label><input id="f-fallback" value="'+esc(localAI.fallback||"")+'"></div>'+
+    '<label style="font-size:.76rem;color:var(--ink-dim)">Reglas Rápidas (Palabras Clave → Respuesta)</label>'+rh+'</div>'+
+    '<div class="panel-section"><div class="panel-section-title">URLs de Redes Sociales</div>'+sh+'</div>'+
+    '<div class="panel-section"><div class="panel-section-title">Seguridad de Acceso</div>'+
+    '<div class="toggle-row"><span>Protección con Clave PIN</span><div class="toggle-switch '+(accessEnabled?"active":"")+'" id="f-access"></div></div>'+
+    '<div class="form-group"><label>Cambiar Clave PIN</label><input id="f-newpin" type="text" placeholder="Nueva clave"></div></div>';
+
+  $("f-access").addEventListener("click",function(){
+    this.classList.toggle("active");
+    accessEnabled=this.classList.contains("active");
+    saveJSON(ACCESS_KEY,accessEnabled);
+  });
 }
+
 function saveAll(){
-  var rules=[];for(var i=0;i<5;i++){var k=$("rk"+i).value.trim(),r=$("rr"+i).value.trim();if(k||r)rules.push({keyword:k,response:r});}
-  localAI={name:$("f-name").value.trim()||"Asistente",greeting:$("f-greeting").value.trim(),fallback:$("f-fallback").value.trim(),rules:rules};
+  var rules=[];
+  for(var i=0;i<5;i++){
+    var k=$("rk"+i).value.trim(), r=$("rr"+i).value.trim();
+    if(k||r) rules.push({keyword:k, response:r});
+  }
+  localAI.greeting=$("f-greeting").value.trim();
+  localAI.fallback=$("f-fallback").value.trim();
+  localAI.rules=rules;
   saveJSON(LOCALAI_KEY,localAI);
-  socials.forEach(function(s,idx){var inp=$("surl"+idx);if(inp)s.url=inp.value.trim();});
+
+  socials.forEach(function(s,idx){
+    var inp=$("surl"+idx);
+    if(inp) s.url=inp.value.trim();
+  });
   saveJSON(SOCIAL_KEY,socials);
-  var np=$("f-newpin").value.trim();if(np){try{localStorage.setItem(PIN_KEY,np);}catch(e){}}
+
+  var np=$("f-newpin").value.trim();
+  if(np){ localStorage.setItem(PIN_KEY,np); }
+
   renderSocials();
-  var w=$("welcome-msg");if(w)w.textContent=localAI.greeting||"Hola.";
-  showSaveMsg("✓ Guardado");setTimeout(closeAdmin,1000);
+  showSaveMsg("✓ Cambios guardados");
+  setTimeout(closeAdmin,800);
 }
+
 function resetAll(){
-  if(!confirm("¿Restablecer IA Local, Redes, clave y acceso?"))return;
-  try{localStorage.removeItem(LOCALAI_KEY);localStorage.removeItem(SOCIAL_KEY);localStorage.removeItem(PIN_KEY);localStorage.removeItem(ACCESS_KEY);}catch(e){}
-  localAI=JSON.parse(JSON.stringify(DEFAULT_LOCALAI));socials=JSON.parse(JSON.stringify(DEFAULT_SOCIAL));accessEnabled=true;
-  renderSocials();var w=$("welcome-msg");if(w)w.textContent=localAI.greeting;
-  showSaveMsg("✓ Restablecido");showPanel();
+  if(!confirm("¿Restablecer todas las configuraciones por defecto?"))return;
+  localStorage.clear();
+  location.reload();
 }
+
 $("admin-trigger").addEventListener("click",openAdmin);
 $("modal-close").addEventListener("click",closeAdmin);
 $("btn-save").addEventListener("click",saveAll);
 $("btn-reset").addEventListener("click",resetAll);
-modal.addEventListener("click",function(e){if(e.target===modal)closeAdmin();});
-document.addEventListener("keydown",function(e){if(e.key==="Escape"&&modal.classList.contains("open"))closeAdmin();});
 
-/* ---------- INTRO ---------- */
+/* ---------- INTRO & INIT ---------- */
 var skipped=false;
 function skipIntro(){if(skipped)return;skipped=true;$("intro").classList.add("fade-out");document.body.classList.add("revealed");}
 $("intro").addEventListener("click",skipIntro);
 document.addEventListener("keydown",skipIntro);
-setTimeout(skipIntro,2400);
+setTimeout(skipIntro,2000);
 
-/* ---------- INIT ---------- */
-renderSocials();fillProvs();updateMemCount();
-try{var ep=localStorage.getItem(OLLAMA_EP);if(ep)$("ollama-ep").value=ep;}catch(e){}
-try{var mod=localStorage.getItem(OLLAMA_MOD);if(mod){var o=document.createElement("option");o.value=mod;o.textContent=mod+" (guardado)";$("ollama-model").add(o,0);$("ollama-model").value=mod;}}catch(e){}
+renderSocials();
+fillProvs();
+updateMemCount();
 setStatus(false);
-log("Sistema listo. Memoria: "+memory.length+" · APIs: "+loadProvs().filter(function(p){return p.key;}).length,"ok");
+log("Sistema Metatron inicializado correctamente","ok");
 })();
 </script>
 </body>
