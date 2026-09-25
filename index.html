@@ -59,6 +59,8 @@
   .btn.cyan{border-color:var(--cyan);color:var(--cyan)}
   .btn.cyan:hover{background:var(--cyan);color:var(--bg)}
   .btn:disabled{opacity:.5;cursor:wait}
+  .btn.danger{border-color:var(--error);color:var(--error)}
+  .btn.danger:hover{background:var(--error);color:var(--bg)}
 
   section{padding:44px 0;border-top:1px solid var(--line)}
   .section-head{margin-bottom:24px}
@@ -99,13 +101,13 @@
   .log-text.ok{color:var(--success)} .log-text.search{color:var(--cyan)} .log-text.ai{color:var(--gold-bright)}
   .log-text.err{color:var(--error)} .log-text.mem{color:#f0a868}
 
-  /* SETTINGS compacto */
+  /* SETTINGS */
   .settings{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden}
   .settings-toggle{width:100%;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;color:var(--gold-bright);font-size:.9rem;font-family:'Space Grotesk',sans-serif}
   .settings-toggle:hover{background:rgba(201,168,118,.04)}
   .settings-body{display:none;padding:16px;border-top:1px solid var(--line);overflow-x:hidden}
   .settings.open .settings-body{display:block}
-  .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
   @media (max-width:820px){.settings-grid{grid-template-columns:1fr}}
   .settings.open .settings-toggle .arr{transform:rotate(180deg)}
   .arr{transition:transform .25s}
@@ -114,12 +116,15 @@
   .form-group input,.form-group textarea,.form-group select{width:100%;padding:8px 10px;background:var(--bg2);border:1px solid var(--line-dim);color:var(--ink);border-radius:3px;font-family:inherit;font-size:.84rem}
   .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--gold)}
   .row{display:flex;gap:8px;align-items:center}
-  .row>*{min-width:0}
-  .provider-row{display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dotted var(--line-dim)}
-  @media (max-width:560px){.provider-row{grid-template-columns:1fr}}
-  .provider-row input{padding:6px 9px;background:var(--bg2);border:1px solid var(--line-dim);color:var(--ink);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:.74rem}
-  .provider-row input:focus{outline:none;border-color:var(--gold)}
-  .provider-tag{font-size:.66rem;padding:3px 8px;border-radius:10px;background:var(--panel2);color:var(--violet-soft);border:1px solid var(--line-dim);text-align:center}
+  
+  /* API CARDS (MANUAL) */
+  .api-list{display:flex;flex-direction:column;gap:12px;margin-bottom:12px}
+  .api-card{background:var(--bg2);border:1px solid var(--line-dim);border-radius:4px;padding:12px;position:relative}
+  .api-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .api-card-header span{font-size:.76rem;color:var(--gold-bright);font-weight:600;letter-spacing:.05em}
+  .api-card input{margin-bottom:8px;font-family:'JetBrains Mono',monospace;font-size:.76rem;padding:6px 8px;width:100%;background:var(--panel);border:1px solid var(--line-dim);color:var(--ink);border-radius:3px}
+  .api-card input:focus{border-color:var(--gold);outline:none}
+  
   .status-line{font-size:.74rem;color:var(--ink-dim);margin-top:6px}
   .status-line.ok{color:var(--success)} .status-line.err{color:var(--error)}
   .mem-count{font-size:.74rem;color:var(--gold-bright);font-family:'JetBrains Mono',monospace}
@@ -152,26 +157,7 @@
   .pin-wrapper{text-align:center;padding:10px 0}
   .pin-input{width:100%;max-width:240px;padding:10px 14px;text-align:center;font-size:1rem;letter-spacing:.15em;background:var(--bg2);border:1px solid var(--line);color:var(--ink);border-radius:4px;font-family:'Space Grotesk',sans-serif;margin:12px 0 6px}
   .pin-input:focus{outline:none;border-color:var(--gold)}
-  .pin-hint{font-size:.74rem;color:var(--ink-dim)}
-  .card-error{color:var(--error);font-size:.78rem;min-height:16px;margin-top:8px}
-  .panel-section{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--line-dim)}
-  .panel-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
-  .panel-section-title{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px}
-  .rule-row{display:grid;grid-template-columns:1fr 1.5fr;gap:7px;margin-bottom:7px}
-  @media (max-width:480px){.rule-row{grid-template-columns:1fr}}
-  .social-edit-row{display:grid;grid-template-columns:80px 1fr;gap:7px;margin-bottom:7px;align-items:center}
-  .social-edit-row .se-name{font-size:.74rem;color:var(--ink-dim);font-family:'JetBrains Mono',monospace}
-  .key-display-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-  .key-display-row input{flex:1;padding:7px 9px;background:var(--bg2);border:1px solid var(--line-dim);color:var(--gold-bright);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:.82rem;letter-spacing:.12em}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0}
-  .toggle-row span{font-size:.82rem;color:var(--ink)}
-  .toggle-switch{width:40px;height:21px;background:var(--bg2);border:1px solid var(--line-dim);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-  .toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;background:var(--ink-dim);border-radius:50%;transition:all .25s}
-  .toggle-switch.active{background:var(--gold);border-color:var(--gold)}
-  .toggle-switch.active::after{transform:translateX(19px);background:var(--bg)}
-
-  .msg{animation:msgIn .4s cubic-bezier(.2,.7,.2,1)}
-  @keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+  
   .thinking-wrap{display:flex;flex-direction:column;gap:7px}
   .thinking-dots{display:flex;gap:5px;align-items:center}
   .thinking-dots i{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);animation:tp 1.2s infinite}
@@ -183,8 +169,7 @@
   .progress-bar{height:3px;background:var(--line-dim);border-radius:2px;overflow:hidden;width:100%}
   .progress-bar i{display:block;height:100%;width:28%;background:linear-gradient(90deg,var(--gold),var(--violet),var(--cyan));animation:prog 1.1s infinite linear;border-radius:2px}
   @keyframes prog{0%{transform:translateX(-120%)}100%{transform:translateX(420%)}}
-  .type-cursor{display:inline-block;width:2px;height:1em;background:var(--gold-bright);vertical-align:text-bottom;animation:blink .7s infinite;margin-left:1px}
-  @keyframes blink{50%{opacity:0}}
+  
   footer{padding:26px 0;color:var(--ink-dim);font-size:.76rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
   header,main,footer{opacity:0;transform:translateY(12px);filter:blur(5px);transition:opacity .8s ease,transform .8s ease,filter .8s ease}
   body.revealed header,body.revealed main,body.revealed footer{opacity:1;transform:none;filter:blur(0)}
@@ -213,13 +198,13 @@
 <main id="top">
   <section class="hero wrap" style="border-top:none">
     <h1>Asistente IA Colaborativo + Aprendizaje Local</h1>
-    <p>Ejecuta tus APIs en paralelo, Ollama y aprendizaje continuo. Sin internet, responde desde memoria local.</p>
+    <p>Agrega tus modelos de IA manualmente. La memoria local guardará todo lo que respondan para aprender de ellas.</p>
   </section>
 
   <!-- AGENTE IA -->
   <section id="agente">
     <div class="wrap">
-      <div class="section-head"><h2>Agente IA Multimodelo</h2><p>Combina dinámicamente: Aprendizaje directo → Reglas → Ollama → Consulta Múltiple de APIs en paralelo → Búsqueda Web.</p></div>
+      <div class="section-head"><h2>Agente IA Multimodelo</h2><p>Las APIs configuradas enseñan a la memoria. Si fallan o no hay internet, la IA responde con lo aprendido.</p></div>
       <div class="agent-layout">
         <div class="chat-panel">
           <div class="chat-header">
@@ -227,7 +212,7 @@
             <div class="agent-status"><span class="status-dot" id="agent-dot"></span><span id="agent-status-text">En línea</span></div>
           </div>
           <div class="chat-messages" id="chat-messages">
-            <div class="msg ai" id="welcome-msg">Hola. Puedes preguntarme o enseñarme datos directamente diciéndome: "Aprende que...", "Recuerda que..." o "Mi clave es...". Mis APIs trabajarán juntas para responderte.</div>
+            <div class="msg ai" id="welcome-msg">Hola. Puedes agregar tus propios modelos en la configuración. **Todo lo que yo responda usando esas APIs, lo aprenderé y guardaré en mi memoria local para siempre.**</div>
           </div>
           <div class="chat-input-row">
             <input id="chat-input" type="text" placeholder="Escribe tu consulta o enséñame algo..." autocomplete="off">
@@ -242,51 +227,47 @@
 
       <!-- SETTINGS compacto -->
       <div class="settings" id="settings">
-        <button class="settings-toggle" id="settings-toggle">⚙️ Configuración de APIs, Ollama y Memoria Aprendida <span class="arr">▾</span></button>
+        <button class="settings-toggle" id="settings-toggle">⚙️ Configurar Modelos Manualmente y Memoria <span class="arr">▾</span></button>
         <div class="settings-body">
           <div class="settings-grid">
             <div>
-              <div class="panel-section-title" style="margin-bottom:8px">APIs Configuradas (Se ejecutan en conjunto)</div>
-              <div class="provider-row">
-                <span class="provider-tag">API 1</span>
-                <input id="p1-name" placeholder="Nombre" value="Gemini">
-                <input id="p1-key" type="password" placeholder="Pega tu API Key de Gemini" style="grid-column:2/-1">
+              <div class="panel-section-title" style="margin-bottom:8px">Modelos API (Configuración Manual)</div>
+              <div class="status-line" style="margin-bottom:12px">Agrega los endpoints y modelos compatibles con el formato OpenAI.</div>
+              
+              <div id="api-list-container" class="api-list">
+                <!-- Tarjetas dinámicas generadas por JS -->
               </div>
-              <div class="provider-row">
-                <span class="provider-tag">API 2</span>
-                <input id="p2-name" placeholder="Nombre" value="OpenAI">
-                <input id="p2-key" type="password" placeholder="Pega tu API Key de OpenAI" style="grid-column:2/-1">
-              </div>
-              <div class="provider-row" style="border-bottom:none">
-                <span class="provider-tag">API 3</span>
-                <input id="p3-name" placeholder="Nombre" value="Groq">
-                <input id="p3-key" type="password" placeholder="Pega tu API Key de Groq / OpenRouter" style="grid-column:2/-1">
-              </div>
-              <div class="status-line ok" style="margin-top:8px">💡 Agrega tus API keys. Las APIs activas responderán juntas para darte la mejor respuesta.</div>
-              <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+              
+              <button class="btn small secondary" id="add-api-btn">+ Añadir otra API</button>
+              
+              <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
                 <button class="btn small" id="save-provs">Guardar APIs</button>
                 <span id="prov-msg" style="font-size:.74rem;color:var(--success)"></span>
               </div>
 
-              <div class="panel-section-title" style="margin:16px 0 8px">Ollama (Servidor Local)</div>
-              <div class="form-group"><label>Dirección API</label><div class="row"><input id="ollama-ep" value="http://localhost:11434" spellcheck="false"><button class="btn small secondary" id="ollama-refresh">↻ Conectar</button></div></div>
+              <div class="panel-section-title" style="margin:24px 0 8px">Ollama (Servidor Local)</div>
+              <div class="form-group"><label>Dirección API</label><div class="row"><input id="ollama-ep" value="http://localhost:11434" spellcheck="false"><button class="btn small secondary" id="ollama-refresh">↻</button></div></div>
               <div class="form-group"><label>Modelo Seleccionado</label><select id="ollama-model"><option value="">Pulsa ↻ para detectar</option></select></div>
-              <div class="status-line" id="ollama-status">Si Ollama está activo, se consulta como fuente local prioritaria.</div>
             </div>
 
             <div>
-              <div class="panel-section-title" style="margin-bottom:8px">Base de Conocimiento / Memoria IA</div>
-              <div class="status-line ok" style="margin:0 0 8px">✓ La IA aprende de tus instrucciones y de cada respuesta recibida.</div>
+              <div class="panel-section-title" style="margin-bottom:8px">Base de Conocimiento / Aprendizaje</div>
+              <div class="status-line ok" style="margin:0 0 8px">🧠 La IA guarda automáticamente las respuestas de tus APIs manuales en esta base de datos.</div>
               <div class="mem-count" id="mem-count">0 elementos guardados</div>
-              <div class="form-group" style="margin-top:12px"><label>Añadir conocimiento explícito</label><input id="mem-q" placeholder="Pregunta o concepto (ej: IP Servidor)"><div style="height:6px"></div><textarea id="mem-a" rows="2" placeholder="Respuesta o dato a aprender (ej: 192.168.1.100)"></textarea></div>
-              <button class="btn small" id="add-mem">Enseñar a la IA</button>
-              <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn small secondary" id="export-mem" style="padding:5px 10px;font-size:.72rem">Exportar Memoria</button>
-                <button class="btn small secondary" id="clear-mem" style="padding:5px 10px;font-size:.72rem">Borrar Memoria</button>
-                <input id="import-file" type="file" accept="application/json,.json" class="hidden">
-                <button class="btn small secondary" id="import-mem" style="padding:5px 10px;font-size:.72rem">Importar Memoria</button>
+              
+              <div class="form-group" style="margin-top:16px">
+                <label>Enseñar Manualmente</label>
+                <input id="mem-q" placeholder="Pregunta (ej: IP del Servidor)">
+                <div style="height:6px"></div>
+                <textarea id="mem-a" rows="3" placeholder="Respuesta (ej: 192.168.1.100)"></textarea>
               </div>
-              <div class="status-line" id="mem-status">La memoria se usa como conocimiento fuera de línea y contexto para las APIs.</div>
+              <button class="btn small" id="add-mem">Guardar en Memoria</button>
+              
+              <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn small secondary" id="export-mem" style="padding:5px 10px;font-size:.72rem">Exportar Memoria</button>
+                <button class="btn small danger" id="clear-mem" style="padding:5px 10px;font-size:.72rem">Borrar Todo</button>
+              </div>
+              <div class="status-line" id="mem-status" style="margin-top:10px">La memoria se usa como conocimiento base y se activa sola si te quedas sin conexión o sin API.</div>
             </div>
           </div>
         </div>
@@ -297,24 +278,21 @@
   <!-- REDES -->
   <section id="redes">
     <div class="wrap">
-      <div class="section-head"><h2>Redes Sociales y Enlaces</h2><p>Gestiona tus enlaces desde el panel de administración (3 puntos abajo a la derecha).</p></div>
+      <div class="section-head"><h2>Redes Sociales</h2></div>
       <div class="social-grid" id="social-grid"></div>
     </div>
   </section>
 </main>
 
-<footer class="wrap"><span>© 2026 Metatron</span><span>IA Colaborativa · Memoria Aprendida</span></footer>
-
 <button id="admin-trigger" aria-label="Admin"><span></span><span></span><span></span></button>
 
 <div id="admin-modal">
   <div class="modal-inner">
-    <div class="modal-header"><h3 id="modal-title">Panel de Control</h3><button class="modal-close" id="modal-close">✕</button></div>
+    <div class="modal-header"><h3 id="modal-title">Panel</h3><button class="modal-close" id="modal-close">✕</button></div>
     <div class="modal-body" id="modal-body"></div>
     <div class="modal-footer" id="modal-footer" style="display:none">
       <div class="save-message" id="save-status"></div>
       <div class="footer-buttons">
-        <button class="btn secondary small" id="btn-reset">Restablecer</button>
         <button class="btn small" id="btn-save">Guardar Cambios</button>
       </div>
     </div>
@@ -324,541 +302,209 @@
 <script>
 (function(){
 'use strict';
-var DEFAULT_PIN="metatron2026";
-var PIN_KEY="mt_pin", LOCALAI_KEY="mt_localai", SOCIAL_KEY="mt_social", PROV_KEY="mt_prov", ACCESS_KEY="mt_access";
-var MEM_KEY="mt_memory_v1", OLLAMA_EP="mt_ollama_ep", OLLAMA_MOD="mt_ollama_mod";
-
-var DEFAULT_SOCIAL=[
-  {id:"github",name:"GitHub",short:"GH",color:"#f0f6fc",textColor:"#0d1117",url:"https://github.com/",icon:"https://cdn.simpleicons.org/github/ffffff"},
-  {id:"facebook",name:"Facebook",short:"FB",color:"#1877f2",textColor:"#fff",url:"https://facebook.com/",icon:"https://cdn.simpleicons.org/facebook/1877f2"},
-  {id:"instagram",name:"Instagram",short:"IG",color:"#e1306c",textColor:"#fff",url:"https://instagram.com/",icon:"https://cdn.simpleicons.org/instagram/e1306c"},
-  {id:"telegram",name:"Telegram",short:"TG",color:"#0088cc",textColor:"#fff",url:"https://t.me/",icon:"https://cdn.simpleicons.org/telegram/26a5e4"},
-  {id:"x",name:"X / Twitter",short:"X",color:"#e7e9ea",textColor:"#000",url:"https://x.com/",icon:"https://cdn.simpleicons.org/x/ffffff"},
-  {id:"youtube",name:"YouTube",short:"YT",color:"#ff0000",textColor:"#fff",url:"https://youtube.com/",icon:"https://cdn.simpleicons.org/youtube/ff0000"},
-  {id:"tiktok",name:"TikTok",short:"TT",color:"#010101",textColor:"#fe2c55",url:"https://tiktok.com/",icon:"https://cdn.simpleicons.org/tiktok/ffffff"}
-];
-
-var DEFAULT_LOCALAI={
-  name:"Metatron Core",
-  greeting:"Hola. Puedes preguntarme lo que sea. Aprendo de cada conversación.",
-  fallback:"No tengo esa información en mi memoria aún. Si me la enseñas, la recordaré.",
-  rules:[
-    {keyword:"hola|saludos|buenas",response:"¡Hola! ¿En qué te puedo ayudar hoy?"},
-    {keyword:"quién eres|quien eres",response:"Soy Metatron, un asistente IA que combina APIs externas, Ollama y memoria de aprendizaje local."},
-    {keyword:"redes|redes sociales",response:"Puedes ver mis redes sociales en la sección inferior de esta página."}
-  ]
-};
+var DEFAULT_PIN="metatron2026", PIN_KEY="mt_pin", LOCALAI_KEY="mt_localai", SOCIAL_KEY="mt_social", PROV_KEY="mt_prov_v2", ACCESS_KEY="mt_access", MEM_KEY="mt_memory_v1";
 
 function $(id){return document.getElementById(id);}
 function esc(s){if(!s)return"";return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-function getPin(){try{return localStorage.getItem(PIN_KEY)||DEFAULT_PIN;}catch(e){return DEFAULT_PIN;}}
+function getPin(){return localStorage.getItem(PIN_KEY)||DEFAULT_PIN;}
 function loadJSON(k,d){try{var r=localStorage.getItem(k);return r?JSON.parse(r):d;}catch(e){return d;}}
 function saveJSON(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 
-var localAI=loadJSON(LOCALAI_KEY,DEFAULT_LOCALAI);
-var socials=loadJSON(SOCIAL_KEY,DEFAULT_SOCIAL);
-var accessEnabled=loadJSON(ACCESS_KEY,true);
+var localAI=loadJSON(LOCALAI_KEY,{greeting:"Hola",fallback:"No tengo esto en memoria.",rules:[]});
 var memory=loadJSON(MEM_KEY,[]);
+var providers=loadJSON(PROV_KEY, [
+  {name: "Gemini", url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", model: "gemini-2.0-flash", key: ""},
+  {name: "OpenRouter/Groq", url: "https://api.groq.com/openai/v1/chat/completions", model: "llama-3.3-70b-versatile", key: ""}
+]);
 var busy=false;
 
-/* ---------- REDES ---------- */
-function renderSocials(){
-  var g=$("social-grid");if(!g)return;g.innerHTML="";
-  socials.forEach(function(s){
-    var has=s.url&&s.url.trim()!=="";
-    var c=document.createElement(has?"a":"div");
-    if(has){c.href=s.url;c.target="_blank";c.rel="noopener";}
-    c.className="social-card"+(has?"":" disabled");
-    var h=has?s.url.replace(/^https?:\/\//,"").replace(/\/$/,""):"Sin enlace";
-    var logo=s.icon?'<div class="social-logo" style="background:rgba(255,255,255,.04)"><img src="'+s.icon+'" alt="'+esc(s.name)+'" style="width:24px;height:24px;object-fit:contain"></div>':'<div class="social-logo" style="background:'+s.color+';color:'+s.textColor+'">'+s.short+'</div>';
-    c.innerHTML=logo+'<div class="social-name">'+esc(s.name)+'</div><div class="social-handle">'+esc(h)+'</div>';
-    g.appendChild(c);
-  });
-}
-
-/* ---------- LOGS DE ACTIVIDAD ---------- */
+/* ---------- LOGS ---------- */
 var logEl=$("activity-log"),tickerEl=$("ticker"),agentDot=$("agent-dot"),agentStatusText=$("agent-status-text");
 var hb=0;
 function nowT(){var d=new Date();function p(n){return(n<10?"0":"")+n;}return p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());}
 function log(t,type){type=type||"";var e=document.createElement("div");e.className="log-entry";e.innerHTML='<span class="log-time mono">'+nowT()+'</span><span class="log-text '+type+'">'+esc(t)+'</span>';logEl.insertBefore(e,logEl.firstChild);while(logEl.children.length>40)logEl.removeChild(logEl.lastChild);}
 setInterval(function(){hb++;if(tickerEl)tickerEl.textContent="● "+hb+"s";},1000);
-
-function setStatus(b,t){
-  busy=b;
-  if(b){agentDot.className="status-dot thinking";agentStatusText.textContent=t||"Procesando…";}
-  else{agentDot.className=navigator.onLine?"status-dot":"status-dot offline";agentStatusText.textContent=navigator.onLine?"En línea":"Sin conexión (Modo Memoria)";}
-}
+function setStatus(b,t){busy=b;if(b){agentDot.className="status-dot thinking";agentStatusText.textContent=t||"Procesando…";}else{agentDot.className=navigator.onLine?"status-dot":"status-dot offline";agentStatusText.textContent=navigator.onLine?"En línea":"Offline (Modo Memoria)";}}
 window.addEventListener("online",function(){setStatus(false);log("Conexión restaurada","ok");});
-window.addEventListener("offline",function(){setStatus(false);log("Modo sin conexión activo","err");});
+window.addEventListener("offline",function(){setStatus(false);log("Modo sin conexión","err");});
 
-/* ---------- SISTEMA DE APRENDIZAJE Y MEMORIA LOCAL ---------- */
-function updateMemCount(){var el=$("mem-count");if(el)el.textContent=memory.length+" elementos aprendidos";}
-function saveMemory(){saveJSON(MEM_KEY,memory.slice(-500));updateMemCount();}
-
+/* ---------- MEMORIA APRENDIDA ---------- */
+function updateMemCount(){if($("mem-count"))$("mem-count").textContent=memory.length+" conocimientos aprendidos";}
+function saveMemory(){saveJSON(MEM_KEY,memory.slice(-1000));updateMemCount();}
 function addMem(q,a){
-  q=String(q||"").trim();a=String(a||"").trim();
-  if(!q||!a)return false;
-  // Evitar duplicados exactos
-  var exists = memory.some(function(m){ return m.q.toLowerCase() === q.toLowerCase() && m.a.toLowerCase() === a.toLowerCase(); });
+  q=String(q||"").trim();a=String(a||"").trim();if(!q||!a)return false;
+  var exists = memory.some(function(m){return m.q.toLowerCase()===q.toLowerCase();});
   if(!exists){
-    memory.push({q:q,a:a,date:Date.now()});
-    saveMemory();
-    // También generar una regla dinámica si es una enseñanza corta
-    if(q.length < 50) {
-      localAI.rules.unshift({keyword: q.toLowerCase(), response: a});
-      saveJSON(LOCALAI_KEY, localAI);
-    }
+    memory.push({q:q,a:a,date:Date.now()}); saveMemory();
+    if(q.length<60){ localAI.rules.unshift({keyword: q.toLowerCase(), response: a}); saveJSON(LOCALAI_KEY, localAI); }
   }
   return true;
 }
-
-// Detección explícita cuando el usuario enseña a la IA
-function checkDirectTeaching(text){
-  var lower = text.toLowerCase().trim();
-  var match = lower.match(/^(?:aprende que|recuerda que|guarda que|mi)\s+(.+?)\s+(?:es|son|se llama|igual a|=|:)\s+(.+)$/i);
-  if(match){
-    var key = match[1].trim();
-    var val = match[2].trim();
-    addMem(key, val);
-    log("Aprender: "+key+" → "+val, "mem");
-    return "🧠 **Aprendido exitosamente**: Guardé que **"+key+"** es **"+val+"**. Ahora lo recordaré en el futuro.";
-  }
-  return null;
-}
-
-// Búsqueda en memoria aprendida
-function findInMemory(question){
+function findInMemory(q){
   if(!memory.length)return null;
-  var qWords=question.toLowerCase().split(/\W+/).filter(function(w){return w.length>2;});
-  if(!qWords.length)return null;
-
+  var words=q.toLowerCase().split(/\W+/).filter(function(w){return w.length>3;});
   var best=null, bestScore=0;
   memory.forEach(function(m){
-    var mq=m.q.toLowerCase();
-    var score=0;
-    qWords.forEach(function(w){
-      if(mq.indexOf(w)!==-1) score+=2;
-    });
-    if(mq.indexOf(question.toLowerCase())!==-1) score+=5;
+    var mq=m.q.toLowerCase(), score=0;
+    words.forEach(function(w){if(mq.indexOf(w)!==-1)score+=2;});
+    if(mq.indexOf(q.toLowerCase())!==-1)score+=5;
     if(score>bestScore){bestScore=score;best=m;}
   });
-
-  if(best && bestScore>=2) return best;
-  return null;
+  return (best&&bestScore>=2)?best:null;
 }
-
-function memContext(){
-  if(!memory.length)return"";
-  return "Memoria de datos aprendidos previamente:\n" + memory.slice(-10).map(function(m){ return "- " + m.q + ": " + m.a; }).join("\n");
-}
+function memContext(){return memory.length ? "Memoria local:\n"+memory.slice(-15).map(function(m){return "- "+m.q+": "+m.a;}).join("\n") : "";}
 
 $("add-mem").addEventListener("click",function(){
   if(addMem($("mem-q").value,$("mem-a").value)){
     $("mem-q").value="";$("mem-a").value="";
-    $("mem-status").textContent="✓ Guardado en memoria local.";
+    $("mem-status").textContent="✓ Aprendido exitosamente.";
     $("mem-status").className="status-line ok";
-    log("Memoria manual agregada","mem");
-  } else {
-    $("mem-status").textContent="Ingresa pregunta/clave y respuesta.";
-    $("mem-status").className="status-line err";
-  }
+    log("Conocimiento enseñado manualmente","mem");
+  } else { $("mem-status").textContent="Rellena ambos campos."; $("mem-status").className="status-line err"; }
 });
-$("clear-mem").addEventListener("click",function(){if(memory.length&&confirm("¿Borrar toda la memoria aprendida?")){memory=[];saveMemory();log("Memoria borrada","err");}});
+$("clear-mem").addEventListener("click",function(){if(confirm("¿Borrar toda la memoria aprendida por la IA?")){memory=[];saveMemory();log("Memoria borrada","err");}});
 $("export-mem").addEventListener("click",function(){var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(memory,null,2)],{type:"application/json"}));a.download="memoria-metatron.json";a.click();});
-$("import-mem").addEventListener("click",function(){$("import-file").click();});
-$("import-file").addEventListener("change",function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(Array.isArray(d)){d.forEach(function(x){if(x&&x.q&&x.a)addMem(x.q,x.a);});saveMemory();log("Memoria importada","mem");}}catch(err){log("Error al importar memoria","err");}};r.readAsText(f);e.target.value="";});
 
-/* ---------- APIs DE IA (EJECUCIÓN COLABORATIVA / PARALELA) ---------- */
-function provUrl(p){
-  var n=(p.name||"").toLowerCase();
-  if(n.indexOf("gemini")!==-1||n.indexOf("google")!==-1) return "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-  if(n.indexOf("groq")!==-1) return "https://api.groq.com/openai/v1/chat/completions";
-  if(n.indexOf("openrouter")!==-1) return "https://openrouter.ai/api/v1/chat/completions";
-  if(n.indexOf("deepseek")!==-1) return "https://api.deepseek.com/chat/completions";
-  return "https://api.openai.com/v1/chat/completions";
+/* ---------- APIs MANUALES ---------- */
+function renderAPIList(){
+  var c=$("api-list-container"); c.innerHTML="";
+  providers.forEach(function(p, i){
+    var card=document.createElement("div"); card.className="api-card";
+    card.innerHTML=
+      '<div class="api-card-header"><span>API '+(i+1)+'</span><button class="btn small danger" onclick="window.removeAPI('+i+')">Eliminar</button></div>'+
+      '<input id="p-name-'+i+'" placeholder="Nombre (ej. Mi API)" value="'+esc(p.name)+'">'+
+      '<input id="p-url-'+i+'" placeholder="URL (ej. https://api.openai.com/v1/chat/completions)" value="'+esc(p.url)+'">'+
+      '<input id="p-model-'+i+'" placeholder="Modelo (ej. gpt-4o, llama3-8b)" value="'+esc(p.model)+'">'+
+      '<input id="p-key-'+i+'" type="password" placeholder="Token / API Key" value="'+esc(p.key)+'">';
+    c.appendChild(card);
+  });
 }
-
-function loadProvs(){
-  var saved=loadJSON(PROV_KEY,null);
-  if(saved && Array.isArray(saved) && saved.length > 0) return saved.slice(0,3);
-  return [
-    {name:"Gemini", key:""},
-    {name:"OpenAI", key:""},
-    {name:"Groq", key:""}
-  ];
-}
-
-function fillProvs(){
-  var p=loadProvs();
-  for(var i=1;i<=3;i++){
-    if(p[i-1]){
-      $("p"+i+"-name").value=p[i-1].name||"";
-      $("p"+i+"-key").value=p[i-1].key||"";
-    }
-  }
-}
+window.removeAPI=function(idx){ providers.splice(idx,1); renderAPIList(); };
+$("add-api-btn").addEventListener("click",function(){ providers.push({name:"",url:"",model:"",key:""}); renderAPIList(); });
 
 $("save-provs").addEventListener("click",function(){
-  var p=[];
-  for(var i=1;i<=3;i++){
-    p.push({name:$("p"+i+"-name").value.trim(), key:$("p"+i+"-key").value.trim()});
-  }
-  saveJSON(PROV_KEY,p);
-  $("prov-msg").textContent="✓ Guardadas correctamente";
-  log("APIs guardadas: "+p.filter(function(x){return x.key;}).length+" activas","ok");
-  setTimeout(function(){$("prov-msg").textContent="";},2500);
+  providers.forEach(function(p, i){
+    if($("p-name-"+i)){
+      p.name=$("p-name-"+i).value.trim(); p.url=$("p-url-"+i).value.trim();
+      p.model=$("p-model-"+i).value.trim(); p.key=$("p-key-"+i).value.trim();
+    }
+  });
+  saveJSON(PROV_KEY, providers);
+  $("prov-msg").textContent="✓ Guardado. Estas APIs alimentarán la memoria.";
+  log("APIs manuales actualizadas","ok");
+  setTimeout(function(){$("prov-msg").textContent="";},3000);
 });
 
-// Función de consulta a una API individual
 function callSingleAPI(p, question, ctx) {
   return new Promise(function(resolve, reject) {
-    var n=(p.name||"").toLowerCase();
-    var model="gpt-3.5-turbo";
-    if(n.indexOf("gemini")!==-1||n.indexOf("google")!==-1) model="gemini-2.0-flash";
-    else if(n.indexOf("groq")!==-1) model="llama-3.3-70b-versatile";
-    else if(n.indexOf("deepseek")!==-1) model="deepseek-chat";
-
-    log("Consultando API → " + p.name, "ai");
-
-    fetch(provUrl(p), {
+    if(!p.url || !p.model || !p.key) { reject(new Error("API Incompleta")); return; }
+    log("Consultando API: " + p.name, "ai");
+    fetch(p.url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + p.key
-      },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + p.key },
       body: JSON.stringify({
-        model: model,
-        messages: [
-          {role: "system", content: "Eres un asistente útil que responde en español. Usa este contexto si ayuda:\n" + ctx},
-          {role: "user", content: question}
-        ],
-        max_tokens: 600,
-        temperature: 0.6
+        model: p.model,
+        messages: [{role: "system", content: "Responde en español. Usa esto como contexto si sirve:\n" + ctx},{role: "user", content: question}],
+        max_tokens: 800, temperature: 0.6
       })
     })
-    .then(function(r){
-      if(!r.ok) throw new Error("Status " + r.status);
-      return r.json();
-    })
+    .then(function(r){if(!r.ok)throw new Error("HTTP "+r.status); return r.json();})
     .then(function(j){
       var txt = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
-      if(!txt) throw new Error("Respuesta vacía");
-      log(p.name + " respondió con éxito", "ok");
-      resolve({ provider: p.name, text: txt.trim() });
-    })
-    .catch(function(err){
-      log(p.name + " falló: " + err.message, "err");
-      reject(err);
-    });
+      if(!txt) throw new Error("Vació");
+      resolve({ provider: p.name + " (" + p.model + ")", text: txt.trim() });
+    }).catch(function(e){ log(p.name+" falló: "+e.message, "err"); reject(e); });
   });
 }
 
-// Ejecutar TODAS las APIs activas simultáneamente en conjunto
 function askMultiAPI(question){
   return new Promise(function(res, rej){
-    var provs = loadProvs().filter(function(p){ return p.key && p.key.trim() !== ""; });
-    if(!provs.length){ rej(new Error("Sin APIs configuradas")); return; }
-
+    var activeProvs = providers.filter(function(p){ return p.url && p.model && p.key; });
+    if(!activeProvs.length){ rej(new Error("Sin APIs manuales configuradas.")); return; }
     var ctx = memContext();
-    var promises = provs.map(function(p){ return callSingleAPI(p, question, ctx); });
-
+    var promises = activeProvs.map(function(p){ return callSingleAPI(p, question, ctx); });
     Promise.allSettled(promises).then(function(results){
-      var successful = results.filter(function(r){ return r.status === "fulfilled"; }).map(function(r){ return r.value; });
-
-      if(!successful.length){
-        rej(new Error("Todas las APIs configuradas fallaron"));
-        return;
-      }
-
-      // Si múltiples APIs respondieron, combinamos información o tomamos la más completa
-      if(successful.length === 1){
-        res({ text: successful[0].text, via: successful[0].provider });
-      } else {
-        var names = successful.map(function(s){ return s.provider; }).join(" + ");
-        // Elegimos la respuesta con mejor extensión/detalle
-        successful.sort(function(a,b){ return b.text.length - a.text.length; });
-        res({ text: successful[0].text, via: names + " (Sintetizado en conjunto)" });
+      var ok = results.filter(function(r){ return r.status==="fulfilled"; }).map(function(r){ return r.value; });
+      if(!ok.length) rej(new Error("Todas las APIs manuales fallaron"));
+      else {
+        ok.sort(function(a,b){ return b.text.length - a.text.length; });
+        res({ text: ok[0].text, via: ok[0].provider });
       }
     });
   });
 }
 
-/* ---------- OLLAMA (SERVIDOR LOCAL) ---------- */
-function getOllamaEP(){
-  var raw=$("ollama-ep").value.trim().replace(/\/+$/,"");
-  try{ var u=new URL(raw); return u.origin+u.pathname.replace(/\/+$/,""); }
-  catch(e){ throw new Error("URL de Ollama inválida"); }
-}
-
+/* ---------- OLLAMA Y CHAT ---------- */
+function getOllamaEP(){var raw=$("ollama-ep").value.trim().replace(/\/+$/,""); try{var u=new URL(raw); return u.origin+u.pathname;}catch(e){return"";}}
 $("ollama-refresh").addEventListener("click",function(){
   var btn=this; btn.disabled=true;
-  try {
-    var base=getOllamaEP();
-    fetch(base+"/api/tags").then(function(r){ return r.json(); }).then(function(d){
-      var items=Array.isArray(d.models)?d.models:[];
-      var sel=$("ollama-model"); sel.innerHTML="";
-      if(!items.length){ sel.add(new Option("Sin modelos","")); return; }
-      items.forEach(function(x){ sel.add(new Option(x.name, x.name)); });
-      log("Ollama: "+items.length+" modelos encontrados","ok");
-    }).catch(function(){ log("Ollama fuera de línea","err"); })
-    .finally(function(){ btn.disabled=false; });
-  } catch(e){ btn.disabled=false; }
+  fetch(getOllamaEP()+"/api/tags").then(function(r){return r.json();}).then(function(d){
+    var sel=$("ollama-model"); sel.innerHTML="";
+    (d.models||[]).forEach(function(x){sel.add(new Option(x.name,x.name));});
+    log("Ollama: OK","ok");
+  }).catch(function(){log("Ollama offline","err");}).finally(function(){btn.disabled=false;});
 });
-
-function askOllama(question){
+function askOllama(q){
   return new Promise(function(res,rej){
-    var model=$("ollama-model").value;
-    if(!model){rej(new Error("Sin modelo Ollama"));return;}
-    var base=getOllamaEP();
-    log("Consultando Ollama → "+model,"ai");
-    fetch(base+"/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:model,
-        messages:[
-          {role:"system",content:"Eres un asistente en español. " + memContext()},
-          {role:"user",content:question}
-        ],
-        stream:false
-      })
-    })
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var a=d.message&&d.message.content?d.message.content.trim():"";
-      if(!a)throw new Error("Vacío");
-      res({text:a, via:"Ollama Local ("+model+")"});
-    })
-    .catch(rej);
+    var m=$("ollama-model").value; if(!m){rej();return;}
+    fetch(getOllamaEP()+"/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:m,messages:[{role:"system",content:"Responde en español. " + memContext()},{role:"user",content:q}],stream:false})})
+    .then(function(r){return r.json();}).then(function(d){res({text:d.message.content.trim(), via:"Ollama ("+m+")"});}).catch(rej);
   });
-}
-
-/* ---------- BÚSQUEDA WEB FALLBACK ---------- */
-function askWebSearch(question){
-  return new Promise(function(res){
-    if(!navigator.onLine){res(null);return;}
-    log("Buscando en Wikipedia…","search");
-    fetch("https://es.wikipedia.org/w/api.php?action=opensearch&search="+encodeURIComponent(question)+"&limit=1&namespace=0&format=json&origin=*")
-    .then(function(r){return r.json();})
-    .then(function(d){
-      var t=d[1]||[];if(!t.length){res(null);return;}
-      fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(t[0]))
-      .then(function(r){return r.json();})
-      .then(function(s){ res({text: "📖 **" + (s.title||t[0]) + "**\n\n" + (s.extract||""), via: "Wikipedia Web"}); })
-      .catch(function(){res(null);});
-    }).catch(function(){res(null);});
-  });
-}
-
-/* ---------- FLUJO DEL AGENTE PRINCIPAL ---------- */
-function appendMsg(text,cls,src){
-  var c=$("chat-messages");
-  var m=document.createElement("div");
-  m.className="msg "+cls;
-  m.textContent=text;
-  if(src){
-    var s=document.createElement("span");
-    s.className="src";
-    s.textContent="Fuente: "+src;
-    m.appendChild(s);
-  }
-  c.appendChild(m);
-  c.scrollTop=c.scrollHeight;
-  return m;
-}
-
-function localRuleMatch(q){
-  q=q.toLowerCase();
-  for(var i=0;i<localAI.rules.length;i++){
-    var r=localAI.rules[i];
-    if(!r.keyword||!r.response)continue;
-    var ks=r.keyword.split("|");
-    for(var j=0;j<ks.length;j++){
-      if(ks[j].trim() && q.indexOf(ks[j].trim().toLowerCase())!==-1){
-        log("Regla local emparejada: '"+ks[j].trim()+"'","mem");
-        return r.response;
-      }
-    }
-  }
-  return null;
 }
 
 function askAgent(question){
-  appendMsg(question,"user");
+  var c=$("chat-messages");
+  var m1=document.createElement("div"); m1.className="msg user"; m1.textContent=question; c.appendChild(m1);
+  c.scrollTop=c.scrollHeight;
+  var typing=document.createElement("div"); typing.className="msg ai"; typing.innerHTML='<div class="thinking-wrap"><div class="thinking-dots"><i></i><i></i><i></i></div><div class="thinking-step" id="thinking-step">Procesando consulta...</div><div class="progress-bar"><i></i></div></div>'; c.appendChild(typing); c.scrollTop=c.scrollHeight;
 
-  // 1. Verificar si el usuario está enseñando algo directo
-  var teachResult = checkDirectTeaching(question);
-  if(teachResult){
-    setTimeout(function(){ appendMsg(teachResult, "ai", "Sistema de Aprendizaje Local"); }, 300);
-    return;
-  }
-
-  var typing=document.createElement("div");
-  typing.className="msg ai";
-  typing.innerHTML='<div class="thinking-wrap"><div class="thinking-dots"><i></i><i></i><i></i></div><div class="thinking-step" id="thinking-step">Procesando consulta...</div><div class="progress-bar"><i></i></div></div>';
-  $("chat-messages").appendChild(typing);
-  $("chat-messages").scrollTop=$("chat-messages").scrollHeight;
-
-  function setStep(t){ var s=$("thinking-step"); if(s)s.textContent=t; }
   setStatus(true,"Pensando…");
+  var setStep=function(t){if($("thinking-step"))$("thinking-step").textContent=t;};
 
   var finish = function(text, via){
     typing.remove();
-    var m = appendMsg("", "ai", via);
-    var txtSpan = document.createElement("span");
-    m.insertBefore(txtSpan, m.firstChild);
-
-    // Efecto de mecanografía
-    var i = 0;
-    var timer = setInterval(function(){
-      if(i < text.length){
-        txtSpan.textContent += text.charAt(i);
-        i++;
-        $("chat-messages").scrollTop = $("chat-messages").scrollHeight;
-      } else {
-        clearInterval(timer);
-      }
-    }, 10);
-
-    // Guardado automático en la memoria aprendida
-    addMem(question, text);
+    var m = document.createElement("div"); m.className="msg ai"; m.textContent=text;
+    var s = document.createElement("span"); s.className="src"; s.textContent="Fuente: "+via; m.appendChild(s);
+    c.appendChild(m); c.scrollTop=c.scrollHeight;
+    
+    // AQUÍ LA IA APRENDE SOLA
+    if(via !== "Memoria Aprendida" && via !== "Regla Local") {
+      addMem(question, text);
+      log("Respuesta guardada en memoria ("+via+")", "mem");
+    }
     setStatus(false);
-    log("Respuesta entregada por: " + via, "ok");
   };
 
-  // 2. Coincidencia con Reglas Locales
-  var rule = localRuleMatch(question);
-  if(rule){ setTimeout(function(){ finish(rule, "Regla Local"); }, 300); return; }
-
-  // 3. Coincidencia en Memoria Aprendida
+  // 1. Memoria Offline Prioritaria si no hay internet
   var mem = findInMemory(question);
-  if(!navigator.onLine && mem){ finish(mem.a, "Memoria Aprendida (Sin Conexión)"); return; }
+  if(!navigator.onLine && mem){ finish(mem.a, "Memoria Aprendida"); return; }
 
-  // 4. Cadena de Ejecución: Ollama → Múltiples APIs en conjunto → Búsqueda Web → Memoria/Fallback
-  setStep("Consultando servidor Ollama...");
-  askOllama(question)
-  .catch(function(){
-    setStep("Consultando APIs en paralelo...");
+  // 2. Ollama -> APIs -> Memoria de Respaldo
+  setStep("Consultando Ollama local...");
+  askOllama(question).catch(function(){
+    setStep("Consultando modelos manuales...");
     return askMultiAPI(question);
-  })
-  .catch(function(){
-    setStep("Buscando en la Web...");
-    return askWebSearch(question);
-  })
-  .then(function(res){
-    if(res && res.text) finish(res.text, res.via);
-    else throw new Error("Sin respuesta");
-  })
-  .catch(function(){
-    if(mem){
-      finish(mem.a, "Memoria Local (Fallback)");
-    } else {
+  }).then(function(res){
+    finish(res.text, res.via);
+  }).catch(function(){
+    if(mem) finish(mem.a, "Memoria Aprendida");
+    else {
       typing.remove();
-      appendMsg(localAI.fallback + " (No hay conexión disponible y no tengo este dato guardado).", "ai", "IA Local");
+      var failMsg = document.createElement("div"); failMsg.className="msg ai"; failMsg.textContent="Las APIs fallaron y no tengo este conocimiento en mi memoria local aún."; c.appendChild(failMsg); c.scrollTop=c.scrollHeight;
       setStatus(false);
     }
   });
 }
 
-$("chat-send").addEventListener("click",function(){
-  var v=$("chat-input").value.trim();
-  if(!v||busy)return;
-  $("chat-input").value="";
-  askAgent(v);
-});
-
+$("chat-send").addEventListener("click",function(){var v=$("chat-input").value.trim();if(!v||busy)return; $("chat-input").value=""; askAgent(v);});
 $("chat-input").addEventListener("keydown",function(e){if(e.key==="Enter")$("chat-send").click();});
 $("settings-toggle").addEventListener("click",function(){$("settings").classList.toggle("open");});
 
-/* ---------- PANEL DE ADMINISTRACIÓN ---------- */
-var modal=$("admin-modal");
-function openAdmin(){modal.style.display="flex";void modal.offsetWidth;modal.classList.add("open");if(!accessEnabled){showPanel();return;}showPinScreen();}
-function closeAdmin(){modal.classList.remove("open");setTimeout(function(){modal.style.display="none";},300);}
+/* ---------- INICIO ---------- */
+renderAPIList(); updateMemCount(); setStatus(false);
+var skipped=false; function skipIntro(){if(skipped)return;skipped=true;$("intro").classList.add("fade-out");document.body.classList.add("revealed");}
+$("intro").addEventListener("click",skipIntro); document.addEventListener("keydown",skipIntro); setTimeout(skipIntro,2000);
 
-function showPinScreen(){
-  $("modal-title").textContent="Acceso Restringido";$("modal-footer").style.display="none";
-  $("modal-body").innerHTML='<div class="pin-wrapper"><p style="font-size:.88rem;color:var(--ink-dim)">Introduce la clave PIN</p><input type="password" class="pin-input" id="pin-input" placeholder="••••••••" autocomplete="off"><div class="pin-hint">Clave por defecto: metatron2026</div><div class="card-error" id="pin-error"></div><button class="btn small" id="pin-submit" style="margin-top:12px">Entrar</button></div>';
-  var inp=$("pin-input");setTimeout(function(){inp.focus();},100);
-  function att(){if(inp.value===getPin())showPanel();else{$("pin-error").textContent="Clave incorrecta";inp.value="";inp.focus();}}
-  $("pin-submit").addEventListener("click",att);
-  inp.addEventListener("keydown",function(e){if(e.key==="Enter")att();});
-}
-
-function showSaveMsg(t,err){
-  var s=$("save-status");s.textContent=t;s.className="save-message"+(err?" error":"");
-  setTimeout(function(){s.textContent="";},3000);
-}
-
-function showPanel(){
-  $("modal-title").textContent="Panel de Control General";$("modal-footer").style.display="flex";
-  var rh="";for(var i=0;i<5;i++){var r=localAI.rules[i]||{keyword:"",response:""};rh+='<div class="rule-row"><input id="rk'+i+'" placeholder="Palabra clave" value="'+esc(r.keyword||"")+'"><input id="rr'+i+'" placeholder="Respuesta" value="'+esc(r.response||"")+'"></div>';}
-  var sh="";socials.forEach(function(s,idx){sh+='<div class="social-edit-row"><span class="se-name">'+esc(s.short)+'·'+esc(s.name)+'</span><input id="surl'+idx+'" placeholder="https://…" value="'+esc(s.url||"")+'"></div>';});
-
-  $("modal-body").innerHTML=
-    '<div class="panel-section"><div class="panel-section-title">Reglas de Respuesta Local</div>'+
-    '<div class="form-group"><label>Mensaje de Bienvenida</label><input id="f-greeting" value="'+esc(localAI.greeting||"")+'"></div>'+
-    '<div class="form-group"><label>Respuesta por Defecto</label><input id="f-fallback" value="'+esc(localAI.fallback||"")+'"></div>'+
-    '<label style="font-size:.76rem;color:var(--ink-dim)">Reglas Rápidas (Palabras Clave → Respuesta)</label>'+rh+'</div>'+
-    '<div class="panel-section"><div class="panel-section-title">URLs de Redes Sociales</div>'+sh+'</div>'+
-    '<div class="panel-section"><div class="panel-section-title">Seguridad de Acceso</div>'+
-    '<div class="toggle-row"><span>Protección con Clave PIN</span><div class="toggle-switch '+(accessEnabled?"active":"")+'" id="f-access"></div></div>'+
-    '<div class="form-group"><label>Cambiar Clave PIN</label><input id="f-newpin" type="text" placeholder="Nueva clave"></div></div>';
-
-  $("f-access").addEventListener("click",function(){
-    this.classList.toggle("active");
-    accessEnabled=this.classList.contains("active");
-    saveJSON(ACCESS_KEY,accessEnabled);
-  });
-}
-
-function saveAll(){
-  var rules=[];
-  for(var i=0;i<5;i++){
-    var k=$("rk"+i).value.trim(), r=$("rr"+i).value.trim();
-    if(k||r) rules.push({keyword:k, response:r});
-  }
-  localAI.greeting=$("f-greeting").value.trim();
-  localAI.fallback=$("f-fallback").value.trim();
-  localAI.rules=rules;
-  saveJSON(LOCALAI_KEY,localAI);
-
-  socials.forEach(function(s,idx){
-    var inp=$("surl"+idx);
-    if(inp) s.url=inp.value.trim();
-  });
-  saveJSON(SOCIAL_KEY,socials);
-
-  var np=$("f-newpin").value.trim();
-  if(np){ localStorage.setItem(PIN_KEY,np); }
-
-  renderSocials();
-  showSaveMsg("✓ Cambios guardados");
-  setTimeout(closeAdmin,800);
-}
-
-function resetAll(){
-  if(!confirm("¿Restablecer todas las configuraciones por defecto?"))return;
-  localStorage.clear();
-  location.reload();
-}
-
-$("admin-trigger").addEventListener("click",openAdmin);
-$("modal-close").addEventListener("click",closeAdmin);
-$("btn-save").addEventListener("click",saveAll);
-$("btn-reset").addEventListener("click",resetAll);
-
-/* ---------- INTRO & INIT ---------- */
-var skipped=false;
-function skipIntro(){if(skipped)return;skipped=true;$("intro").classList.add("fade-out");document.body.classList.add("revealed");}
-$("intro").addEventListener("click",skipIntro);
-document.addEventListener("keydown",skipIntro);
-setTimeout(skipIntro,2000);
-
-renderSocials();
-fillProvs();
-updateMemCount();
-setStatus(false);
-log("Sistema Metatron inicializado correctamente","ok");
 })();
 </script>
 </body>
