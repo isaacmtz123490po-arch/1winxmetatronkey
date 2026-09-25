@@ -1,13 +1,275 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Metatron</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Metatron</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0b10; --bg2:#0f1119; --panel:#13151f;
+    --gold:#c9a876; --gold-bright:#e4c99a; --violet:#8b7fd9;
+    --ink:#eae7dd; --ink-dim:#9a9aa5; --line:rgba(201,168,118,.25);
+    --line-dim:rgba(201,168,118,.12);
+    --success:#86d9a9; --error:#d98080;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(139,127,217,.06) 0%, transparent 45%),
+      radial-gradient(ellipse at 85% 30%, rgba(201,168,118,.05) 0%, transparent 40%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%23c9a876' stroke-opacity='0.05' stroke-width='1'%3E%3Ccircle cx='120' cy='30' r='10'/%3E%3Ccircle cx='120' cy='210' r='10'/%3E%3Ccircle cx='30' cy='75' r='10'/%3E%3Ccircle cx='210' cy='75' r='10'/%3E%3Ccircle cx='30' cy='165' r='10'/%3E%3Ccircle cx='210' cy='165' r='10'/%3E%3Ccircle cx='120' cy='120' r='10'/%3E%3Cline x1='120' y1='30' x2='120' y2='210'/%3E%3Cline x1='30' y1='75' x2='210' y2='165'/%3E%3Cline x1='30' y1='165' x2='210' y2='75'/%3E%3Cline x1='30' y1='75' x2='30' y2='165'/%3E%3Cline x1='210' y1='75' x2='210' y2='165'/%3E%3Cline x1='120' y1='30' x2='30' y2='75'/%3E%3Cline x1='120' y1='30' x2='210' y2='75'/%3E%3Cline x1='120' y1='210' x2='30' y2='165'/%3E%3Cline x1='120' y1='210' x2='210' y2='165'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat:no-repeat,no-repeat,repeat;
+    background-attachment:fixed,fixed,fixed;
+    background-size:auto,auto,240px 240px;
+  }
+  h1,h2,h3,h4,.brand{font-family:'Space Grotesk',sans-serif;font-weight:600}
+  a{color:inherit;text-decoration:none;transition:color .25s ease}
+  button{font-family:inherit;cursor:pointer}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+  /* ---------- INTRO ---------- */
+  #intro{
+    position:fixed;inset:0;z-index:9999;
+    background:linear-gradient(180deg,#11131e 0%,var(--bg) 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    transition:opacity 1.4s cubic-bezier(.4,0,.2,1),visibility 1.4s,transform 1.4s;
+  }
+  #intro.fade-out{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-20px)}
+  .intro-title{
+    font-size:clamp(2.4rem,6vw,3.8rem);color:var(--gold-bright);
+    letter-spacing:.25em;font-weight:700;opacity:0;transform:translateY(10px);
+    animation:titleIn 1.2s cubic-bezier(.2,.7,.2,1) forwards .2s;
+    text-shadow:0 0 40px rgba(201,168,118,.15);
+  }
+  @keyframes titleIn{to{opacity:1;transform:translateY(0)}}
+  .intro-label{
+    margin-top:18px;letter-spacing:.4em;font-size:.75rem;color:var(--ink-dim);
+    opacity:0;transform:translateY(6px);
+    animation:fadeUp 1s cubic-bezier(.2,.7,.2,1) forwards .9s;
+  }
+  @keyframes fadeUp{to{opacity:.8;transform:translateY(0)}}
+  .intro-label::after{
+    content:'';display:block;width:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    margin:14px auto 0;animation:expandLine 1.6s ease forwards 1.4s;
+  }
+  @keyframes expandLine{to{width:100%}}
+  .cube-stage{width:300px;height:300px;perspective:1200px;position:relative;margin:24px 0 36px}
+  .glow{
+    position:absolute;inset:-70px;border-radius:50%;
+    background:radial-gradient(circle,rgba(201,168,118,.18) 0%,rgba(139,127,217,.08) 45%,transparent 70%);
+    filter:blur(3px);animation:pulse 4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.5;transform:scale(.95)}50%{opacity:.9;transform:scale(1.05)}}
+  .ring-outer{
+    position:absolute;inset:8%;border:1px solid rgba(201,168,118,.2);border-radius:50%;
+    animation:spin-rev 10s linear infinite;transform-style:preserve-3d;
+  }
+  .ring-outer::before{
+    content:'';position:absolute;inset:-1px;border-radius:50%;
+    border:1px solid rgba(139,127,217,.15);transform:rotate3d(1,1,0,55deg);
+  }
+  @keyframes spin-rev{from{transform:rotateX(70deg) rotateZ(0)}to{transform:rotateX(70deg) rotateZ(-360deg)}}
+  .cube-rot{
+    width:100%;height:100%;transform-style:preserve-3d;opacity:0;
+    animation:spin 8s cubic-bezier(.45,.05,.55,.95) infinite,fadeInCube 1.2s ease forwards .3s;
+  }
+  @keyframes fadeInCube{to{opacity:1}}
+  @keyframes spin{
+    from{transform:rotateX(18deg) rotateY(0) scale(.92)}
+    20%{transform:rotateX(18deg) rotateY(72deg) scale(1)}
+    40%{transform:rotateX(18deg) rotateY(144deg) scale(1)}
+    60%{transform:rotateX(18deg) rotateY(216deg) scale(1)}
+    80%{transform:rotateX(18deg) rotateY(288deg) scale(1)}
+    to{transform:rotateX(18deg) rotateY(360deg) scale(.92)}
+  }
+  #intro svg{width:100%;height:100%;overflow:visible}
+  #intro svg circle{fill:none;stroke:var(--gold);stroke-width:1.1;opacity:.9}
+  #intro svg line{stroke:var(--violet);stroke-width:.8;opacity:.6}
+  #intro svg .node{stroke-dasharray:240;stroke-dashoffset:240;animation:drawNodes 2.8s cubic-bezier(.2,.7,.2,1) forwards .4s}
+  #intro svg line{stroke-dasharray:140;stroke-dashoffset:140;animation:drawLines 2.8s cubic-bezier(.2,.7,.2,1) forwards .4s}
+  @keyframes drawNodes{to{stroke-dashoffset:0}}
+  @keyframes drawLines{to{stroke-dashoffset:0}}
+
+  /* ---------- HEADER ---------- */
+  header{
+    position:sticky;top:0;z-index:40;padding-top:env(safe-area-inset-top,0px);
+    background:rgba(10,11,16,.8);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+  .brand{font-size:1.25rem;color:var(--gold-bright);letter-spacing:.12em}
+  .brand:hover{opacity:.85}
+  nav.links{display:flex;gap:32px;font-size:.92rem}
+  nav.links a{color:var(--ink-dim);position:relative}
+  nav.links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--gold);transition:width .25s}
+  nav.links a:hover{color:var(--gold-bright)}
+  nav.links a:hover::after{width:100%}
+  @media (max-width:640px){nav.links{display:none}}
+
+  /* ---------- HERO ---------- */
+  .hero{padding:90px 0;position:relative;min-height:calc(100vh - 180px);display:flex;flex-direction:column;justify-content:center}
+  .hero h1{font-size:clamp(2.1rem,5.5vw,3.4rem);max-width:660px;margin:0 0 24px;line-height:1.2}
+  .hero p{max-width:540px;color:var(--ink-dim);font-size:1.05rem;margin:0 0 36px;line-height:1.7}
+  .hero-sigil{position:absolute;right:-20px;top:50%;transform:translateY(-50%);width:300px;opacity:.08;pointer-events:none}
+  @media (max-width:900px){.hero-sigil{display:none}}
+  .hero-img{border-radius:4px;border:1px solid var(--line);margin-bottom:28px;max-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.2);display:none}
+  .btn{
+    display:inline-block;padding:14px 28px;border:1px solid var(--gold);
+    color:var(--gold-bright);font-size:.92rem;letter-spacing:.03em;border-radius:2px;
+    transition:all .25s ease;background:transparent;text-decoration:none;
+  }
+  .btn:hover{background:var(--gold);color:var(--bg);transform:translateY(-1px);box-shadow:0 4px 12px rgba(201,168,118,.15)}
+  .btn.secondary{border-color:var(--ink-dim);color:var(--ink-dim)}
+  .btn.secondary:hover{background:var(--ink-dim);color:var(--bg)}
+  .btn.small{padding:8px 16px;font-size:.85rem}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:80px 0;border-top:1px solid var(--line)}
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:48px;gap:20px;flex-wrap:wrap}
+  .section-head h2{font-size:1.7rem}
+  .section-head span{color:var(--ink-dim);font-size:.9rem;max-width:340px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+  @media (max-width:800px){.grid3{grid-template-columns:1fr}}
+  header,main,footer{opacity:0;transform:translateY(16px);filter:blur(6px);
+    transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1s,filter 1s}
+  body.revealed header,body.revealed main,body.revealed footer{opacity:1;transform:none;filter:blur(0)}
+  .cell{background:var(--bg2);padding:36px 30px;transition:background .25s}
+  .cell:hover{background:#161926}
+  .cell .mark{width:30px;height:30px;margin-bottom:18px;display:block}
+  .cell .mark circle{fill:none;stroke:var(--gold);stroke-width:1.3}
+  .cell .mark line{stroke:var(--violet);stroke-width:1;opacity:.7}
+  .cell h3{font-size:1.1rem;margin:0 0 12px;color:var(--gold-bright)}
+  .cell p{color:var(--ink-dim);font-size:.94rem;line-height:1.7}
+  .about{display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center}
+  @media (max-width:800px){.about{grid-template-columns:1fr}}
+  .about h2{margin-bottom:20px}
+  .about p{color:var(--ink-dim);margin-bottom:16px;line-height:1.7}
+  .figure{width:100%;aspect-ratio:1/1;max-width:320px;margin:0 auto;opacity:.9}
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+  @media (max-width:800px){.contact-grid{grid-template-columns:1fr}}
+  .contact-grid h2{margin-bottom:20px}
+  .contact-grid p{color:var(--ink-dim);margin-bottom:24px}
+  .contact-grid dt{color:var(--ink-dim);font-size:.8rem;margin-top:20px;letter-spacing:.05em}
+  .contact-grid dd{margin:4px 0 0;font-size:1.02rem}
+  footer{padding:40px 0;color:var(--ink-dim);font-size:.82rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+  /* ---------- ADMIN TRIGGER ---------- */
+  #admin-trigger{
+    position:fixed;bottom:env(safe-area-inset-bottom,20px);right:20px;
+    width:36px;height:36px;display:flex;flex-direction:column;justify-content:center;gap:4px;
+    align-items:center;cursor:pointer;z-index:50;opacity:.2;transition:opacity .3s,transform .2s;
+    background:none;border:none;padding:0;border-radius:4px;
+  }
+  #admin-trigger:hover,#admin-trigger:focus-visible{opacity:.7;transform:scale(1.05)}
+  #admin-trigger span{width:18px;height:1px;background:var(--ink-dim)}
+
+  /* ---------- MODAL ---------- */
+  #admin-modal{
+    position:fixed;inset:0;background:rgba(6,7,11,.9);backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
+    opacity:0;transition:opacity .3s;
+  }
+  #admin-modal.open{display:flex;opacity:1}
+  .modal-inner{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    width:100%;max-width:480px;max-height:88vh;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;
+  }
+  .modal-header{
+    padding:20px 26px;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;flex-shrink:0;
+  }
+  .modal-header h3{margin:0;font-size:1.05rem;color:var(--gold-bright);letter-spacing:.05em}
+  .modal-close{background:none;border:none;color:var(--ink-dim);font-size:1.1rem;cursor:pointer;transition:color .2s;padding:4px 8px}
+  .modal-close:hover{color:var(--ink)}
+  .modal-body{padding:24px 26px;overflow-y:auto;flex:1}
+  .modal-body p{color:var(--ink-dim);font-size:.88rem;line-height:1.6}
+  .modal-footer{
+    padding:14px 26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;
+    align-items:center;gap:12px;flex-shrink:0;background:rgba(0,0,0,.1);
+  }
+  .footer-buttons{display:flex;gap:10px;margin-left:auto}
+  .save-message{font-size:.8rem;color:var(--success);transition:opacity .3s;max-width:50%}
+  .save-message.error{color:var(--error)}
+  .save-message.hidden{opacity:0}
+
+  /* PIN screen */
+  .pin-wrapper{text-align:center;padding:16px 0}
+  .pin-input{
+    width:100%;max-width:280px;padding:12px 16px;text-align:center;
+    font-size:1.1rem;letter-spacing:.15em;background:var(--bg2);
+    border:1px solid var(--line);color:var(--ink);border-radius:4px;
+    font-family:'Space Grotesk',sans-serif;margin:18px 0 8px;
+    transition:border-color .2s,box-shadow .2s;
+  }
+  .pin-input:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,118,.1)}
+  .pin-hint{font-size:.78rem;color:var(--ink-dim);margin-top:6px}
+  .card-error{color:var(--error);font-size:.82rem;min-height:20px;margin-top:10px}
+
+  /* Panel sections */
+  .panel-section{margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid var(--line-dim)}
+  .panel-section:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+  .panel-section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:14px}
+  .form-group{margin-bottom:14px}
+  .form-group label{display:block;font-size:.82rem;color:var(--ink-dim);margin-bottom:6px}
+  .form-group input,.form-group textarea{
+    width:100%;padding:10px 12px;background:var(--bg2);border:1px solid rgba(201,168,118,.18);
+    color:var(--ink);border-radius:3px;font-family:inherit;font-size:.92rem;transition:border-color .2s;
+  }
+  .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--gold)}
+  .form-group textarea{resize:vertical;min-height:76px}
+
+  /* Stats */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+  .stat-card{background:var(--bg2);border-radius:3px;padding:14px 10px;text-align:center;border:1px solid var(--line-dim)}
+  .stat-value{font-size:1.15rem;font-weight:600;color:var(--gold-bright);font-family:'Space Grotesk',sans-serif}
+  .stat-label{font-size:.72rem;color:var(--ink-dim);margin-top:4px}
+
+  /* Info grid (device / network) */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+  @media (max-width:480px){.info-grid{grid-template-columns:1fr}}
+  .info-item{font-size:.82rem;padding:6px 0;border-bottom:1px dotted var(--line-dim)}
+  .info-item .k{color:var(--ink-dim);display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+  .info-item .v{color:var(--ink);word-break:break-all;font-size:.85rem}
+  .info-item.full{grid-column:1/-1}
+  .info-loading{color:var(--ink-dim);font-size:.82rem;font-style:italic;padding:8px 0}
+
+  /* File upload */
+  .file-upload{
+    border:1px dashed rgba(201,168,118,.25);border-radius:4px;padding:18px;text-align:center;
+    transition:border-color .25s,background .25s;cursor:pointer;
+  }
+  .file-upload:hover{border-color:var(--gold);background:rgba(201,168,118,.02)}
+  .file-upload input[type="file"]{display:none}
+  .file-label{color:var(--ink-dim);font-size:.86rem;cursor:pointer;display:block;line-height:1.6}
+  .file-label b{color:var(--gold-bright);font-weight:500}
+  .image-preview{margin-top:14px;display:none;position:relative}
+  .image-preview.show{display:block}
+  .image-preview img{width:100%;height:auto;border-radius:3px;border:1px solid var(--line);object-fit:cover;max-height:160px}
+  .image-preview-name{font-size:.78rem;color:var(--ink-dim);margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .btn-remove-image{
+    position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;
+    background:rgba(0,0,0,.7);border:none;color:#fff;font-size:.85rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .2s;
+  }
+  .btn-remove-image:hover{background:rgba(0,0,0,.9)}
+
+  @media (prefers-reduced-motion:reduce){
+    .cube-rot{animation:none}
+    #intro svg .node,#intro svg line{animation:none;stroke-dashoffset:0}
+    *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  }
+</style>
 </head>
 <body>
 
@@ -129,8 +391,8 @@
     <div class="wrap contact-grid">
       <div>
         <h2>Conversemos</h2>
-        <p>Cuéntanos en qué punto está tu operación hoy y qué te gustaría que dejara de depender de ti.</p>
-        <a class="btn" id="contact-mailto" href="mailto:hola@metatron.com">Escribir a <span id="contact-email-label">hola@metatron.com</span></a>
+        <p style="color:var(--ink-dim)">Cuéntanos en qué punto está tu operación hoy y qué te gustaría que dejara de depender de ti.</p>
+        <a class="btn" id="contact-mailto" style="margin-top:6px" href="mailto:hola@metatron.com">Escribir a <span id="contact-email-label">hola@metatron.com</span></a>
       </div>
       <dl>
         <dt>Correo</dt><dd id="contact-email">hola@metatron.com</dd>
@@ -147,18 +409,18 @@
 </footer>
 
 <!-- TRIGGER -->
-<button id="admin-trigger" aria-label="menú de administración">
+<button id="admin-trigger" aria-label="Panel de administración">
   <span></span><span></span><span></span>
 </button>
 
-<!-- MODAL DE ADMINISTRACIÓN -->
+<!-- MODAL -->
 <div id="admin-modal">
   <div class="modal-inner">
     <div class="modal-header">
       <h3 id="modal-title">Acceso restringido</h3>
-      <button class="modal-close" aria-label="Cerrar">✕</button>
+      <button class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
     </div>
-    <div class="modal-body" id="modal-body-content"></div>
+    <div class="modal-body" id="modal-body"></div>
     <div class="modal-footer" id="modal-footer" style="display:none">
       <div class="save-message" id="save-status"></div>
       <div class="footer-buttons">
@@ -169,6 +431,373 @@
   </div>
 </div>
 
-<script src="app.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  /* ============================================================
+     CONFIGURACIÓN — Clave por defecto (cámbiala aquí o desde el panel)
+     ============================================================ */
+  var DEFAULT_PIN = "metatron2026";   // ← Clave inicial (letras/números/símbolos)
+  var PIN_KEY     = "metatron_pin";
+  var STORE_KEY   = "metatron_content";
+
+  var DEFAULTS = {
+    heroTitle: "Damos estructura a lo que tu empresa aún no ha ordenado.",
+    heroText:  "Metatron diseña sistemas, procesos y arquitecturas digitales para negocios que necesitan operar con precisión, no con improvisación.",
+    heroImg:   "",
+    email:     "hola@metatron.com",
+    phone:     "+52 55 0000 0000",
+    address:   "Ciudad de México, México"
+  };
+
+  var pendingImageData = null;
+  var deviceInfo = {};
+  var networkInfo = null;
+
+  /* ---------- Utilidades ---------- */
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    if(!s) return "";
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function getPin(){
+    try { return localStorage.getItem(PIN_KEY) || DEFAULT_PIN; }
+    catch(e){ return DEFAULT_PIN; }
+  }
+  function getData(){
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      return raw ? JSON.parse(raw) : DEFAULTS;
+    } catch(e){ return DEFAULTS; }
+  }
+
+  /* ---------- Aplicar contenido a la página ---------- */
+  function applyContent(d){
+    if(d.heroTitle) $("hero-title").textContent = d.heroTitle;
+    if(d.heroText)  $("hero-text").textContent  = d.heroText;
+    if(d.heroImg){
+      var img = $("hero-img");
+      img.src = d.heroImg;
+      img.style.display = "block";
+    } else {
+      $("hero-img").style.display = "none";
+    }
+    if(d.email){
+      $("contact-email").textContent = d.email;
+      $("contact-email-label").textContent = d.email;
+      $("contact-mailto").href = "mailto:" + d.email;
+    }
+    if(d.phone)   $("contact-phone").textContent   = d.phone;
+    if(d.address) $("contact-address").textContent = d.address;
+  }
+
+  /* ---------- Detectar información REAL del dispositivo ---------- */
+  function detectDeviceInfo(){
+    var n = navigator, s = screen, w = window;
+    var info = {};
+    info["User Agent"]      = n.userAgent || "—";
+    info["Plataforma"]      = (n.userAgentData && n.userAgentData.platform) || n.platform || "—";
+    info["Idioma"]          = (n.languages && n.languages.join(", ")) || n.language || "—";
+    info["Pantalla"]        = s.width + " × " + s.height + " px";
+    info["Ventana"]         = w.innerWidth + " × " + w.innerHeight + " px";
+    info["Profundidad color"] = s.colorDepth + " bits";
+    info["Densidad píxeles"]  = (w.devicePixelRatio || 1) + "x";
+    info["Zona horaria"]    = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "—";
+    info["Cookies"]         = n.cookieEnabled ? "Habilitadas" : "Deshabilitadas";
+    info["En línea"]        = n.onLine ? "Sí" : "No";
+    info["Táctil"]          = (n.maxTouchPoints > 0) ? ("Sí (" + n.maxTouchPoints + " puntos)") : "No";
+    info["Núcleos CPU"]     = n.hardwareConcurrency ? n.hardwareConcurrency + " núcleos" : "—";
+    info["Memoria RAM"]     = n.deviceMemory ? (n.deviceMemory + " GB (aprox.)") : "—";
+    info["Conexión"]        = (n.connection && n.connection.effectiveType) ? n.connection.effectiveType.toUpperCase() : "—";
+    info["No rastrear"]     = (n.doNotTrack === "1" || n.doNotTrack === "yes") ? "Activo" : "Desactivado";
+    // GPU (WebGL)
+    try{
+      var c = document.createElement("canvas");
+      var gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+      if(gl){
+        var dbg = gl.getExtension("WEBGL_debug_renderer_info");
+        if(dbg){
+          info["GPU / Renderer"] = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || "—";
+        }
+      }
+    }catch(e){}
+    return info;
+  }
+
+  /* ---------- Detectar IP y ubicación REALES (API pública) ---------- */
+  function detectNetworkInfo(callback){
+    try{
+      fetch("https://ipapi.co/json/", {cache:"no-store"})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if(d && d.ip){
+            networkInfo = {
+              "IP pública": d.ip || "—",
+              "Ciudad":     d.city || "—",
+              "Región":     d.region || "—",
+              "País":       d.country_name || "—",
+              "Código postal": d.postal || "—",
+              "Coordenadas": (d.latitude && d.longitude) ? (d.latitude + ", " + d.longitude) : "—",
+              "Zona horaria (IP)": d.timezone || "—",
+              "Proveedor (ISP)": d.org || "—"
+            };
+          } else {
+            networkInfo = { "Error": "No se pudo obtener la IP" };
+          }
+          if(callback) callback();
+        })
+        .catch(function(){
+          networkInfo = { "Nota": "No disponible (sin conexión o bloqueado por el navegador)" };
+          if(callback) callback();
+        });
+    }catch(e){
+      networkInfo = { "Nota": "No disponible" };
+      if(callback) callback();
+    }
+  }
+
+  /* ---------- Batería (async) ---------- */
+  function detectBattery(callback){
+    if(navigator.getBattery){
+      navigator.getBattery().then(function(b){
+        var pct = Math.round(b.level * 100) + "%";
+        var charging = b.charging ? " (cargando)" : "";
+        deviceInfo["Batería"] = pct + charging;
+        if(callback) callback();
+      }).catch(function(){ if(callback) callback(); });
+    } else {
+      if(callback) callback();
+    }
+  }
+
+  /* ---------- Modal ---------- */
+  var modal = $("admin-modal");
+  function openAdmin(){
+    modal.style.display = "flex";
+    void modal.offsetWidth;
+    modal.classList.add("open");
+    showPinScreen();
+  }
+  function closeAdmin(){
+    modal.classList.remove("open");
+    setTimeout(function(){ modal.style.display = "none"; }, 300);
+    pendingImageData = null;
+  }
+
+  /* ---------- Pantalla de clave (letras/números/símbolos) ---------- */
+  function showPinScreen(){
+    $("modal-title").textContent = "Acceso restringido";
+    $("modal-footer").style.display = "none";
+    $("modal-body").innerHTML =
+      '<div class="pin-wrapper">' +
+        '<p>Introduce la clave de administración</p>' +
+        '<input type="password" class="pin-input" id="pin-input" placeholder="••••••••" autocomplete="off" autofocus>' +
+        '<div class="pin-hint">Acepta letras, números y símbolos</div>' +
+        '<div class="card-error" id="pin-error"></div>' +
+        '<button class="btn small" id="pin-submit" style="margin-top:14px">Entrar</button>' +
+      '</div>';
+    var input = $("pin-input");
+    setTimeout(function(){ input.focus(); }, 100);
+    function attempt(){
+      if(input.value === getPin()){
+        showPanel();
+      } else {
+        $("pin-error").textContent = "Clave incorrecta";
+        input.value = "";
+        input.focus();
+      }
+    }
+    $("pin-submit").addEventListener("click", attempt);
+    input.addEventListener("keydown", function(e){
+      if(e.key === "Enter") attempt();
+    });
+  }
+
+  /* ---------- Panel de administración ---------- */
+  function showPanel(){
+    $("modal-title").textContent = "Panel de Administración";
+    $("modal-footer").style.display = "flex";
+    var d = getData();
+    pendingImageData = d.heroImg || null;
+    deviceInfo = detectDeviceInfo();
+
+    $("modal-body").innerHTML =
+      '<div class="stats-row">' +
+        '<div class="stat-card"><div class="stat-value">3</div><div class="stat-label">Mensajes nuevos</div></div>' +
+        '<div class="stat-card"><div class="stat-value">128</div><div class="stat-label">Visitas hoy</div></div>' +
+        '<div class="stat-card"><div class="stat-value">✓</div><div class="stat-label">En línea</div></div>' +
+      '</div>' +
+
+      '<div class="panel-section">' +
+        '<div class="panel-section-title">Información de este dispositivo</div>' +
+        '<div class="info-grid" id="device-info-grid"></div>' +
+      '</div>' +
+
+      '<div class="panel-section">' +
+        '<div class="panel-section-title">Red y ubicación (IP real)</div>' +
+        '<div class="info-grid" id="network-info-grid">' +
+          '<div class="info-loading">Detectando IP y ubicación…</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="panel-section">' +
+        '<div class="panel-section-title">Contenido del sitio</div>' +
+        '<div class="form-group"><label>Título principal</label>' +
+          '<input id="f-title" value="' + esc(d.heroTitle) + '"></div>' +
+        '<div class="form-group"><label>Texto principal</label>' +
+          '<textarea id="f-text" rows="3">' + esc(d.heroText) + '</textarea></div>' +
+        '<div class="form-group"><label>Imagen de portada</label>' +
+          '<div class="file-upload" id="file-zone">' +
+            '<label class="file-label" for="f-img"><b>Selecciona una imagen</b><br>JPG, PNG, SVG · máx. 5 MB</label>' +
+            '<input id="f-img" type="file" accept="image/*">' +
+          '</div>' +
+          '<div class="image-preview" id="img-preview">' +
+            '<button class="btn-remove-image" id="remove-img" title="Quitar imagen">✕</button>' +
+            '<img id="preview-img" src="" alt="Vista previa">' +
+            '<div class="image-preview-name" id="img-name"></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="panel-section">' +
+        '<div class="panel-section-title">Contacto</div>' +
+        '<div class="form-group"><label>Correo</label>' +
+          '<input id="f-email" value="' + esc(d.email) + '"></div>' +
+        '<div class="form-group"><label>Teléfono</label>' +
+          '<input id="f-phone" value="' + esc(d.phone) + '"></div>' +
+        '<div class="form-group"><label>Ubicación</label>' +
+          '<input id="f-address" value="' + esc(d.address) + '"></div>' +
+      '</div>' +
+
+      '<div class="panel-section">' +
+        '<div class="panel-section-title">Seguridad — cambiar clave</div>' +
+        '<div class="form-group"><label>Nueva clave (letras, números, símbolos)</label>' +
+          '<input id="f-newpin" type="text" placeholder="Deja vacío para no cambiarla"></div>' +
+      '</div>';
+
+    renderInfoGrid("device-info-grid", deviceInfo);
+    if(pendingImageData) showImagePreview(pendingImageData, "Imagen guardada");
+    bindImageUpload();
+
+    // Completar batería y red de forma asíncrona
+    detectBattery(function(){ renderInfoGrid("device-info-grid", deviceInfo); });
+    detectNetworkInfo(function(){
+      if(networkInfo) renderInfoGrid("network-info-grid", networkInfo);
+    });
+  }
+
+  function renderInfoGrid(containerId, obj){
+    var c = $(containerId);
+    if(!c) return;
+    var html = "";
+    for(var k in obj){
+      if(!obj.hasOwnProperty(k)) continue;
+      var full = (String(obj[k]).length > 40) ? " full" : "";
+      html += '<div class="info-item' + full + '"><span class="k">' + esc(k) + '</span><span class="v">' + esc(obj[k]) + '</span></div>';
+    }
+    c.innerHTML = html;
+  }
+
+  /* ---------- Subida de imagen ---------- */
+  function bindImageUpload(){
+    var fileInput = $("f-img");
+    var preview = $("img-preview");
+    fileInput.addEventListener("change", function(e){
+      var file = e.target.files[0];
+      if(!file) return;
+      if(file.size > 5 * 1024 * 1024){
+        showSaveMessage("La imagen supera los 5 MB.", true);
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(ev){
+        pendingImageData = ev.target.result;
+        showImagePreview(pendingImageData, file.name);
+      };
+      reader.readAsDataURL(file);
+    });
+    $("remove-img").addEventListener("click", function(){
+      pendingImageData = null;
+      preview.classList.remove("show");
+      fileInput.value = "";
+    });
+  }
+  function showImagePreview(src, name){
+    var preview = $("img-preview");
+    $("preview-img").src = src;
+    $("img-name").textContent = name;
+    preview.classList.add("show");
+  }
+
+  /* ---------- Guardar / Restablecer ---------- */
+  function showSaveMessage(text, isError){
+    var s = $("save-status");
+    s.textContent = text;
+    s.className = "save-message" + (isError ? " error" : "");
+    clearTimeout(window._saveT);
+    window._saveT = setTimeout(function(){ s.classList.add("hidden"); }, 3500);
+  }
+
+  function saveContent(){
+    var newPin = $("f-newpin").value.trim();
+    if(newPin.length > 0){
+      try { localStorage.setItem(PIN_KEY, newPin); } catch(e){}
+    }
+    var d = {
+      heroTitle: $("f-title").value,
+      heroText:  $("f-text").value,
+      heroImg:   pendingImageData || "",
+      email:     $("f-email").value,
+      phone:     $("f-phone").value,
+      address:   $("f-address").value
+    };
+    try{
+      localStorage.setItem(STORE_KEY, JSON.stringify(d));
+      applyContent(d);
+      showSaveMessage("✓ Guardado. La página ya está actualizada.");
+      setTimeout(closeAdmin, 1200);
+    }catch(e){
+      showSaveMessage("✗ No se pudo guardar (almacenamiento lleno o bloqueado).", true);
+    }
+  }
+
+  function resetAll(){
+    if(!confirm("¿Restablecer todo el contenido y la clave a los valores originales?")) return;
+    try{
+      localStorage.removeItem(STORE_KEY);
+      localStorage.removeItem(PIN_KEY);
+    }catch(e){}
+    pendingImageData = null;
+    applyContent(DEFAULTS);
+    showSaveMessage("✓ Restablecido a valores originales.");
+    showPanel();
+  }
+
+  /* ---------- Inicialización ---------- */
+  document.addEventListener("DOMContentLoaded", function(){
+    // Cargar contenido guardado AL ENTRAR a la página
+    applyContent(getData());
+
+    // Intro → revelar contenido
+    setTimeout(function(){
+      $("intro").classList.add("fade-out");
+      document.body.classList.add("revealed");
+    }, 2800);
+
+    // Eventos
+    $("admin-trigger").addEventListener("click", openAdmin);
+    $("modal-close").addEventListener("click", closeAdmin);
+    $("btn-save").addEventListener("click", saveContent);
+    $("btn-reset").addEventListener("click", resetAll);
+    modal.addEventListener("click", function(e){
+      if(e.target === modal) closeAdmin();
+    });
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape" && modal.classList.contains("open")) closeAdmin();
+    });
+  });
+})();
+</script>
 </body>
 </html>
