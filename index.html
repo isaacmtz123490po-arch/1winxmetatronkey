@@ -481,6 +481,29 @@ button{
     margin-bottom:10px;
 }
 
+/* Herramientas de volcado y extracción */
+.byte-tools{
+    margin-top:12px;
+    border-color:#395243;
+}
+.byte-preview{
+    max-height:120px;
+    overflow:auto;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font:10px/1.5 var(--mono);
+    color:#d9e7de;
+    background:#0b100d;
+    border:1px solid #202c25;
+    border-radius:8px;
+    padding:9px;
+    margin:6px 0 10px;
+}
+.byte-tools .toolbar{
+    padding:6px 0 0;
+    flex-wrap:wrap;
+}
+
 @media(max-width:520px){
     body{
         padding:10px;
@@ -576,6 +599,12 @@ button{
             <button id="clearBtn" class="actionbtn danger">
                 Limpiar
             </button>
+        </div>
+
+        <div class="toolbar" style="padding-top:0;flex-wrap:wrap">
+            <button id="downloadAllFilesBtn" class="actionbtn">Extraer todos los archivos (ZIP)</button>
+            <button id="exportAppReportBtn" class="actionbtn primary">Descargar reporte de la app</button>
+            <button id="shareAppReportBtn" class="actionbtn">Compartir reporte</button>
         </div>
 
         <div class="section-title">Archivos</div>
@@ -678,6 +707,127 @@ function hex(n){
     return "0x" + n.toString(16).toUpperCase();
 }
 
+const MAX_TEXT_DUMP_BYTES = 1024 * 1024;
+const MAX_UNITY_FILES = 100;
+const MAX_UNITY_STRINGS = 50000;
+const MAX_APP_SCAN_FILES = 150;
+const MAX_APP_STRINGS = 20000;
+const MAX_APP_SCAN_BYTES = 512 * 1024;
+const MAX_APP_ARCHIVE_BYTES = 256 * 1024 * 1024;
+
+function makeByteDump(input,format="hex",limit=MAX_TEXT_DUMP_BYTES){
+    const bytes = input instanceof Uint8Array ? input : new Uint8Array(input);
+    const length = Math.min(bytes.length, Math.max(0, limit));
+    const lines = [
+        `Formato: ${format === "decimal" ? "decimal (0-255)" : "hexadecimal"}`,
+        `Bytes exportados: ${length} de ${bytes.length}${length < bytes.length ? " (volcado limitado para proteger el navegador)" : ""}`,
+        "Offset     Datos"
+    ];
+
+    for(let offset=0; offset<length; offset+=16){
+        const end = Math.min(offset+16,length);
+        const chunk = bytes.subarray(offset,end);
+        if(format === "decimal"){
+            lines.push(
+                offset.toString(16).toUpperCase().padStart(8,"0") + "  " +
+                Array.from(chunk,b=>String(b).padStart(3," ")).join(" ")
+            );
+        }else{
+            const hexPart = Array.from(chunk,b=>b.toString(16).toUpperCase().padStart(2,"0")).join(" ");
+            const asciiPart = Array.from(chunk,b=>b>=32 && b<=126 ? String.fromCharCode(b) : ".").join("");
+            lines.push(offset.toString(16).toUpperCase().padStart(8,"0") + "  " + hexPart.padEnd(47," ") + "  |" + asciiPart + "|");
+        }
+    }
+    return lines.join("\n");
+}
+
+function safeDownloadStem(name){
+    return String(name || "archivo")
+        .replace(/[/\\]+/g,"_")
+        .replace(/[^A-Za-z0-9._-]+/g,"_")
+        .replace(/^\.+|\.+$/g,"") || "archivo";
+}
+
+async function shareText(title,filename,text){
+    const content = String(text ?? "");
+    try{
+        if(typeof navigator !== "undefined" && typeof navigator.share === "function"){
+            const mime = /\\.json$/i.test(filename) ? "application/json;charset=utf-8" : "text/plain;charset=utf-8";
+            const file = typeof File === "function"
+                ? new File([content],filename,{type:mime})
+                : null;
+            if(file && typeof navigator.canShare === "function" && navigator.canShare({files:[file]})){
+                await navigator.share({title,files:[file]});
+                setStatus("Archivo compartido");
+                return;
+            }
+            const maxShareChars = 20000;
+            const sharedText = content.length > maxShareChars
+                ? content.slice(0,maxShareChars) + "\n\n[Resumen recortado; descarga el archivo completo desde la aplicación.]"
+                : content;
+            await navigator.share({title,text:sharedText});
+            setStatus(content.length > maxShareChars ? "Resumen compartido; descarga el archivo completo" : "Compartido");
+            return;
+        }
+    }catch(error){
+        if(error?.name === "AbortError") return;
+        console.warn("No se pudo abrir el menú para compartir:",error);
+    }
+
+    try{
+        if(typeof navigator !== "undefined" && navigator.clipboard?.writeText){
+            const maxClipboardChars = 20000;
+            const clipboardText = content.length > maxClipboardChars
+                ? content.slice(0,maxClipboardChars) + "\n\n[Resumen recortado; descarga el archivo completo para compartirlo.]"
+                : content;
+            await navigator.clipboard.writeText(clipboardText);
+            setStatus("Resumen copiado para compartir");
+            return;
+        }
+    }catch(error){
+        console.warn("No se pudo copiar el extracto:",error);
+    }
+    downloadText(filename,content,"text/plain;charset=utf-8");
+    setStatus("Archivo descargado para compartir");
+}
+
+function attachByteTools(entry,buffer){
+    if(!entry || !buffer || !resultPanel) return;
+    const bytes = buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer);
+    const preview = bytes.subarray(0,64);
+    const hexPreview = Array.from(preview,b=>b.toString(16).toUpperCase().padStart(2,"0")).join(" ") || "(vacío)";
+    const decimalPreview = Array.from(preview,b=>String(b)).join(" ") || "(vacío)";
+    const stem = safeDownloadStem(entry.name);
+    const wrap = document.createElement("div");
+    wrap.className = "item byte-tools";
+    wrap.innerHTML = `
+        <div class="item-title">Extracción de bytes</div>
+        <div class="item-sub">${formatBytes(bytes.length)} · vista previa de ${preview.length} bytes. Los volcados de texto se limitan a 1 MiB; el archivo original puede descargarse completo.</div>
+        <div class="info-label">HEX normal</div>
+        <div class="byte-preview">${escapeHTML(hexPreview)}</div>
+        <div class="info-label">Decimal (0–255)</div>
+        <div class="byte-preview">${escapeHTML(decimalPreview)}</div>
+        <div class="toolbar">
+            <button type="button" class="actionbtn" data-dump="hex">Descargar HEX</button>
+            <button type="button" class="actionbtn" data-dump="decimal">Descargar decimal</button>
+            <button type="button" class="actionbtn primary" data-share-bytes>Compartir extracto</button>
+        </div>`;
+    resultPanel.appendChild(wrap);
+
+    wrap.querySelectorAll("[data-dump]").forEach(button=>{
+        button.addEventListener("click",()=>{
+            const format = button.dataset.dump;
+            const text = makeByteDump(bytes,format);
+            downloadText(`${stem}.${format === "decimal" ? "decimal" : "hex"}.txt`,text,"text/plain;charset=utf-8");
+        });
+    });
+    wrap.querySelector("[data-share-bytes]")?.addEventListener("click",async()=>{
+        const shareLimit = Math.min(bytes.length,65536);
+        const payload = `Archivo: ${entry.path || entry.name}\nTamaño: ${bytes.length} bytes\n\nHEX (primeros ${Math.min(bytes.length,64)} bytes):\n${hexPreview}\n\nDecimal (primeros ${Math.min(bytes.length,64)} bytes):\n${decimalPreview}\n\nVolcado HEX compartible (hasta ${shareLimit} bytes):\n${makeByteDump(bytes,"hex",shareLimit)}`;
+        await shareText(`Extracto de ${entry.name}`,`${stem}-extracto.txt`,payload);
+    });
+}
+
 function u32(view, offset){
     if(offset < 0 || offset + 4 > view.byteLength) return null;
     return view.getUint32(offset,true);
@@ -727,8 +877,18 @@ $("clearBtn").addEventListener("click", ()=>{
 });
 
 $("analyzeBtn").addEventListener("click", async ()=>{
-    await analyzeUnity();
+    try{
+        await analyzeUnity();
+    }catch(error){
+        console.error(error);
+        setStatus("Error de análisis");
+        showResult(`<div class="note">No se pudo analizar el archivo: ${escapeHTML(error?.message || error)}</div>`);
+    }
 });
+
+$("downloadAllFilesBtn").addEventListener("click",downloadAllAppFiles);
+$("exportAppReportBtn").addEventListener("click",()=>exportAppExtractionReport(false));
+$("shareAppReportBtn").addEventListener("click",()=>exportAppExtractionReport(true));
 
 search.addEventListener("input", ()=>{
     renderTree(search.value.trim().toLowerCase());
@@ -754,8 +914,7 @@ async function loadFile(file){
             lower.endsWith(".apk") ||
             lower.endsWith(".ipa") ||
             lower.endsWith(".aab") ||
-            lower.endsWith(".zip") ||
-            lower.endsWith(".unity3d")
+            lower.endsWith(".zip")
         ){
             if(!window.JSZip){
                 throw new Error("JSZip no está disponible.");
@@ -1047,27 +1206,24 @@ tree.addEventListener("click", async e=>{
    ENTRADA
 ========================================================= */
 
-async function getEntryBuffer(entry){
+async function getEntryBuffer(entry,cache=true){
 
     if(entry.buffer){
         return entry.buffer;
     }
 
     if(entry.directFile){
-        entry.buffer = await entry.directFile.arrayBuffer();
-        return entry.buffer;
+        const buffer = await entry.directFile.arrayBuffer();
+        if(cache) entry.buffer = buffer;
+        return buffer;
     }
 
     if(entry.zipEntry){
-
         const buffer = await entry.zipEntry.async("arraybuffer");
-
-        entry.buffer = buffer;
-
-        if(!entry.size){
-            entry.size = buffer.byteLength;
+        if(cache){
+            entry.buffer = buffer;
+            if(!entry.size) entry.size = buffer.byteLength;
         }
-
         return buffer;
     }
 
@@ -1140,6 +1296,7 @@ async function inspectEntry(entry){
             showGenericFile(entry,buffer,strings);
         }
 
+        attachByteTools(entry,buffer);
         setStatus("Listo");
 
     }catch(error){
@@ -1378,7 +1535,16 @@ function renderUnityDashboard(){
             </div>
 
             <button class="actionbtn primary" id="exportUnityReport">
-                Exportar
+                Exportar reporte
+            </button>
+        </div>
+
+        <div class="toolbar" style="padding:0;flex-wrap:wrap;margin-bottom:10px">
+            <button class="actionbtn primary" id="exportUnityData">
+                Descargar datos extraídos
+            </button>
+            <button class="actionbtn" id="shareUnityData">
+                Compartir extracción
             </button>
         </div>
 
@@ -1519,6 +1685,9 @@ function renderUnityDashboard(){
             "application/json"
         );
     });
+
+    $("exportUnityData")?.addEventListener("click",()=>exportUnityExtraction(false));
+    $("shareUnityData")?.addEventListener("click",()=>exportUnityExtraction(true));
 
     $("btnAssemblies")?.addEventListener("click",showAssemblies);
     $("btnMetadata")?.addEventListener("click",()=>{
@@ -3439,7 +3608,7 @@ function analyzeUnityBinary(buffer,name){
    STRINGS
 ========================================================= */
 
-function extractStrings(buffer,minLen=5){
+function extractStrings(buffer,minLen=5,maxCount=Infinity){
 
     const bytes =
         new Uint8Array(buffer);
@@ -3468,6 +3637,7 @@ function extractStrings(buffer,minLen=5){
 
                     seen.add(ascii);
                     result.push(ascii);
+                    if(result.length>=maxCount) return result;
                 }
             }
 
@@ -3477,6 +3647,7 @@ function extractStrings(buffer,minLen=5){
 
     if(ascii.length>=minLen && !seen.has(ascii)){
         result.push(ascii);
+        if(result.length>=maxCount) return result;
     }
 
     /*
@@ -3506,6 +3677,7 @@ function extractStrings(buffer,minLen=5){
 
                     seen.add(utf);
                     result.push(utf);
+                    if(result.length>=maxCount) return result;
                 }
             }
 
@@ -3517,7 +3689,7 @@ function extractStrings(buffer,minLen=5){
         result.push(utf);
     }
 
-    return result;
+    return result.slice(0,maxCount);
 }
 
 /* =========================================================
@@ -4219,10 +4391,11 @@ function showUnityAsset(entry,info){
                 </div>
             </div>
 
-            <button id="assetDownload"
-                    class="actionbtn">
-                Descargar
-            </button>
+            <div class="toolbar" style="padding:0;flex-wrap:wrap">
+                <button id="assetDownload" class="actionbtn">Descargar original</button>
+                <button id="assetStringsDownload" class="actionbtn">Descargar strings</button>
+                <button id="assetStringsShare" class="actionbtn">Compartir strings</button>
+            </div>
 
         </div>
 
@@ -4253,15 +4426,17 @@ function showUnityAsset(entry,info){
     `);
 
     $("assetDownload")?.addEventListener("click",async()=>{
-
-        const buffer =
-            await getEntryBuffer(entry);
-
-        downloadBlob(
-            entry.name,
-            new Blob([buffer])
-        );
+        const buffer = await getEntryBuffer(entry);
+        downloadBlob(entry.name,new Blob([buffer]));
     });
+
+    const stringsText = (info.strings || []).join("\n");
+    $("assetStringsDownload")?.addEventListener("click",()=>{
+        downloadText(`${safeDownloadStem(entry.name)}.strings.txt`,stringsText,"text/plain;charset=utf-8");
+    });
+    $("assetStringsShare")?.addEventListener("click",()=>
+        shareText(`Strings extraídos de ${entry.name}`,`${safeDownloadStem(entry.name)}.strings.txt`,stringsText)
+    );
 }
 
 /* =========================================================
@@ -4269,91 +4444,41 @@ function showUnityAsset(entry,info){
 ========================================================= */
 
 async function showUnityStrings(){
-
-    const candidates =
-        state.entries.filter(e=>{
-            const n=e.name.toLowerCase();
-
-            return n.endsWith(".dll") ||
-                   n.endsWith(".so") ||
-                   n.endsWith(".dat") ||
-                   n.endsWith(".assets") ||
-                   n.endsWith(".json") ||
-                   n.endsWith(".xml") ||
-                   n.endsWith(".bin");
-        });
-
-    const all=[];
-
     setStatus("Extrayendo strings...");
-
-    for(const entry of candidates.slice(0,100)){
-
-        try{
-
-            const buffer =
-                await getEntryBuffer(entry);
-
-            const strings =
-                extractStrings(buffer,5)
-                .slice(0,5000);
-
-            for(const s of strings){
-
-                all.push({
-                    file:entry.path,
-                    value:s
-                });
-            }
-
-        }catch{}
-    }
-
-    const unique =
-        Array.from(
-            new Map(
-                all.map(x=>[
-                    x.file+"\0"+x.value,
-                    x
-                ])
-            ).values()
+    try{
+        const extraction = await collectUnityExtraction();
+        const all = extraction.files.flatMap(file=>
+            file.strings.map(value=>({file:file.path,value}))
         );
-
-    showResult(`
-
-        <div class="result-header">
-            <div>
-                <div class="result-title">
-                    Strings Unity
-                </div>
-
-                <div class="result-meta">
-                    ${unique.length} cadenas encontradas
+        const unique = Array.from(new Map(all.map(x=>[x.file+"\0"+x.value,x])).values());
+        const text = unique.map(x=>`[${x.file}] ${x.value}`).join("\n");
+        const json = JSON.stringify(extraction,null,2);
+        showResult(`
+            <div class="result-header">
+                <div>
+                    <div class="result-title">Strings Unity</div>
+                    <div class="result-meta">${unique.length} cadenas · ${extraction.errors.length} archivos con errores</div>
                 </div>
             </div>
-
-            <button id="exportAllStrings"
-                    class="actionbtn">
-                Exportar
-            </button>
-        </div>
-
-        <div class="code">${escapeHTML(
-            unique.slice(0,10000)
-                .map(x=>`[${x.file}] ${x.value}`)
-                .join("\n")
-        )}</div>
-    `);
-
-    $("exportAllStrings")?.addEventListener("click",()=>{
-        downloadText(
-            "unity-strings.txt",
-            unique.map(x=>`[${x.file}] ${x.value}`).join("\n"),
-            "text/plain"
-        );
-    });
-
-    setStatus("Listo");
+            <div class="toolbar" style="padding:0;flex-wrap:wrap">
+                <button id="exportAllStrings" class="actionbtn primary">Descargar TXT</button>
+                <button id="exportAllUnityJson" class="actionbtn">Descargar JSON</button>
+                <button id="shareAllUnityData" class="actionbtn">Compartir</button>
+            </div>
+            <div class="note">
+                Se recorrieron ${extraction.summary.filesScanned} archivos de ${extraction.summary.candidateFiles} candidatos y se incluyeron hasta ${MAX_UNITY_STRINGS} strings. ${extraction.summary.truncated ? "Se alcanzó un límite de seguridad; revisa el JSON para ver el detalle." : "La búsqueda terminó dentro de los límites."} Los errores quedan anotados en el JSON. Los bundles Unity comprimidos pueden requerir un extractor especializado; aquí se exporta lo que el navegador pudo leer sin inventar datos.
+            </div>
+            ${extraction.errors.length ? `<div class="note">No se pudieron leer ${extraction.errors.length} archivo(s); el resto de la extracción sí quedó disponible.</div>` : ""}
+            <div class="code">${escapeHTML(unique.slice(0,10000).map(x=>`[${x.file}] ${x.value}`).join("\n"))}</div>
+        `);
+        $("exportAllStrings")?.addEventListener("click",()=>downloadText("unity-strings.txt",text,"text/plain;charset=utf-8"));
+        $("exportAllUnityJson")?.addEventListener("click",()=>downloadText("unity-extraction.json",json,"application/json;charset=utf-8"));
+        $("shareAllUnityData")?.addEventListener("click",()=>shareText("Extracción Unity","unity-extraction.json",json));
+        setStatus("Extracción lista");
+    }catch(error){
+        setStatus("Error de extracción");
+        showResult(`<div class="note">No se pudo completar el análisis Unity: ${escapeHTML(error?.message || error)}</div>`);
+    }
 }
 
 /* =========================================================
@@ -4612,6 +4737,381 @@ function showTextResult(title,text){
 /* =========================================================
    REPORTE
 ========================================================= */
+
+function declaredEntrySize(entry){
+    const value=entry?.size || entry?.zipEntry?._data?.uncompressedSize || entry?.directFile?.size || entry?.buffer?.byteLength || 0;
+    return Number.isFinite(Number(value)) ? Number(value) : 0;
+}
+
+function appFileType(name){
+    const n=String(name || "").toLowerCase();
+    if(n.endsWith(".dll")) return "Ensamblado .NET/Mono";
+    if(n.endsWith(".so") || n.endsWith(".dylib") || n.endsWith(".wasm")) return "Binario nativo";
+    if(n.endsWith(".assets") || n.endsWith(".ress") || n.endsWith(".resource") || n.endsWith(".unity3d") || n.endsWith(".bundle")) return "Recurso Unity";
+    if(n.endsWith(".xml") || n.endsWith(".json") || n.endsWith(".plist") || n.endsWith(".strings") || n.endsWith(".txt") || n.endsWith(".csv") || n.endsWith(".ini") || n.endsWith(".cfg") || n.endsWith(".yaml") || n.endsWith(".yml") || n.endsWith(".properties")) return "Texto / configuración";
+    if(/\\.(png|jpe?g|webp|gif|tga|bmp|astc|ktx2?)$/i.test(n)) return "Imagen / textura";
+    if(/\\.(ogg|mp3|wav|aac|m4a|mp4|webm|avi)$/i.test(n)) return "Audio / video";
+    if(n.endsWith(".dex") || n.endsWith(".odex") || n.endsWith(".vdex")) return "Bytecode Android";
+    return "Archivo binario / otro";
+}
+
+function safeArchivePath(path,index=0){
+    const parts=String(path || "")
+        .replace(/\\\\/g,"/")
+        .split("/")
+        .filter(part=>part && part!=="." && part!=="..");
+    return parts.join("/") || `archivo_${index+1}`;
+}
+
+async function downloadAllAppFiles(){
+    const entries=state.entries.filter(e=>!e.dir);
+    if(!entries.length){
+        showResult(`<div class="empty">Primero carga un APK, IPA, AAB, ZIP o archivo.</div>`);
+        return;
+    }
+    if(!window.JSZip){
+        showResult(`<div class="note">No está disponible el empaquetador ZIP en este momento. Puedes descargar archivos individuales desde el árbol.</div>`);
+        return;
+    }
+
+    const estimated=entries.reduce((sum,e)=>sum+declaredEntrySize(e),0);
+    if(estimated>MAX_APP_ARCHIVE_BYTES){
+        setStatus("Paquete demasiado grande");
+        showResult(`<div class="note">La extracción en un ZIP nuevo se detuvo para evitar que el navegador se quede sin memoria (${formatBytes(estimated)} estimados). Puedes descargar archivos individualmente desde el árbol o usar el archivo original.</div>
+            <button id="downloadOriginalApp" class="actionbtn primary">Descargar archivo original</button>`);
+        $("downloadOriginalApp")?.addEventListener("click",()=>{
+            if(state.sourceFile) downloadBlob(state.sourceFile.name,state.sourceFile);
+        });
+        return;
+    }
+
+    const output=new JSZip();
+    const errors=[];
+    let added=0;
+    let actualBytes=0;
+    let sizeLimitReached=false;
+    setStatus("Extrayendo archivos...");
+    for(let i=0;i<entries.length;i++){
+        const entry=entries[i];
+        try{
+            let data;
+            if(entry.zipEntry){
+                data=await entry.zipEntry.async("uint8array");
+            }else if(entry.directFile){
+                data=new Uint8Array(await entry.directFile.arrayBuffer());
+            }else if(entry.buffer){
+                data=new Uint8Array(entry.buffer);
+            }else{
+                throw new Error("No se encontró el contenido del archivo");
+            }
+            actualBytes+=data.byteLength;
+            if(actualBytes>MAX_APP_ARCHIVE_BYTES){
+                sizeLimitReached=true;
+                errors.push({path:entry.path,error:"Se alcanzó el límite de tamaño seguro para el ZIP."});
+                break;
+            }
+            output.file(safeArchivePath(entry.path,i),data,{binary:true,createFolders:true});
+            added++;
+            if(i%10===0 || i===entries.length-1){
+                setStatus(`Extrayendo archivos... ${Math.round((i+1)/entries.length*100)}%`);
+            }
+        }catch(error){
+            errors.push({path:entry.path,error:String(error?.message || error)});
+        }
+    }
+    try{
+        const blob=await output.generateAsync({type:"blob",compression:"STORE"},meta=>{
+            setStatus(`Preparando ZIP... ${Math.round(meta.percent)}%`);
+        });
+        const fileName=`${safeDownloadStem(state.sourceFile?.name || "aplicacion")}-archivos-extraidos.zip`;
+        downloadBlob(fileName,blob);
+        setStatus(errors.length ? `ZIP parcial · ${errors.length} archivo(s) con error` : `ZIP listo · ${added} archivos`);
+        showResult(`<div class="note">Se incluyeron ${added} archivos.${sizeLimitReached ? " Se detuvo al alcanzar el límite de seguridad de 256 MiB; revisa el reporte y descarga los restantes individualmente." : ""}${errors.length ? ` No se pudieron incluir ${errors.length}; sus rutas y errores están en el reporte.` : ""} Los nombres con rutas inseguras se normalizaron al crear el ZIP.</div>`);
+    }catch(error){
+        setStatus("No se pudo crear el ZIP");
+        showResult(`<div class="note">No se pudo empaquetar la extracción: ${escapeHTML(error?.message || error)}. Intenta descargar archivos individuales desde el árbol.</div>`);
+    }
+}
+
+async function collectAppExtractionReport(){
+    const allEntries=state.entries.filter(e=>!e.dir);
+    if(!allEntries.length) throw new Error("Primero carga un archivo o paquete.");
+    const reportFiles=allEntries.map(entry=>({
+        path:entry.path,
+        type:appFileType(entry.name),
+        size:declaredEntrySize(entry) || null,
+        scanned:false,
+        bytesScanned:0,
+        strings:[]
+    }));
+    const errors=[];
+    let scannedFiles=0;
+    let totalStrings=0;
+    const scanEntries=allEntries.slice(0,MAX_APP_SCAN_FILES);
+
+    for(let i=0;i<scanEntries.length;i++){
+        const entry=scanEntries[i];
+        const record=reportFiles[i];
+        const declaredSize=declaredEntrySize(entry);
+        if(totalStrings>=MAX_APP_STRINGS){
+            record.scanNote="Se alcanzó el límite global de strings; el archivo completo queda en el ZIP.";
+            continue;
+        }
+        if(declaredSize>64*1024*1024){
+            const error="Se omitió el escaneo de texto por tamaño; el archivo completo puede incluirse en el ZIP de extracción.";
+            record.scanNote=error;
+            errors.push({path:entry.path,phase:"scan",error});
+            continue;
+        }
+        try{
+            const buffer=await getEntryBuffer(entry,false);
+            if(!buffer) throw new Error("No se pudo leer el contenido");
+            const bytes=new Uint8Array(buffer);
+            const sample=bytes.subarray(0,Math.min(bytes.length,MAX_APP_SCAN_BYTES));
+            const remaining=MAX_APP_STRINGS-totalStrings;
+            const strings=remaining>0 ? extractStrings(sample,5,Math.min(400,remaining)) : [];
+            totalStrings+=strings.length;
+            scannedFiles++;
+            record.size=bytes.byteLength;
+            record.scanned=true;
+            record.bytesScanned=sample.length;
+            record.strings=strings;
+            if(sample.length<bytes.length) record.scanNote="Se analizaron solo los primeros 512 KiB; el archivo completo puede descargarse en el ZIP de extracción.";
+
+            const lower=entry.name.toLowerCase();
+            const isText=/\\.(xml|json|plist|strings|txt|csv|ini|cfg|yaml|yml|properties|gradle|java|kt|swift|cs|md)$/i.test(lower);
+            if(isText){
+                const text=decodeBytes(sample.subarray(0,Math.min(sample.length,32768)));
+                if(!/[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F]/.test(text)){
+                    record.textPreview=text.slice(0,16000);
+                    if(lower.endsWith(".json") && bytes.byteLength<=32768){
+                        try{ JSON.parse(text); record.jsonValid=true; }
+                        catch{ record.jsonValid=false; }
+                    }
+                }
+            }
+
+            if(lower.endsWith(".dll")){
+                try{
+                    const parsed=parseDotNetAssembly(buffer);
+                    if(parsed.dotnet){
+                        record.dotnet={
+                            valid:parsed.valid,
+                            machine:parsed.machine,
+                            typeCount:parsed.types.length,
+                            methodCount:parsed.methods.length,
+                            fieldCount:parsed.fields.length,
+                            types:parsed.types.slice(0,2000),
+                            methods:parsed.methods.slice(0,4000),
+                            fields:parsed.fields.slice(0,4000),
+                            truncated:parsed.types.length>2000 || parsed.methods.length>4000 || parsed.fields.length>4000
+                        };
+                    }
+                }catch(error){
+                    errors.push({path:entry.path,phase:"Mono/.NET",error:String(error?.message || error)});
+                }
+            }
+
+            if(lower.endsWith(".assets") || lower.endsWith(".unity3d") || lower.endsWith(".bundle")){
+                const header=decodeBytes(sample.subarray(0,200000));
+                record.unityAsset={
+                    signatures:["UnityFS","UnityWeb","UnityRaw"].filter(sig=>header.includes(sig)),
+                    indicators:strings.filter(x=>/Unity|Texture2D|MonoBehaviour|GameObject|AudioClip|Shader|Mesh|Material|Sprite|Animator|TextAsset/i.test(x)).slice(0,200)
+                };
+            }
+            if(i%10===0 || i===scanEntries.length-1) setStatus(`Analizando paquete... ${Math.round((i+1)/scanEntries.length*100)}%`);
+        }catch(error){
+            record.scanNote=String(error?.message || error);
+            errors.push({path:entry.path,phase:"scan",error:String(error?.message || error)});
+        }
+    }
+    for(let i=scanEntries.length;i<reportFiles.length;i++){
+        reportFiles[i].scanNote="Fuera del límite de escaneo; puede incluirse en el ZIP de extracción.";
+    }
+
+    let il2cpp=state.unity.metadata;
+    if(!il2cpp){
+        const metadataEntry=allEntries.find(e=>e.name.toLowerCase()==="global-metadata.dat");
+        if(metadataEntry){
+            try{ il2cpp=parseIl2CppMetadata(await getEntryBuffer(metadataEntry,false)); }
+            catch(error){ errors.push({path:metadataEntry.path,phase:"IL2CPP",error:String(error?.message || error)}); }
+        }
+    }
+    const metadata=il2cpp ? {
+        valid:il2cpp.valid,
+        magic:il2cpp.magic,
+        version:il2cpp.version,
+        typeCount:il2cpp.typeCount,
+        methodCount:il2cpp.methodCount,
+        fieldCount:il2cpp.fieldCount,
+        types:(il2cpp.types || []).slice(0,5000),
+        strings:(il2cpp.strings || []).slice(0,5000).map(x=>typeof x==="string" ? x : (x?.value ?? String(x)))
+    } : null;
+
+    return {
+        generatedAt:new Date().toISOString(),
+        source:state.sourceFile?.name || null,
+        application:{platform:state.sourceFile?.name?.toLowerCase().endsWith(".ipa") ? "iOS/IPA" : state.sourceFile?.name?.toLowerCase().endsWith(".apk") ? "Android/APK" : "Paquete/archivo",unityDetected:state.unity.detected,backend:state.unity.backend},
+        summary:{
+            totalFiles:allEntries.length,
+            scannedFiles,
+            scanLimit:MAX_APP_SCAN_FILES,
+            stringsExtracted:totalStrings,
+            stringsLimit:MAX_APP_STRINGS,
+            truncated:allEntries.length>scanEntries.length || totalStrings>=MAX_APP_STRINGS,
+            extractedArchiveAvailable:true
+        },
+        unityMetadata:metadata,
+        files:reportFiles,
+        errors
+    };
+}
+
+async function exportAppExtractionReport(share=false){
+    setStatus("Preparando reporte de la aplicación...");
+    try{
+        const report=await collectAppExtractionReport();
+        const json=JSON.stringify(report,null,2);
+        if(share){
+            await shareText("Reporte de extracción de aplicación","app-extraction-report.json",json);
+        }else{
+            downloadText("app-extraction-report.json",json,"application/json;charset=utf-8");
+            setStatus(`Reporte listo · ${report.summary.totalFiles} archivos`);
+        }
+    }catch(error){
+        setStatus("Error en el reporte");
+        showResult(`<div class="note">No se pudo preparar el reporte: ${escapeHTML(error?.message || error)}</div>`);
+    }
+}
+
+async function collectUnityExtraction(){
+    const allCandidates = state.entries.filter(e=>{
+        if(e.dir) return false;
+        const n = e.name.toLowerCase();
+        return n.endsWith(".dll") || n.endsWith(".so") || n.endsWith(".dylib") ||
+               n.endsWith(".dat") || n.endsWith(".assets") || n.endsWith(".ress") ||
+               n.endsWith(".resource") || n.endsWith(".unity3d") || n.endsWith(".bundle") ||
+               n.endsWith(".json") || n.endsWith(".xml") || n.endsWith(".bin") || n.endsWith(".wasm");
+    });
+    const candidates = allCandidates.slice(0,MAX_UNITY_FILES);
+
+    const files=[];
+    const errors=[];
+    let totalStrings=0;
+    for(const entry of candidates){
+        if(totalStrings>=MAX_UNITY_STRINGS) break;
+        try{
+            if(declaredEntrySize(entry)>64*1024*1024){
+                errors.push({path:entry.path,error:"Archivo omitido del escaneo de texto por superar 64 MiB; usa la descarga del original."});
+                continue;
+            }
+            const buffer=await getEntryBuffer(entry,false);
+            if(!buffer) throw new Error("No se pudo leer el archivo");
+            const remaining=MAX_UNITY_STRINGS-totalStrings;
+            const strings=extractStrings(buffer,5,Math.min(2500,remaining));
+            totalStrings+=strings.length;
+            const fileResult={path:entry.path,size:buffer.byteLength,stringCount:strings.length,strings};
+            const lowerName=entry.name.toLowerCase();
+
+            if(lowerName.endsWith(".dll")){
+                try{
+                    const parsed=parseDotNetAssembly(buffer);
+                    if(parsed.dotnet){
+                        fileResult.dotnet={
+                            valid:parsed.valid,
+                            machine:parsed.machine,
+                            metadataRva:parsed.metadataRva,
+                            typeCount:parsed.types.length,
+                            methodCount:parsed.methods.length,
+                            fieldCount:parsed.fields.length,
+                            types:parsed.types.slice(0,5000),
+                            methods:parsed.methods.slice(0,10000),
+                            fields:parsed.fields.slice(0,10000),
+                            truncated:parsed.types.length>5000 || parsed.methods.length>10000 || parsed.fields.length>10000
+                        };
+                    }
+                }catch(error){
+                    errors.push({path:entry.path,phase:"Mono/.NET",error:String(error?.message || error)});
+                }
+            }
+
+            if(lowerName.endsWith(".assets") || lowerName.endsWith(".unity3d") || lowerName.endsWith(".bundle")){
+                const header=decodeBytes(new Uint8Array(buffer).subarray(0,200000));
+                const signatures=[];
+                if(header.includes("UnityFS")) signatures.push("UnityFS AssetBundle");
+                if(header.includes("UnityWeb")) signatures.push("UnityWeb AssetBundle");
+                if(header.includes("UnityRaw")) signatures.push("UnityRaw AssetBundle");
+                if(/SerializedFile|UnityEngine|Texture2D|MonoBehaviour|GameObject/.test(header)) signatures.push("Unity SerializedFile indicators");
+                fileResult.unityAsset={
+                    signatures,
+                    indicators:strings.filter(x=>/Unity|Texture2D|MonoBehaviour|GameObject|AudioClip|Shader|Mesh|Material|Sprite|Animator|TextAsset/i.test(x)).slice(0,1000)
+                };
+            }
+            files.push(fileResult);
+        }catch(error){
+            errors.push({path:entry.path,error:String(error?.message || error)});
+        }
+    }
+
+    const metadata=state.unity.metadata;
+    const metadataResult=metadata ? {
+        valid:metadata.valid ?? true,
+        magic:metadata.magic ?? null,
+        version:metadata.version ?? null,
+        rawSize:metadata.rawSize ?? null,
+        typeCount:metadata.typeCount ?? (metadata.types || []).length,
+        methodCount:metadata.methodCount ?? null,
+        fieldCount:metadata.fieldCount ?? null,
+        propertyCount:metadata.propertyCount ?? null,
+        types:(metadata.types || []).slice(0,20000).map(t=>({
+            index:t.index ?? null,
+            namespace:t.namespace ?? "",
+            name:t.name ?? "",
+            offset:t.offset ?? null,
+            size:t.size ?? null,
+            fieldList:t.fieldList ?? null,
+            methodList:t.methodList ?? null
+        })),
+        strings:(metadata.strings || []).slice(0,20000).map(x=>typeof x === "string" ? x : (x?.value ?? String(x)))
+    } : null;
+
+    return {
+        generatedAt:new Date().toISOString(),
+        source:state.sourceFile?.name || null,
+        unity:{detected:state.unity.detected,backend:state.unity.backend,version:state.unity.version},
+        summary:{
+            archiveFiles:state.entries.length,
+            scannedFiles:files.length,
+            candidateFiles:allCandidates.length,
+            totalExtractedStrings:totalStrings,
+            monoAssemblies:files.filter(x=>x.dotnet).length,
+            unityAssetFiles:files.filter(x=>x.unityAsset).length,
+            truncated:allCandidates.length>files.length || totalStrings>=MAX_UNITY_STRINGS,
+            limits:{maxFiles:MAX_UNITY_FILES,maxStrings:MAX_UNITY_STRINGS,maxTypesPerAssembly:5000,maxMethodsPerAssembly:10000,maxFieldsPerAssembly:10000},
+            metadataAvailable:!!metadata
+        },
+        metadata:metadataResult,
+        files,
+        errors
+    };
+}
+
+async function exportUnityExtraction(share=false){
+    setStatus("Preparando extracción Unity...");
+    try{
+        const extraction=await collectUnityExtraction();
+        const json=JSON.stringify(extraction,null,2);
+        if(share){
+            await shareText("Extracción Unity", "unity-extraction.json", json);
+        }else{
+            downloadText("unity-extraction.json",json,"application/json;charset=utf-8");
+            setStatus(`Extracción descargada · ${extraction.summary.totalExtractedStrings} strings`);
+        }
+    }catch(error){
+        setStatus("Error de extracción");
+        showResult(`<div class="note">No se pudo preparar la extracción Unity: ${escapeHTML(error?.message || error)}</div>`);
+    }
+}
 
 function makeUnityReport(){
 
