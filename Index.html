@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="Directorio curado de herramientas para análisis de Unity, .NET, Android y reverse engineering. Descubre recursos y visita sus sitios oficiales.">
+  <title>Metatron Extractor — Directorio de herramientas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#0b1220;--surface:#111b2e;--surface-2:#17243a;--surface-3:#1d2c43;
+      --text:#edf3ff;--muted:#a2afc5;--subtle:#6f7f99;--line:rgba(166,185,213,.14);
+      --accent:#5eead4;--accent-strong:#2dd4bf;--blue:#7dd3fc;--warning:#f6c76a;
+      --shadow:0 18px 55px rgba(0,0,0,.24);--radius:18px;--max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth;scroll-padding-top:24px}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 78% -12%,rgba(45,212,191,.12),transparent 38%),radial-gradient(ellipse at 5% 15%,rgba(56,132,214,.10),transparent 34%),var(--bg);color:var(--text);font-family:'Sora',system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+    button,input{font:inherit}
+    button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid rgba(94,234,212,.8);outline-offset:3px}
+    .container{width:min(var(--max),calc(100% - 40px));margin-inline:auto}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .skip-link{position:absolute;left:12px;top:-60px;padding:10px 14px;background:var(--accent);color:#06211f;border-radius:8px;z-index:10}
+    .skip-link:focus{top:12px}
+    .topbar{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+    .logo{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid rgba(94,234,212,.45);box-shadow:0 0 0 4px rgba(94,234,212,.07)}
+    .brand-name{font:700 1rem 'Chakra Petch',sans-serif;letter-spacing:.1em}
+    .brand-caption{display:block;color:var(--subtle);font-size:.68rem;letter-spacing:.04em;line-height:1.2;margin-top:2px}
+    .topbar-note{color:var(--muted);font-size:.76rem;display:flex;align-items:center;gap:8px}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-strong);box-shadow:0 0 12px rgba(45,212,191,.5)}
+    .hero{padding:76px 0 62px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);align-items:center;gap:54px}
+    .eyebrow{display:flex;align-items:center;gap:10px;color:var(--accent);font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase}
+    .eyebrow:before{content:"";width:24px;height:1px;background:var(--accent)}
+    h1{font:700 clamp(2.4rem,5.6vw,4.5rem)/1.05 'Chakra Petch',sans-serif;letter-spacing:-.035em;margin:18px 0 18px;max-width:760px}
+    h1 span{color:var(--accent)}
+    .hero-copy{max-width:650px;color:var(--muted);font-size:1rem;margin:0}
+    .hero-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:28px}
+    .cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 17px;border-radius:10px;background:var(--accent);color:#06211f;text-decoration:none;font-size:.84rem;font-weight:700;transition:transform .18s,background .18s}
+    .cta:hover{background:#8cf4e6;transform:translateY(-1px)}
+    .hero-caption{color:var(--subtle);font-size:.75rem}
+    .stats-panel{padding:23px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(24,39,62,.9),rgba(14,23,39,.9));box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .stats-panel:after{content:"";position:absolute;width:180px;height:180px;border:1px solid rgba(94,234,212,.12);border-radius:50%;right:-88px;top:-110px;box-shadow:0 0 0 22px rgba(94,234,212,.025),0 0 0 44px rgba(94,234,212,.02)}
+    .panel-label{color:var(--subtle);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px}
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative;z-index:1}
+    .stat{padding:13px 14px;background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:12px}
+    .stat strong{display:block;font:700 1.7rem 'Chakra Petch',sans-serif;color:var(--text)}
+    .stat span{display:block;color:var(--muted);font-size:.71rem;margin-top:2px}
+    .panel-foot{border-top:1px solid var(--line);margin-top:17px;padding-top:14px;color:var(--subtle);font-size:.72rem}
+    main{padding:0 0 68px}
+    .catalog{border-top:1px solid var(--line);padding-top:34px}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:22px}
+    .section-kicker{font-size:.68rem;color:var(--accent);font-weight:700;letter-spacing:.13em;text-transform:uppercase;margin:0 0 5px}
+    h2{font:600 clamp(1.45rem,3vw,2rem)/1.2 'Chakra Petch',sans-serif;margin:0;letter-spacing:-.015em}
+    .section-intro{margin:6px 0 0;color:var(--muted);font-size:.82rem}
+    .count{color:var(--muted);font-size:.76rem;white-space:nowrap}
+    .toolbar{display:grid;grid-template-columns:minmax(240px,1fr) auto;gap:14px;align-items:center;margin:22px 0 16px}
+    .search-box{position:relative;display:flex;align-items:center}
+    .search-box svg{position:absolute;left:15px;width:18px;height:18px;stroke:var(--subtle);fill:none;stroke-width:1.8;pointer-events:none}
+    #search{width:100%;min-height:48px;padding:11px 42px 11px 44px;border:1px solid var(--line);border-radius:11px;background:rgba(17,27,46,.84);color:var(--text);font-size:.84rem;transition:border-color .2s,box-shadow .2s}
+    #search::placeholder{color:var(--subtle)}
+    #search:focus{border-color:rgba(94,234,212,.65);box-shadow:0 0 0 4px rgba(94,234,212,.08);outline:0}
+    #clearSearch{position:absolute;right:9px;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer;font-size:1.2rem;line-height:1}
+    #clearSearch:hover{background:var(--surface-3);color:var(--text)}
+    .filter-label{color:var(--subtle);font-size:.7rem;font-weight:600;white-space:nowrap}
+    .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scrollbar-color:var(--surface-3) transparent}
+    .chip{flex:0 0 auto;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(17,27,46,.72);color:var(--muted);font-size:.72rem;font-weight:600;cursor:pointer;transition:all .16s}
+    .chip:hover{border-color:rgba(94,234,212,.45);color:var(--text)}
+    .chip.active{background:rgba(94,234,212,.11);border-color:rgba(94,234,212,.48);color:var(--accent)}
+    .results-line{min-height:27px;display:flex;align-items:center;justify-content:space-between;color:var(--subtle);font-size:.73rem;margin:5px 0 12px}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .card{min-height:222px;display:flex;flex-direction:column;padding:19px;background:linear-gradient(155deg,rgba(20,32,52,.96),rgba(15,24,40,.96));border:1px solid var(--line);border-radius:15px;transition:transform .18s,border-color .18s,box-shadow .18s}
+    .card:hover{transform:translateY(-3px);border-color:rgba(94,234,212,.38);box-shadow:0 16px 32px rgba(0,0,0,.20)}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+    .type{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .type:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue)}
+    .type.github:before{background:var(--warning)}.type.app:before{background:var(--accent)}
+    .category{max-width:58%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--subtle);font-size:.63rem;text-align:right}
+    .card h3{font:600 1.02rem/1.3 'Chakra Petch',sans-serif;letter-spacing:.005em;margin:0 0 8px;overflow-wrap:anywhere}
+    .card p{color:var(--muted);font-size:.76rem;line-height:1.65;margin:0 0 18px;flex:1}
+    .card-link{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid var(--line);color:var(--accent);font-size:.74rem;font-weight:700;text-decoration:none}
+    .card-link svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;transition:transform .18s}
+    .card-link:hover svg{transform:translate(2px,-2px)}
+    .empty{grid-column:1/-1;padding:48px 18px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+    .notice{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;margin-top:26px;padding:17px 19px;border:1px solid rgba(246,199,106,.2);border-radius:13px;background:rgba(246,199,106,.045)}
+    .notice-icon{width:28px;height:28px;display:grid;place-items:center;border:1px solid rgba(246,199,106,.3);border-radius:8px;color:var(--warning);font-weight:700;font-size:.82rem}
+    .notice strong{display:block;color:#f4d58f;font-size:.76rem;margin-bottom:3px}
+    .notice p{margin:0;color:var(--muted);font-size:.72rem;line-height:1.6}
+    footer{border-top:1px solid var(--line);padding:23px 0 34px;color:var(--subtle);font-size:.7rem}
+    .footer-inner{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    footer strong{color:var(--muted)}
+    @media(max-width:900px){.hero{gap:32px;padding:62px 0 50px}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr}.filter-label{display:none}}
+    @media(max-width:640px){.container{width:min(100% - 28px,var(--max))}.topbar{min-height:66px}.topbar-note{font-size:0}.topbar-note .status-dot{width:9px;height:9px}.hero{grid-template-columns:1fr;padding:48px 0 39px;gap:27px}h1{font-size:clamp(2.4rem,12vw,3.5rem)}.hero-copy{font-size:.89rem}.stats-panel{padding:18px}.stat{padding:10px 12px}.stat strong{font-size:1.45rem}.section-head{align-items:start;flex-direction:column;gap:7px}.grid{grid-template-columns:1fr}.card{min-height:0}.card p{margin-bottom:15px}.catalog{padding-top:28px}.footer-inner{display:block}.footer-inner span{display:block;margin-top:5px}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#catalogo">Ir al catálogo</a>
+  <header class="container">
+    <nav class="topbar" aria-label="Navegación principal">
+      <a class="brand" href="#inicio" aria-label="Metatron Extractor, inicio">
+        <img class="logo" src="data:image/jpeg;base64,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" alt="Logo Metatron Extractor" >
+        <span><span class="brand-name">METATRON EXTRACTOR</span><span class="brand-caption">DIRECTORIO DE HERRAMIENTAS</span></span>
+      </a>
+      <span class="topbar-note"><i class="status-dot" aria-hidden="true"></i> Recursos seleccionados para análisis técnico</span>
+    </nav>
+    <section class="hero" id="inicio" aria-labelledby="hero-title">
+      <div>
+        <div class="eyebrow">Unity · .NET · Android · RE</div>
+        <h1 id="hero-title">Analiza software.<br><span>Encuentra la herramienta.</span></h1>
+        <p class="hero-copy">Un directorio claro de herramientas para explorar código, assets y binarios. Busca por plataforma, tecnología o nombre y visita directamente la fuente de cada proyecto.</p>
+        <div class="hero-actions"><a class="cta" href="#catalogo">Explorar herramientas <span aria-hidden="true">→</span></a><span class="hero-caption">Enlaces a sitios y repositorios oficiales</span></div>
+      </div>
+      <aside class="stats-panel" aria-label="Resumen del directorio">
+        <p class="panel-label">El catálogo</p>
+        <div class="stat-grid">
+          <div class="stat"><strong id="toolTotal">—</strong><span>herramientas</span></div>
+          <div class="stat"><strong id="categoryTotal">—</strong><span>categorías</span></div>
+        </div>
+        <div class="panel-foot">Enlaces externos revisados · última comprobación al preparar esta versión</div>
+      </aside>
+    </section>
+  </header>
+
+  <main class="container">
+    <section class="catalog" id="catalogo" aria-labelledby="catalog-title">
+      <div class="section-head">
+        <div><p class="section-kicker">Directorio</p><h2 id="catalog-title">Catálogo de herramientas</h2><p class="section-intro">Filtra por especialidad o busca una herramienta concreta.</p></div>
+        <span class="count" id="countPill" aria-live="polite">— herramientas</span>
+      </div>
+      <div class="toolbar">
+        <div class="search-box">
+          <label class="sr-only" for="search">Buscar herramientas</label>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+          <input id="search" type="search" autocomplete="off" placeholder="Buscar por nombre, descripción o tecnología…">
+          <button id="clearSearch" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+        </div>
+        <span class="filter-label">FILTRAR POR CATEGORÍA</span>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filtrar por categoría"></div>
+      <div class="results-line"><span id="resultSummary" aria-live="polite">Mostrando todas las herramientas</span><span>Abre los recursos en una pestaña nueva</span></div>
+      <div class="grid" id="grid"></div>
+      <aside class="notice" aria-label="Aviso de uso responsable">
+        <span class="notice-icon" aria-hidden="true">!</span>
+        <div><strong>Uso responsable y privacidad</strong><p>Utiliza estas herramientas solo con software propio, autorización o fines educativos y de investigación permitidos. Revisa la licencia y las leyes aplicables. Antes de subir archivos a un servicio web, considera que su contenido podría quedar expuesto a terceros.</p></div>
+      </aside>
+    </section>
+  </main>
+  <footer><div class="container footer-inner"><strong>Metatron Extractor</strong><span>Directorio independiente; los sitios enlazados pertenecen a sus respectivos autores.</span></div></footer>
+
+  <script>
+  (function(){
+    var TOOLS = [
+    {name:"Decompiler.com · Unity", url:"https://www.decompiler.com/unity", desc:"Sube APK / .unity3d / .assets / .bundle: extrae assets y código C# (Mono) o dump.cs + stubs (IL2CPP). Gratis, hasta 512 MB.", cat:"Web (subir archivo)", type:"web"},
+    {name:"Decompiler.com · DLL", url:"https://www.decompiler.com/dll", desc:"Descompila .dll / .exe .NET a proyecto C# completo, online y sin instalar nada.", cat:"Web (subir archivo)", type:"web"},
+    {name:"Decompiler.com · APK", url:"https://www.decompiler.com/apk", desc:"Descompila APK (Java + recursos) y detecta/analiza el payload Unity incluido.", cat:"Web (subir archivo)", type:"web"},
+    {name:"Omnvert EXE Decompiler", url:"https://omnvert.com/en/tools/exe-decompiler", desc:"Online: .NET exe/dll, Java .jar/.class y binarios PyInstaller de vuelta a código fuente.", cat:"Web (subir archivo)", type:"web"},
+    {name:"Java Decompilers · APK", url:"https://www.javadecompilers.com/apk", desc:"Sube un APK y obtén el código Java de la parte Android (no el motor Unity).", cat:"Web (subir archivo)", type:"web"},
+    {name:"APKLint Unity Analyzer", url:"https://apklint.com/decompile-unity-apk/", desc:"Analiza el APK en el navegador: detecta si es Unity, si es Mono o IL2CPP y qué SDKs integra.", cat:"Web (subir archivo)", type:"web"},
+
+    {name:"dnSpyEx", url:"https://github.com/dnSpyEx/dnSpy", desc:"El clásico revivido: descompila .NET / Unity Mono a C#, depura adjuntado al juego y edita el código.", cat:".NET / Mono (C#)", type:"github"},
+    {name:"ILSpy", url:"https://github.com/icsharpcode/ILSpy", desc:"Descompilador .NET libre, gratuito y multiplataforma (Windows / macOS / Linux).", cat:".NET / Mono (C#)", type:"github"},
+    {name:"JetBrains dotPeek", url:"https://www.jetbrains.com/decompiler/", desc:"Descompilador .NET gratuito y muy pulido. Solo Windows.", cat:".NET / Mono (C#)", type:"app"},
+
+    {name:"Il2CppDumper", url:"https://github.com/Perfare/Il2CppDumper", desc:"Estándar para IL2CPP: extrae clases, métodos, strings y genera DummyDll + scripts para Ghidra/IDA. Tiene GUI.", cat:"Unity IL2CPP", type:"github"},
+    {name:"Il2CppInspector", url:"https://github.com/djkaty/Il2CppInspector", desc:"Análisis automático de binarios IL2CPP; genera andamiaje y stubs para IDA y Ghidra.", cat:"Unity IL2CPP", type:"github"},
+    {name:"Cpp2IL", url:"https://github.com/SamboyCoding/Cpp2IL", desc:"Intenta reconstruir pseudo-C# de más alto nivel y assemblies dummy desde IL2CPP.", cat:"Unity IL2CPP", type:"github"},
+    {name:"Zygisk-Il2CppDumper", url:"https://github.com/Perfare/Zygisk-Il2CppDumper", desc:"Extrae la metadata incluso si está encriptada, volcándola en vivo desde memoria (Android con root).", cat:"Unity IL2CPP", type:"github"},
+
+    {name:"AssetRipper", url:"https://github.com/AssetRipper/AssetRipper", desc:"El más completo: GUI multiplataforma que extrae assets e intenta reconstruir un proyecto Unity abrible.", cat:"Assets de Unity", type:"github"},
+    {name:"AssetStudio", url:"https://github.com/Perfare/AssetStudio", desc:"GUI (Windows) para explorar y exportar por tipo: texturas, modelos, audio, shaders, MonoBehaviour.", cat:"Assets de Unity", type:"github"},
+    {name:"UABEA (UABE Avalonia)", url:"https://github.com/nesrak1/UABEA", desc:"Sucesor del viejo UABE: edita y reemplaza assets dentro de bundles. Multiplataforma.", cat:"Assets de Unity", type:"github"},
+    {name:"UnityPy", url:"https://github.com/K0lb3/UnityPy", desc:"Librería/CLI en Python para extracción de assets por lotes o en scripts propios.", cat:"Assets de Unity", type:"github"},
+
+    {name:"JADX (jadx-gui)", url:"https://github.com/skylot/jadx", desc:"El mejor descompilador APK → Java, con GUI multiplataforma, buscador y desofuscador incluido.", cat:"APK / Android", type:"github"},
+    {name:"Apktool", url:"https://github.com/iBotPeaches/Apktool", desc:"Extrae recursos y descompila a smali; permite recompilar después de modificar.", cat:"APK / Android", type:"github"},
+    {name:"Bytecode-Viewer", url:"https://github.com/Konloch/bytecode-viewer", desc:"GUI que combina varios decompiladores Java/Android a la vez para comparar salidas.", cat:"APK / Android", type:"github"},
+
+    {name:"Ghidra", url:"https://github.com/NationalSecurityAgency/ghidra", desc:"Suite de reverse engineering gratuita de la NSA. Imprescindible para ver el código nativo de IL2CPP.", cat:"Desensambladores / RE", type:"github"},
+    {name:"Cutter", url:"https://github.com/rizinorg/cutter", desc:"GUI libre sobre rizin: alternativa más ligera y moderna a Ghidra/IDA.", cat:"Desensambladores / RE", type:"github"},
+    {name:"x64dbg", url:"https://github.com/x64dbg/x64dbg", desc:"Debugger dinámico para Windows: analiza el juego o programa mientras corre.", cat:"Desensambladores / RE", type:"github"},
+
+    {name:"Detect It Easy (DiE)", url:"https://github.com/horsicq/Detect-It-Easy", desc:"Primer paso: arrastra el archivo y te dice con qué se compiló y si está protegido/ofuscado.", cat:"Identificar / Desofuscar", type:"github"},
+    {name:"de4dot", url:"https://github.com/0xd4d/de4dot", desc:"Limpia ofuscación .NET (Confuser, .NET Reactor, SmartAssembly, Eazfuscator…) antes de descompilar.", cat:"Identificar / Desofuscar", type:"github"},
+
+    {name:"BepInEx", url:"https://github.com/BepInEx/BepInEx", desc:"Framework de mods para Unity (Mono e IL2CPP): inyecta código y hookea funciones en runtime.", cat:"Modding / En vivo", type:"github"},
+    {name:"MelonLoader", url:"https://github.com/LavaGang/MelonLoader", desc:"Framework de mods alternativo para juegos Unity.", cat:"Modding / En vivo", type:"github"},
+    {name:"UnityExplorer", url:"https://github.com/yukieiji/UnityExplorer", desc:"Panel dentro del juego: navega por objetos, componentes y valores en tiempo real.", cat:"Modding / En vivo", type:"github"},
+    {name:"Frida", url:"https://github.com/frida/frida", desc:"Hooking dinámico en Android, iOS y PC: intercepta y modifica llamadas mientras corre.", cat:"Modding / En vivo", type:"github"}
+  ];
+    var TYPE_LABEL = {web:"Servicio web",github:"Código abierto",app:"Aplicación"};
+    var grid=document.getElementById("grid"),filtersEl=document.getElementById("filters"),searchEl=document.getElementById("search"),clearSearch=document.getElementById("clearSearch"),countPill=document.getElementById("countPill"),resultSummary=document.getElementById("resultSummary");
+    var categories=[];
+    TOOLS.forEach(function(tool){if(categories.indexOf(tool.cat)===-1)categories.push(tool.cat);});
+    document.getElementById("toolTotal").textContent=TOOLS.length;
+    document.getElementById("categoryTotal").textContent=categories.length;
+    var activeCategory="Todas",query="";
+    ["Todas"].concat(categories).forEach(function(category){
+      var button=document.createElement("button");
+      button.type="button";button.className="chip"+(category==="Todas"?" active":"");button.textContent=category;button.setAttribute("aria-pressed",category==="Todas"?"true":"false");
+      button.addEventListener("click",function(){activeCategory=category;renderFilters();render();});
+      filtersEl.appendChild(button);
+    });
+    function renderFilters(){Array.prototype.forEach.call(filtersEl.children,function(button){var selected=button.textContent===activeCategory;button.classList.toggle("active",selected);button.setAttribute("aria-pressed",selected?"true":"false");});}
+    function makeExternalIcon(){var svg=document.createElementNS("http://www.w3.org/2000/svg","svg");svg.setAttribute("viewBox","0 0 24 24");svg.setAttribute("aria-hidden","true");var path=document.createElementNS("http://www.w3.org/2000/svg","path");path.setAttribute("d","M14 3h7v7M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5");svg.appendChild(path);return svg;}
+    function makeCard(tool){
+      var article=document.createElement("article");article.className="card";
+      var head=document.createElement("div");head.className="card-head";
+      var type=document.createElement("span");type.className="type "+tool.type;type.textContent=TYPE_LABEL[tool.type]||"Recurso";
+      var category=document.createElement("span");category.className="category";category.textContent=tool.cat;
+      head.appendChild(type);head.appendChild(category);
+      var title=document.createElement("h3");title.textContent=tool.name;
+      var desc=document.createElement("p");desc.textContent=tool.desc;
+      var link=document.createElement("a");link.className="card-link";link.href=tool.url;link.target="_blank";link.rel="noopener noreferrer";link.setAttribute("aria-label","Abrir "+tool.name+" en una pestaña nueva");
+      var label=document.createElement("span");label.textContent="Visitar sitio oficial";link.appendChild(label);link.appendChild(makeExternalIcon());
+      article.appendChild(head);article.appendChild(title);article.appendChild(desc);article.appendChild(link);return article;
+    }
+    function render(){
+      var q=query.trim().toLocaleLowerCase("es");
+      var list=TOOLS.filter(function(tool){var matchesCategory=activeCategory==="Todas"||tool.cat===activeCategory;var haystack=(tool.name+" "+tool.desc+" "+tool.cat).toLocaleLowerCase("es");return matchesCategory&&(!q||haystack.indexOf(q)!==-1);});
+      countPill.textContent=list.length+" de "+TOOLS.length+" herramientas";
+      resultSummary.textContent=(q||activeCategory!=="Todas")?"Resultados para los filtros seleccionados":"Mostrando todas las herramientas";
+      grid.replaceChildren();
+      if(!list.length){var empty=document.createElement("div");empty.className="empty";empty.textContent="No encontramos herramientas con esos términos. Prueba otra búsqueda o categoría.";grid.appendChild(empty);return;}
+      list.forEach(function(tool){grid.appendChild(makeCard(tool));});
+    }
+    searchEl.addEventListener("input",function(){query=searchEl.value;clearSearch.hidden=!query;render();});
+    clearSearch.addEventListener("click",function(){searchEl.value="";query="";clearSearch.hidden=true;searchEl.focus();render();});
+    render();
+  })();
+  </script>
+</body>
+</html>
