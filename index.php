@@ -1,71 +1,21 @@
 <?php
 declare(strict_types=1);
 
-// Cambia estos valores por los de tu cuenta de cPanel:
-const WEBHOOK_SECRET = 'REEMPLAZA_ESTO_POR_UN_SECRETO_ALEATORIO_LARGO';
-const REPO_DIR       = '/home/TU_USUARIO/repositories/TU_REPOSITORIO';
-const SITE_DIR       = '/home/TU_USUARIO/public_html';
-const BRANCH         = 'main';
+// Reemplaza USUARIO_CPANEL por el usuario real de tu cuenta cPanel.
+const REPO_DIR     = '/home/USUARIO_CPANEL/repositories/1winxmetatronkey';
+const SITE_DIR     = '/home/USUARIO_CPANEL/public_html';
+const SECRET_FILE  = '/home/USUARIO_CPANEL/.github-webhook-secret.php';
 
-const GIT_BIN   = '/usr/bin/git';
-const RSYNC_BIN = '/usr/bin/rsync';
+const GITHUB_REPO  = 'isaacmtz123490po-arch/1winxmetatronkey';
+const BRANCH       = 'main';
+const GIT_BIN      = '/usr/bin/git';
+const RSYNC_BIN    = '/usr/bin/rsync';
 
 function respond(int \(status, string \)message): void
 {
     http_response_code($status);
     header('Content-Type: text/plain; charset=utf-8');
     exit($message);
-}
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    respond(405, 'Solo se aceptan avisos POST.');
-}
-
-if (WEBHOOK_SECRET === 'REEMPLAZA_ESTO_POR_UN_SECRETO_ALEATORIO_LARGO') {
-    respond(500, 'Falta configurar el secreto del webhook.');
-}
-
-if (!function_exists('exec')) {
-    respond(500, 'El hosting no permite ejecutar Git desde PHP.');
-}
-
-$body = file_get_contents('php://input');
-\(signature = \)_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
-
-if (!is_string(\(body) || \)body === '' || $signature === '') {
-    respond(400, 'Aviso incompleto.');
-}
-
-\(expected = 'sha256=' . hash_hmac('sha256', \)body, WEBHOOK_SECRET);
-
-if (!hash_equals(\(expected, \)signature)) {
-    respond(403, 'Firma no válida.');
-}
-
-\(event = \)_SERVER['HTTP_X_GITHUB_EVENT'] ?? '';
-\(payload = json_decode(\)body, true);
-
-if ($event === 'ping') {
-    respond(200, 'Webhook conectado.');
-}
-
-if (\(event !== 'push' || !is_array(\)payload)) {
-    respond(202, 'Evento ignorado.');
-}
-
-if (($payload['ref'] ?? '') !== 'refs/heads/' . BRANCH) {
-    respond(202, 'Rama ignorada.');
-}
-
-$repo = realpath(REPO_DIR);
-$site = realpath(SITE_DIR);
-
-if (\(repo === false || \)site === false || !is_dir(\(repo) || !is_dir(\)site)) {
-    respond(500, 'Revisa las rutas configuradas en el archivo.');
-}
-
-if (!is_executable(GIT_BIN) || !is_executable(RSYNC_BIN)) {
-    respond(500, 'Git o rsync no está disponible en esa ruta.');
 }
 
 function runCommand(array $args): int
@@ -78,29 +28,104 @@ function runCommand(array $args): int
     return $status;
 }
 
-// Actualiza la copia del repositorio que ya está en cPanel.
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+    respond(200, 'Webhook listo.');
+}
+
+if (!is_readable(SECRET_FILE)) {
+    respond(500, 'No se encuentra el archivo del secreto.');
+}
+
+$secret = require SECRET_FILE;
+if (!is_string(\(secret) || \)secret === '') {
+    respond(500, 'El secreto del webhook no está configurado.');
+}
+
+$body = file_get_contents('php://input');
+\(signature = \)_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? '';
+
+if (!is_string(\(body) || \)body === '' || $signature === '') {
+    respond(400, 'Aviso incompleto.');
+}
+
+\(expectedSignature = 'sha256=' . hash_hmac('sha256', \)body, $secret);
+if (!hash_equals(\(expectedSignature, \)signature)) {
+    respond(403, 'Firma no válida.');
+}
+
+\(event = \)_SERVER['HTTP_X_GITHUB_EVENT'] ?? '';
+
+if ($event === 'ping') {
+    respond(200, 'Webhook conectado.');
+}
+
+\(payload = json_decode(\)body, true);
+
+if (\(event !== 'push' || !is_array(\)payload)) {
+    respond(202, 'Evento ignorado.');
+}
+
+if (($payload['repository']['full_name'] ?? '') !== GITHUB_REPO) {
+    respond(202, 'Repositorio ignorado.');
+}
+
+if (($payload['ref'] ?? '') !== 'refs/heads/' . BRANCH) {
+    respond(202, 'Rama ignorada.');
+}
+
+$repo = realpath(REPO_DIR);
+$site = realpath(SITE_DIR);
+
+if (\(repo === false || \)site === false || !is_dir(\(repo) || !is_dir(\)site)) {
+    respond(500, 'Revisa las rutas configuradas y que las carpetas existan.');
+}
+
+// Evita que --delete pueda borrar el repositorio por una ruta mal configurada.
+\(repoPath = rtrim(\)repo, DIRECTORY_SEPARATOR);
+\(sitePath = rtrim(\)site, DIRECTORY_SEPARATOR);
+
+if (
+    \(repoPath === \)sitePath
+    || strpos(\(repoPath . DIRECTORY_SEPARATOR, \)sitePath . DIRECTORY_SEPARATOR) === 0
+    || strpos(\(sitePath . DIRECTORY_SEPARATOR, \)repoPath . DIRECTORY_SEPARATOR) === 0
+) {
+    respond(500, 'La carpeta del repositorio y la del sitio no pueden superponerse.');
+}
+
+if (
+    !function_exists('exec')
+    || !is_executable(GIT_BIN)
+    || !is_executable(RSYNC_BIN)
+) {
+    respond(500, 'El hosting no tiene disponibles Git, rsync o exec.');
+}
+
 if (runCommand([
-    GIT_BIN, '-C', $repo, 'pull', '--ff-only', 'origin', BRANCH
+    GIT_BIN,
+    '-C',
+    $repo,
+    'pull',
+    '--ff-only',
+    'origin',
+    BRANCH,
 ]) !== 0) {
     error_log('Falló git pull del webhook.');
     respond(500, 'Falló la actualización del repositorio.');
 }
 
-// Copia los archivos al sitio. No borra archivos existentes.
-\(source = rtrim(\)repo, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-\(destination = rtrim(\)site, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+\(source = \)repoPath . DIRECTORY_SEPARATOR;
+\(destination = \)sitePath . DIRECTORY_SEPARATOR;
 
 if (runCommand([
     RSYNC_BIN,
     '-a',
+    '--delete',
     '--exclude=.git',
     '--exclude=.env',
-    '--exclude=github-webhook.php',
-    '--exclude=.cpanel.yml',
     $source,
-    $destination
+    $destination,
 ]) !== 0) {
-    error_log('Falló la copia de archivos del webhook.');
+    error_log('Falló la copia del webhook.');
     respond(500, 'Falló la copia al sitio.');
 }
 
