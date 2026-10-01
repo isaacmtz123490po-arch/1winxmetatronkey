@@ -40,7 +40,7 @@ mkdir mi-aplicacion && cd mi-aplicacion
   "main": "app.js",
   "scripts": { "start": "node app.js" },
   "dependencies": { "express": "^4.19.2" },
-  "license": "MIT"
+  "license": "APPLE_LICENSE"
 }
 ```
 
