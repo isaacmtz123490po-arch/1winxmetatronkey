@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="banner.gif" alt="mrtatron server" width="100%">
+  <img src="1.gif" alt="mrtatron server" width="100%">
 </p>
 
 <h1 align="center">🚀 mrtatron server</h1>
